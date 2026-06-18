@@ -1,0 +1,11 @@
+{
+  "name": "DOFFA",
+  "symbol": "DOFFA",
+  "description": "DOFFA — кофейня (espresso bar) из аула Псаучье-Дахе, Карачаево-Черкесия. Каждая проданная чашка сжигает один токен $DOFFA: предложение тает, дефицит растёт. Утилити-токен, связанный с реальной кофейней. Не является ценной бумагой, инвестицией или обещанием дохода.",
+  "image": "https://doffa-site.vercel.app/token/logo.png",
+  "external_url": "https://doffa-site.vercel.app",
+  "properties": {
+    "files": [{ "uri": "https://doffa-site.vercel.app/token/logo.png", "type": "image/png" }],
+    "category": "image"
+  }
+}
