@@ -57,12 +57,15 @@ export default function Home() {
   const burnedPct = (MOCK.burned / TOKEN.supply) * 100;
 
   const nav: { id: string; label: string }[] = [
-    { id: "story", label: t.nav.story },
-    { id: "how", label: t.nav.how },
-    { id: "token", label: t.nav.token },
-    { id: "burns", label: t.nav.burns },
-    { id: "menu", label: t.nav.menu },
-    { id: "buy", label: t.nav.buy },
+    { id: "story",   label: t.nav.story },
+    { id: "how",     label: t.nav.how },
+    { id: "token",   label: t.nav.token },
+    { id: "burns",   label: t.nav.burns },
+    { id: "menu",    label: t.nav.menu },
+    { id: "buy",     label: t.nav.buy },
+    { id: "roadmap", label: t.nav.roadmap },
+    { id: "faq",     label: t.nav.faq },
+    { id: "contact", label: t.nav.contact },
   ];
 
   return (
@@ -76,9 +79,9 @@ export default function Home() {
               DOFFA<span className="text-teal">.</span>
             </span>
           </a>
-          <nav className="hidden items-center gap-6 lg:flex">
+          <nav className="hidden items-center gap-4 xl:gap-5 lg:flex">
             {nav.map((n) => (
-              <a key={n.id} href={`#${n.id}`} className="text-sm text-cream/70 transition hover:text-gold">
+              <a key={n.id} href={`#${n.id}`} className="text-xs xl:text-sm text-cream/70 transition hover:text-gold">
                 {n.label}
               </a>
             ))}
@@ -125,6 +128,11 @@ export default function Home() {
         <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/55 to-ink/30" />
         <div className="absolute inset-0 bg-ink/20" />
         <div className="absolute -left-40 top-1/3 h-96 w-96 rounded-full bg-amber/20 blur-[120px]" />
+        {/* эффект пара */}
+        <div className="steam" />
+        <div className="steam s2" />
+        <div className="steam s3" />
+        <div className="steam s4" />
 
         <div className="relative mx-auto w-full max-w-6xl px-5 pb-20 pt-28">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
@@ -161,14 +169,15 @@ export default function Home() {
 
       {/* ---------- MARQUEE ---------- */}
       <div className="overflow-hidden border-y border-white/5 bg-espresso-deep/40 py-3">
-        <div className="display flex gap-10 whitespace-nowrap px-5 text-sm uppercase tracking-[0.3em] text-cream/40">
-          {Array.from({ length: 2 }).map((_, i) => (
-            <span key={i} className="flex gap-10">
+        <div className="marquee-track">
+          {[0, 1].map((i) => (
+            <span key={i} className="display inline-flex shrink-0 items-center gap-10 px-10 text-sm uppercase tracking-[0.3em] text-cream/40">
               <span>1 чашка = 1 токен</span><span className="text-teal">·</span>
               <span>Since 2021</span><span className="text-teal">·</span>
               <span>Solana SPL</span><span className="text-teal">·</span>
               <span>Deflationary</span><span className="text-teal">·</span>
               <span>Halal spirit</span><span className="text-teal">·</span>
+              <span>DOFFA</span><span className="text-teal">·</span>
             </span>
           ))}
         </div>
@@ -290,13 +299,32 @@ export default function Home() {
 
       {/* ---------- MENU ---------- */}
       <Section id="menu">
-        <div className="relative overflow-hidden rounded-3xl">
-          <Image src="/brand/cafe-night-1.png" alt="DOFFA" width={1200} height={800} className="h-72 w-full object-cover sm:h-96" />
-          <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/60 to-transparent" />
-          <div className="absolute bottom-0 p-8">
+        <Reveal>
+          <div className="text-center">
             <Tag>{t.menu.tag}</Tag>
-            <h2 className="display mt-4 text-4xl font-bold text-cream-soft">{t.menu.title}</h2>
-            <p className="mt-3 max-w-md text-cream/75">{t.menu.sub}</p>
+            <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.menu.title}</h2>
+          </div>
+        </Reveal>
+        <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {t.menu.items.map((item, i) => (
+            <Reveal key={item.name} delay={i * 0.06}>
+              <div className="card h-full rounded-2xl p-5">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <p className="display font-bold text-cream-soft">{item.name}</p>
+                    <p className="mt-1 text-xs text-cream/55">{item.desc}</p>
+                  </div>
+                  <span className="display shrink-0 text-sm font-bold text-gold">{item.price}</span>
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+        <div className="relative mt-8 overflow-hidden rounded-3xl">
+          <Image src="/brand/cafe-night-1.png" alt="DOFFA" width={1200} height={800} className="h-48 w-full object-cover sm:h-64" />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/80 to-transparent" />
+          <div className="absolute bottom-0 left-0 p-6">
+            <p className="text-xs text-cream/50">{t.menu.sub}</p>
           </div>
         </div>
       </Section>

@@ -27,7 +27,7 @@ type Dict = {
   how: { tag: string; title: string; sub: string; steps: { t: string; d: string }[] };
   token: { tag: string; title: string; sub: string; rows: { k: string; v: string }[]; alloc: { name: string; pct: number }[] };
   burns: { tag: string; title: string; supply: string; burned: string; left: string; cups: string; note: string };
-  menu: { tag: string; title: string; sub: string };
+  menu: { tag: string; title: string; sub: string; items: { name: string; desc: string; price: string }[] };
   buy: { tag: string; title: string; sub: string; connect: string; soon: string; points: string[] };
   roadmap: { tag: string; title: string; phases: { n: string; t: string; d: string; done?: boolean }[] };
   faq: { tag: string; title: string; items: { q: string; a: string }[] };
@@ -96,7 +96,21 @@ export const dict: Record<Lang, Dict> = {
       cups: "Продано чашек",
       note: "Демо-данные до запуска токена. После mainnet здесь будут реальные цифры из блокчейна.",
     },
-    menu: { tag: "Кофейня", title: "Меню", sub: "Скоро добавим полное меню с ценами и фотографиями напитков из DOFFA." },
+    menu: {
+      tag: "Кофейня",
+      title: "Меню",
+      sub: "Цены ориентировочные — уточняются у владельца.",
+      items: [
+        { name: "Эспрессо",       desc: "Двойной шот, 60 мл",               price: "150 ₽" },
+        { name: "Американо",      desc: "Эспрессо + вода, 200 мл",           price: "170 ₽" },
+        { name: "Капучино",       desc: "Эспрессо + молочная пенка, 200 мл", price: "220 ₽" },
+        { name: "Флэт Уайт",      desc: "Двойной шот + молоко, 180 мл",      price: "230 ₽" },
+        { name: "Латте",          desc: "Эспрессо + молоко, 300 мл",         price: "230 ₽" },
+        { name: "Раф",            desc: "Сливки + ваниль + эспрессо, 200 мл",price: "260 ₽" },
+        { name: "Матча Латте",    desc: "Матча + молоко, 300 мл",            price: "270 ₽" },
+        { name: "Фильтр",         desc: "Альтернативная заварка, 300 мл",    price: "200 ₽" },
+      ],
+    },
     buy: {
       tag: "Купить и хранить",
       title: "Купить $DOFFA",
@@ -204,7 +218,21 @@ export const dict: Record<Lang, Dict> = {
       cups: "Cups sold",
       note: "Demo data before token launch. After mainnet these will be real on-chain numbers.",
     },
-    menu: { tag: "Coffee bar", title: "Menu", sub: "Full menu with prices and drink photos from DOFFA coming soon." },
+    menu: {
+      tag: "Coffee bar",
+      title: "Menu",
+      sub: "Prices are indicative — to be confirmed by the owner.",
+      items: [
+        { name: "Espresso",       desc: "Double shot, 60 ml",              price: "150 ₽" },
+        { name: "Americano",      desc: "Espresso + water, 200 ml",        price: "170 ₽" },
+        { name: "Cappuccino",     desc: "Espresso + milk foam, 200 ml",    price: "220 ₽" },
+        { name: "Flat White",     desc: "Double shot + milk, 180 ml",      price: "230 ₽" },
+        { name: "Latte",          desc: "Espresso + milk, 300 ml",         price: "230 ₽" },
+        { name: "Raf",            desc: "Cream + vanilla + espresso, 200 ml", price: "260 ₽" },
+        { name: "Matcha Latte",   desc: "Matcha + milk, 300 ml",           price: "270 ₽" },
+        { name: "Filter",         desc: "Alternative brew, 300 ml",        price: "200 ₽" },
+      ],
+    },
     buy: {
       tag: "Buy & hold",
       title: "Buy $DOFFA",
