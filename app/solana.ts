@@ -16,6 +16,11 @@ export function solscanToken(): string {
   return `https://solscan.io/token/${CHAIN.mint}${suffix}`;
 }
 
+export function solscanTx(sig: string): string {
+  const suffix = CHAIN.cluster === "devnet" ? "?cluster=devnet" : "";
+  return `https://solscan.io/tx/${sig}${suffix}`;
+}
+
 async function rpc<T>(method: string, params: unknown[]): Promise<T> {
   const res = await fetch(CHAIN.rpc, {
     method: "POST",
@@ -45,6 +50,119 @@ export async function fetchBalance(owner: string): Promise<number> {
   }
   return total;
 }
+
+/* ---------- Burn history from on-chain memos ---------- */
+
+export const BURN_MEMO_PREFIX = "DOFFA coffee burn |";
+const MEMO_PROGRAM = "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr";
+const MEMO_PROGRAM_V1 = "Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo";
+
+export type BurnRecord = {
+  sig: string;
+  blockTime: number | null;
+  amount: number;   // токенов сожжено (UI amount)
+  saleId: string;
+  receiptHash: string;
+  rawMemo: string;
+};
+
+type TxIx = {
+  programId: string;
+  parsed?: string | Record<string, unknown>;
+  data?: string;
+  accounts?: string[];
+};
+
+type TxMeta = {
+  preTokenBalances?: { mint: string; uiTokenAmount: { uiAmount: number | null } }[];
+  postTokenBalances?: { mint: string; uiTokenAmount: { uiAmount: number | null } }[];
+  innerInstructions?: { index: number; instructions: TxIx[] }[];
+} | null;
+
+type SolTx = {
+  blockTime: number | null;
+  meta: TxMeta;
+  transaction: { message: { instructions: TxIx[] } };
+} | null;
+
+function extractMemo(tx: SolTx): string {
+  if (!tx) return "";
+  const allIxs: TxIx[] = [
+    ...(tx.transaction.message.instructions ?? []),
+    ...(tx.meta?.innerInstructions?.flatMap((ii) => ii.instructions) ?? []),
+  ];
+  for (const ix of allIxs) {
+    if (ix.programId !== MEMO_PROGRAM && ix.programId !== MEMO_PROGRAM_V1) continue;
+    if (typeof ix.parsed === "string") return ix.parsed;
+    // fallback: base64-decode ix.data
+    if (typeof ix.data === "string") {
+      try {
+        // ix.data is base58 or base64 depending on encoding
+        return Buffer.from(ix.data, "base64").toString("utf8");
+      } catch {
+        return ix.data;
+      }
+    }
+  }
+  return "";
+}
+
+function burnedFromTx(tx: SolTx): number {
+  if (!tx?.meta) return 0;
+  const pre = tx.meta.preTokenBalances ?? [];
+  const post = tx.meta.postTokenBalances ?? [];
+  const preSum = pre.filter((b) => b.mint === CHAIN.mint).reduce((s, b) => s + (b.uiTokenAmount.uiAmount ?? 0), 0);
+  const postSum = post.filter((b) => b.mint === CHAIN.mint).reduce((s, b) => s + (b.uiTokenAmount.uiAmount ?? 0), 0);
+  return Math.max(preSum - postSum, 0);
+}
+
+/**
+ * Последние сожжения с on-chain мемо "DOFFA coffee burn | sale_id | receipt_hash".
+ * Читает напрямую из блокчейна — данные невозможно подделать на уровне сайта.
+ */
+export async function fetchBurnHistory(limit = 15): Promise<BurnRecord[]> {
+  type SigInfo = { signature: string; slot: number; blockTime: number | null };
+  const sigs = await rpc<SigInfo[]>("getSignaturesForAddress", [CHAIN.mint, { limit: 50 }]);
+
+  // Параллельно загружаем транзакции, чтобы не ждать по одной
+  const txResults = await Promise.allSettled(
+    sigs.map((s) =>
+      rpc<SolTx>("getTransaction", [
+        s.signature,
+        { encoding: "jsonParsed", maxSupportedTransactionVersion: 0 },
+      ]).then((tx) => ({ sig: s.signature, blockTime: s.blockTime, tx })),
+    ),
+  );
+
+  const records: BurnRecord[] = [];
+
+  for (const r of txResults) {
+    if (r.status !== "fulfilled") continue;
+    const { sig, blockTime, tx } = r.value;
+    if (!tx) continue;
+
+    const memo = extractMemo(tx);
+    if (!memo.startsWith(BURN_MEMO_PREFIX)) continue;
+
+    const parts = memo.split("|").map((p) => p.trim());
+    const amount = burnedFromTx(tx);
+
+    records.push({
+      sig,
+      blockTime: blockTime ?? tx.blockTime,
+      amount,
+      saleId: parts[1] ?? "",
+      receiptHash: parts[2] ?? "",
+      rawMemo: memo,
+    });
+
+    if (records.length >= limit) break;
+  }
+
+  return records;
+}
+
+/* ---------- Phantom wallet ---------- */
 
 type PhantomProvider = {
   isPhantom?: boolean;

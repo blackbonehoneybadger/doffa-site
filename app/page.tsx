@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView, useMotionValue, animate } from "framer-motion";
 import { dict, TOKEN, MOCK, CONTACT, GALLERY, VIDEOS, type Lang } from "./content";
-import { CHAIN, solscanToken, fetchSupply, fetchBalance, getPhantom } from "./solana";
+import { CHAIN, solscanToken, solscanTx, fetchSupply, fetchBalance, fetchBurnHistory, getPhantom, type BurnRecord } from "./solana";
 
 // Главный ролик в hero — без вшитых субтитров. Лежит в public/brand/hero.mp4.
 const HERO_VIDEO: string | null = "/brand/hero.mp4";
@@ -64,6 +64,14 @@ export default function Home() {
       .catch(() => setLiveSupply(null));
   }, []);
 
+  // История сжиганий — читается напрямую из Solana (мемо "DOFFA coffee burn | ...").
+  const [burns, setBurns] = useState<BurnRecord[] | null>(null);
+  useEffect(() => {
+    fetchBurnHistory(15)
+      .then(setBurns)
+      .catch(() => setBurns([]));
+  }, []);
+
   const isLive = liveSupply !== null;
   const burned = isLive ? Math.max(CHAIN.initialSupply - liveSupply!, 0) : MOCK.burned;
   const remaining = isLive ? liveSupply! : TOKEN.supply - MOCK.burned;
@@ -104,6 +112,7 @@ export default function Home() {
     { id: "how",     label: t.nav.how },
     { id: "token",   label: t.nav.token },
     { id: "burns",   label: t.nav.burns },
+    { id: "proof",   label: t.nav.proof },
     { id: "menu",    label: t.nav.menu },
     { id: "gallery", label: t.nav.gallery },
     { id: "buy",     label: t.nav.buy },
@@ -430,6 +439,121 @@ export default function Home() {
         </Reveal>
       </Section>
 
+      {/* ---------- PROOF DASHBOARD ---------- */}
+      <Section id="proof">
+        <Reveal>
+          <div className="text-center">
+            <Tag>{t.proof.tag}</Tag>
+            <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.proof.title}</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-cream/70">{t.proof.sub}</p>
+          </div>
+        </Reveal>
+
+        {/* Таблица истории сжиганий */}
+        <Reveal>
+          <div className="mt-10 overflow-hidden rounded-2xl border border-white/10">
+            {/* header */}
+            <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-3 border-b border-white/10 bg-white/[0.03] px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-cream/40">
+              <span>{t.proof.colTime}</span>
+              <span className="text-right">{t.proof.colAmount}</span>
+              <span className="hidden text-right sm:block">{t.proof.colSale}</span>
+              <span className="text-right">{t.proof.colHash}</span>
+              <span className="text-right">{t.proof.colVerify}</span>
+            </div>
+
+            {/* rows */}
+            {burns === null ? (
+              <div className="flex items-center justify-center gap-2 px-5 py-12 text-sm text-cream/40">
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-teal/40 border-t-teal" />
+                {t.proof.loading}
+              </div>
+            ) : burns.length === 0 ? (
+              <div className="px-5 py-12 text-center text-sm text-cream/40">{t.proof.empty}</div>
+            ) : (
+              burns.map((b, i) => (
+                <BurnRow key={b.sig} burn={b} even={i % 2 === 0} verifyLabel={t.proof.colVerify} />
+              ))
+            )}
+          </div>
+        </Reveal>
+
+        {/* Предупреждение при несовпадении */}
+        {burns && burns.length > 0 && isLive && burns.length !== burned && (
+          <Reveal>
+            <div className="mt-5 flex items-start gap-3 rounded-xl border border-amber/40 bg-amber/10 px-5 py-4 text-sm text-amber">
+              <span className="mt-0.5 shrink-0">⚠</span>
+              <div>
+                <p className="font-semibold">{t.proof.mismatchWarn}</p>
+                <p className="mt-1 text-xs text-amber/70">
+                  {lang === "ru"
+                    ? `Solana: ${burned.toLocaleString("ru-RU")} сожжено · On-chain мемо: ${burns.length} записей`
+                    : `Solana: ${burned.toLocaleString("en-US")} burned · On-chain memos: ${burns.length} records`}
+                </p>
+              </div>
+            </div>
+          </Reveal>
+        )}
+
+        {/* Блок объяснения системы доверия */}
+        <div className="mt-20">
+          <Reveal>
+            <div className="text-center">
+              <Tag>{t.proof.trustTag}</Tag>
+              <h3 className="display mt-5 text-3xl font-bold text-cream-soft sm:text-4xl">{t.proof.trustTitle}</h3>
+              <p className="mx-auto mt-4 max-w-2xl text-cream/70">{t.proof.trustSub}</p>
+            </div>
+          </Reveal>
+
+          <div className="mt-10 grid gap-6 md:grid-cols-3">
+            {t.proof.trustSteps.map((s, i) => (
+              <Reveal key={i} delay={i * 0.1}>
+                <div className="card h-full rounded-2xl p-7">
+                  <div className="mb-4 text-4xl">{s.icon}</div>
+                  <h4 className="display text-lg font-bold text-cream-soft">{s.t}</h4>
+                  <p className="mt-3 text-sm leading-relaxed text-cream/70">{s.d}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+
+          {/* Схема потока данных */}
+          <Reveal>
+            <div className="mt-10 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] p-6">
+              <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-cream/40">
+                {lang === "ru" ? "Поток данных" : "Data flow"}
+              </p>
+              <div className="flex flex-wrap items-center gap-2 text-sm">
+                {[
+                  { icon: "☕", label: lang === "ru" ? "Продажа кофе" : "Coffee sale" },
+                  { icon: "→", label: null },
+                  { icon: "🧾", label: lang === "ru" ? "POS вебхук" : "POS webhook" },
+                  { icon: "→", label: null },
+                  { icon: "🔐", label: lang === "ru" ? "receipt_hash" : "receipt_hash" },
+                  { icon: "→", label: null },
+                  { icon: "⛓", label: lang === "ru" ? "Solana memo" : "Solana memo" },
+                  { icon: "→", label: null },
+                  { icon: "📊", label: lang === "ru" ? "Этот дашборд" : "This dashboard" },
+                ].map((step, i) =>
+                  step.label === null ? (
+                    <span key={i} className="text-cream/30">{step.icon}</span>
+                  ) : (
+                    <span key={i} className="inline-flex flex-col items-center gap-1 rounded-xl border border-white/10 px-4 py-3 text-center">
+                      <span className="text-xl">{step.icon}</span>
+                      <span className="text-xs text-cream/60">{step.label}</span>
+                    </span>
+                  ),
+                )}
+              </div>
+              <p className="mt-4 text-xs text-cream/40">
+                {lang === "ru"
+                  ? "Сайт не может редактировать историю сжиганий — она живёт только в Solana."
+                  : "The website cannot edit the burn history — it exists only on Solana."}
+              </p>
+            </div>
+          </Reveal>
+        </div>
+      </Section>
+
       {/* ---------- MENU ---------- */}
       <Section id="menu">
         <Reveal>
@@ -662,6 +786,34 @@ function Stat({ label, value, unit, accent }: { label: string; value: React.Reac
         <div className="mt-2 text-xs uppercase tracking-wider text-cream/50">{label}</div>
       </div>
     </Reveal>
+  );
+}
+
+function BurnRow({ burn, even, verifyLabel }: { burn: BurnRecord; even: boolean; verifyLabel: string }) {
+  const date = burn.blockTime
+    ? new Date(burn.blockTime * 1000).toLocaleString("ru-RU", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })
+    : "—";
+  const shortHash = burn.receiptHash ? burn.receiptHash.slice(0, 8) + "…" : "—";
+  const shortSale = burn.saleId ? (burn.saleId.length > 14 ? burn.saleId.slice(0, 14) + "…" : burn.saleId) : "—";
+
+  return (
+    <div className={`grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-3 px-5 py-3 text-sm ${even ? "bg-transparent" : "bg-white/[0.015]"}`}>
+      <span className="text-cream/60 tabular-nums">{date}</span>
+      <span className="display text-right font-bold text-amber tabular-nums">
+        {burn.amount > 0 ? burn.amount.toLocaleString("ru-RU") : "?"} 🔥
+      </span>
+      <span className="hidden text-right font-mono text-xs text-cream/50 sm:block" title={burn.saleId}>{shortSale}</span>
+      <span className="font-mono text-right text-xs text-cream/50" title={burn.receiptHash}>{shortHash}</span>
+      <a
+        href={solscanTx(burn.sig)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-right text-xs font-semibold text-teal transition hover:text-gold"
+        title={burn.sig}
+      >
+        {verifyLabel} ↗
+      </a>
+    </div>
   );
 }
 

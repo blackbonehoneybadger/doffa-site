@@ -48,12 +48,29 @@ export const MOCK = {
 };
 
 type Dict = {
-  nav: { story: string; how: string; token: string; burns: string; menu: string; gallery: string; buy: string; roadmap: string; faq: string; contact: string };
+  nav: { story: string; how: string; token: string; burns: string; proof: string; menu: string; gallery: string; buy: string; roadmap: string; faq: string; contact: string };
   hero: { kicker: string; title1: string; title2: string; sub: string; ctaBuy: string; ctaMenu: string; soon: string; mediaCaption: string };
   story: { tag: string; title: string; body: string[] };
   how: { tag: string; title: string; sub: string; steps: { t: string; d: string }[] };
   token: { tag: string; title: string; sub: string; rows: { k: string; v: string }[]; alloc: { name: string; pct: number }[] };
   burns: { tag: string; title: string; supply: string; burned: string; left: string; cups: string; note: string; live: string; verify: string; liveNote: string };
+  proof: {
+    tag: string;
+    title: string;
+    sub: string;
+    colTime: string;
+    colAmount: string;
+    colSale: string;
+    colHash: string;
+    colVerify: string;
+    empty: string;
+    loading: string;
+    mismatchWarn: string;
+    trustTag: string;
+    trustTitle: string;
+    trustSub: string;
+    trustSteps: { icon: string; t: string; d: string }[];
+  };
   menu: { tag: string; title: string; sub: string; note: string; groups: { title: string; items: { name: string; price: string }[] }[] };
   videos: { tag: string; title: string; sub: string };
   gallery: { tag: string; title: string; sub: string };
@@ -66,7 +83,7 @@ type Dict = {
 
 export const dict: Record<Lang, Dict> = {
   ru: {
-    nav: { story: "История", how: "Как это работает", token: "Токеномика", burns: "Сжигания", menu: "Меню", gallery: "Галерея", buy: "Купить", roadmap: "Дорожная карта", faq: "FAQ", contact: "Контакты" },
+    nav: { story: "История", how: "Как это работает", token: "Токеномика", burns: "Сжигания", proof: "Доказательства", menu: "Меню", gallery: "Галерея", buy: "Купить", roadmap: "Дорожная карта", faq: "FAQ", contact: "Контакты" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "Каждая чашка",
@@ -127,6 +144,39 @@ export const dict: Record<Lang, Dict> = {
       live: "Live · devnet",
       verify: "Проверить в Solscan",
       liveNote: "Цифры читаются напрямую из блокчейна Solana (тест-токен на devnet). Их никто не вписывает вручную — любой может перепроверить в Solscan.",
+    },
+    proof: {
+      tag: "Публичный аудит",
+      title: "История сжиганий",
+      sub: "Каждая запись в этой таблице — транзакция в блокчейне Solana. Они не редактируются и не удаляются. Проверить может любой.",
+      colTime: "Дата",
+      colAmount: "Сожжено",
+      colSale: "ID продажи",
+      colHash: "Хеш квитанции",
+      colVerify: "TX",
+      empty: "Пока нет сжиганий с on-chain подтверждением. Первая запись появится после запуска системы.",
+      loading: "Читаем блокчейн…",
+      mismatchWarn: "⚠ Данные кассы не совпадают с блокчейном",
+      trustTag: "Система доверия",
+      trustTitle: "Почему это нельзя подделать",
+      trustSub: "Данные о сжиганиях хранятся исключительно в блокчейне Solana — сайт их только читает, не записывает.",
+      trustSteps: [
+        {
+          icon: "🧾",
+          t: "Продажа в кассе",
+          d: "Кассовая система (Square / Shopify / Stripe) отправляет вебхук на наш сервер. Сервер вычисляет анонимный SHA-256 хеш квитанции (без персональных данных покупателя).",
+        },
+        {
+          icon: "🔥",
+          t: "Burn в блокчейне",
+          d: "Оператор запускает команду burn с sale_id и receipt_hash. Транзакция уходит в Solana с мемо «DOFFA coffee burn | sale_id | hash» — эта строка навсегда записана в блокчейн.",
+        },
+        {
+          icon: "🔍",
+          t: "Публичная проверка",
+          d: "Любой человек открывает Solscan, вводит адрес токена и видит все транзакции сжигания с мемо. Сайт лишь читает эти данные — подменить или скрыть их невозможно.",
+        },
+      ],
     },
     menu: {
       tag: "Кофейня",
@@ -240,7 +290,7 @@ export const dict: Record<Lang, Dict> = {
       "$DOFFA — утилити-токен, связанный с кофейней DOFFA. Это не ценная бумага, не инвестиционный продукт и не предложение о покупке ценных бумаг. Материалы сайта носят информационный характер и не являются финансовой, юридической или налоговой консультацией. Криптоактивы волатильны и рискованны. Участвуйте ответственно и в рамках законов вашей юрисдикции.",
   },
   en: {
-    nav: { story: "Story", how: "How it works", token: "Tokenomics", burns: "Burns", menu: "Menu", gallery: "Gallery", buy: "Buy", roadmap: "Roadmap", faq: "FAQ", contact: "Contact" },
+    nav: { story: "Story", how: "How it works", token: "Tokenomics", burns: "Burns", proof: "Proof", menu: "Menu", gallery: "Gallery", buy: "Buy", roadmap: "Roadmap", faq: "FAQ", contact: "Contact" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "Every cup",
@@ -301,6 +351,39 @@ export const dict: Record<Lang, Dict> = {
       live: "Live · devnet",
       verify: "Verify on Solscan",
       liveNote: "These numbers are read straight from the Solana blockchain (devnet test token). Nobody types them in by hand — anyone can re-check them on Solscan.",
+    },
+    proof: {
+      tag: "Public audit",
+      title: "Burn history",
+      sub: "Every row in this table is a Solana blockchain transaction. It cannot be edited or deleted. Anyone can verify it.",
+      colTime: "Date",
+      colAmount: "Burned",
+      colSale: "Sale ID",
+      colHash: "Receipt hash",
+      colVerify: "TX",
+      empty: "No on-chain burn records yet. The first entry will appear once the system goes live.",
+      loading: "Reading the blockchain…",
+      mismatchWarn: "⚠ POS data doesn't match the blockchain",
+      trustTag: "Trust system",
+      trustTitle: "Why this cannot be faked",
+      trustSub: "Burn data is stored exclusively on the Solana blockchain — the website only reads it, never writes it.",
+      trustSteps: [
+        {
+          icon: "🧾",
+          t: "Sale at the register",
+          d: "The POS system (Square / Shopify / Stripe) sends a webhook to our server. The server computes an anonymous SHA-256 receipt hash — no buyer personal data is stored.",
+        },
+        {
+          icon: "🔥",
+          t: "Burn on-chain",
+          d: "The operator runs the burn command with sale_id and receipt_hash. The transaction is sent to Solana with the memo 'DOFFA coffee burn | sale_id | hash' — permanently recorded in the blockchain.",
+        },
+        {
+          icon: "🔍",
+          t: "Public verification",
+          d: "Anyone can open Solscan, enter the token address and see all burn transactions with memos. The website only reads this data — substituting or hiding it is impossible.",
+        },
+      ],
     },
     menu: {
       tag: "Coffee bar",
