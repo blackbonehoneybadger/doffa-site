@@ -53,11 +53,11 @@ type Dict = {
   story: { tag: string; title: string; body: string[] };
   how: { tag: string; title: string; sub: string; steps: { t: string; d: string }[] };
   token: { tag: string; title: string; sub: string; rows: { k: string; v: string }[]; alloc: { name: string; pct: number }[] };
-  burns: { tag: string; title: string; supply: string; burned: string; left: string; cups: string; note: string };
+  burns: { tag: string; title: string; supply: string; burned: string; left: string; cups: string; note: string; live: string; verify: string; liveNote: string };
   menu: { tag: string; title: string; sub: string; note: string; groups: { title: string; items: { name: string; price: string }[] }[] };
   videos: { tag: string; title: string; sub: string };
   gallery: { tag: string; title: string; sub: string };
-  buy: { tag: string; title: string; sub: string; connect: string; soon: string; points: string[] };
+  buy: { tag: string; title: string; sub: string; connect: string; soon: string; points: string[]; connected: string; balanceLabel: string; install: string; demoNote: string; disconnect: string };
   roadmap: { tag: string; title: string; phases: { n: string; t: string; d: string; done?: boolean }[] };
   faq: { tag: string; title: string; items: { q: string; a: string }[] };
   contact: { tag: string; title: string; sub: string; address: string; addressVal: string; phone: string; phoneVal: string; hours: string; hoursVal: string; ig: string; mapCta: string };
@@ -124,6 +124,9 @@ export const dict: Record<Lang, Dict> = {
       left: "Осталось",
       cups: "Продано чашек",
       note: "Демо-данные до запуска токена. После mainnet здесь будут реальные цифры из блокчейна.",
+      live: "Live · devnet",
+      verify: "Проверить в Solscan",
+      liveNote: "Цифры читаются напрямую из блокчейна Solana (тест-токен на devnet). Их никто не вписывает вручную — любой может перепроверить в Solscan.",
     },
     menu: {
       tag: "Кофейня",
@@ -192,6 +195,11 @@ export const dict: Record<Lang, Dict> = {
         "Обмен $DOFFA ↔ USDT — через Jupiter / Raydium.",
         "Покупка за рубли — через сторонний лицензированный сервис.",
       ],
+      connected: "Кошелёк",
+      balanceLabel: "Ваш баланс",
+      install: "Установить Phantom",
+      demoNote: "Демо на тестовой сети (devnet). Подключите Phantom, чтобы увидеть баланс тест-токена $DOFFA. Реальных денег здесь нет.",
+      disconnect: "Отключить",
     },
     roadmap: {
       tag: "План",
@@ -290,6 +298,9 @@ export const dict: Record<Lang, Dict> = {
       left: "Remaining",
       cups: "Cups sold",
       note: "Demo data before token launch. After mainnet these will be real on-chain numbers.",
+      live: "Live · devnet",
+      verify: "Verify on Solscan",
+      liveNote: "These numbers are read straight from the Solana blockchain (devnet test token). Nobody types them in by hand — anyone can re-check them on Solscan.",
     },
     menu: {
       tag: "Coffee bar",
@@ -358,6 +369,11 @@ export const dict: Record<Lang, Dict> = {
         "Swap $DOFFA ↔ USDT via Jupiter / Raydium.",
         "Fiat on-ramp via a licensed third-party provider.",
       ],
+      connected: "Wallet",
+      balanceLabel: "Your balance",
+      install: "Install Phantom",
+      demoNote: "Demo on the test network (devnet). Connect Phantom to see your $DOFFA test-token balance. No real money here.",
+      disconnect: "Disconnect",
     },
     roadmap: {
       tag: "Plan",

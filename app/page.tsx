@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView, useMotionValue, animate } from "framer-motion";
 import { dict, TOKEN, MOCK, CONTACT, GALLERY, VIDEOS, type Lang } from "./content";
+import { CHAIN, solscanToken, fetchSupply, fetchBalance, getPhantom } from "./solana";
 
 // Главный ролик в hero — без вшитых субтитров. Лежит в public/brand/hero.mp4.
 const HERO_VIDEO: string | null = "/brand/hero.mp4";
@@ -54,8 +55,49 @@ export default function Home() {
   const [lang, setLang] = useState<Lang>("ru");
   const [menuOpen, setMenuOpen] = useState(false);
   const t = dict[lang];
-  const remaining = TOKEN.supply - MOCK.burned;
-  const burnedPct = (MOCK.burned / TOKEN.supply) * 100;
+
+  // Живые данные из блокчейна (devnet). null — ещё не загружено / недоступно.
+  const [liveSupply, setLiveSupply] = useState<number | null>(null);
+  useEffect(() => {
+    fetchSupply()
+      .then(setLiveSupply)
+      .catch(() => setLiveSupply(null));
+  }, []);
+
+  const isLive = liveSupply !== null;
+  const burned = isLive ? Math.max(CHAIN.initialSupply - liveSupply!, 0) : MOCK.burned;
+  const remaining = isLive ? liveSupply! : TOKEN.supply - MOCK.burned;
+  const cupsSold = isLive ? burned : MOCK.cupsSold;
+  const burnedPct = (burned / TOKEN.supply) * 100;
+
+  // Кошелёк (Phantom, devnet-демо).
+  const [wallet, setWallet] = useState<string | null>(null);
+  const [walletBal, setWalletBal] = useState<number | null>(null);
+  const connectWallet = async () => {
+    const p = getPhantom();
+    if (!p) {
+      window.open("https://phantom.app/", "_blank", "noopener,noreferrer");
+      return;
+    }
+    try {
+      const resp = await p.connect();
+      const addr = resp.publicKey.toString();
+      setWallet(addr);
+      setWalletBal(null);
+      fetchBalance(addr).then(setWalletBal).catch(() => setWalletBal(0));
+    } catch {
+      /* пользователь отклонил подключение */
+    }
+  };
+  const disconnectWallet = async () => {
+    try {
+      await getPhantom()?.disconnect();
+    } catch {
+      /* ignore */
+    }
+    setWallet(null);
+    setWalletBal(null);
+  };
 
   const nav: { id: string; label: string }[] = [
     { id: "story",   label: t.nav.story },
@@ -350,13 +392,19 @@ export default function Home() {
           <div className="text-center">
             <Tag>{t.burns.tag}</Tag>
             <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.burns.title}</h2>
+            {isLive && (
+              <span className="mt-4 inline-flex items-center gap-2 rounded-full border border-teal/40 bg-teal/10 px-3 py-1 text-xs font-semibold text-teal">
+                <span className="h-2 w-2 animate-pulse rounded-full bg-teal" />
+                {t.burns.live}
+              </span>
+            )}
           </div>
         </Reveal>
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           <Stat label={t.burns.supply} value={TOKEN.supply.toLocaleString("ru-RU")} unit={TOKEN.symbol} />
-          <Stat label={t.burns.burned} value={<CountUp to={MOCK.burned} />} unit={`🔥 ${TOKEN.symbol}`} accent />
+          <Stat label={t.burns.burned} value={<CountUp to={burned} />} unit={`🔥 ${TOKEN.symbol}`} accent />
           <Stat label={t.burns.left} value={remaining.toLocaleString("ru-RU")} unit={TOKEN.symbol} />
-          <Stat label={t.burns.cups} value={<CountUp to={MOCK.cupsSold} />} unit="☕" />
+          <Stat label={t.burns.cups} value={<CountUp to={cupsSold} />} unit="☕" />
         </div>
         <Reveal>
           <div className="mt-8 h-3 overflow-hidden rounded-full bg-white/10">
@@ -368,7 +416,17 @@ export default function Home() {
               className="h-full rounded-full bg-gradient-to-r from-amber to-teal"
             />
           </div>
-          <p className="mt-4 text-center text-xs text-cream/50">{t.burns.note}</p>
+          <p className="mt-4 text-center text-xs text-cream/50">{isLive ? t.burns.liveNote : t.burns.note}</p>
+          <div className="mt-3 text-center">
+            <a
+              href={solscanToken()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal transition hover:text-gold"
+            >
+              {t.burns.verify} ↗
+            </a>
+          </div>
         </Reveal>
       </Section>
 
@@ -442,10 +500,34 @@ export default function Home() {
             <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.buy.title}</h2>
             <p className="mt-4 text-cream/70">{t.buy.sub}</p>
             <div className="mt-7">
-              <span className="inline-flex cursor-not-allowed items-center gap-2 rounded-full bg-cream/10 px-7 py-3 font-bold text-cream/60">
-                {t.buy.connect}
-              </span>
-              <p className="mt-2 text-xs uppercase tracking-wider text-teal">{t.buy.soon}</p>
+              {wallet ? (
+                <div className="space-y-3">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span className="inline-flex items-center gap-2 rounded-full border border-teal/40 bg-teal/10 px-4 py-2 text-sm font-semibold text-teal">
+                      <span className="h-2 w-2 rounded-full bg-teal" />
+                      {t.buy.connected}: {wallet.slice(0, 4)}…{wallet.slice(-4)}
+                    </span>
+                    <button onClick={disconnectWallet} className="text-xs text-cream/50 underline transition hover:text-cream">
+                      {t.buy.disconnect}
+                    </button>
+                  </div>
+                  <div className="rounded-xl border border-white/10 bg-white/[0.02] px-5 py-4">
+                    <div className="text-xs uppercase tracking-wider text-cream/50">{t.buy.balanceLabel}</div>
+                    <div className="display mt-1 text-2xl font-extrabold text-cream-soft">
+                      {walletBal === null ? "…" : walletBal.toLocaleString("ru-RU")}{" "}
+                      <span className="text-gold">{TOKEN.symbol}</span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={connectWallet}
+                  className="inline-flex items-center gap-2 rounded-full bg-gold px-7 py-3 font-bold text-ink transition hover:brightness-110"
+                >
+                  {t.buy.connect}
+                </button>
+              )}
+              <p className="mt-3 max-w-md text-xs text-cream/50">{t.buy.demoNote}</p>
             </div>
           </Reveal>
           <Reveal delay={0.15}>
