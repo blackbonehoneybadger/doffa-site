@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { motion, useInView, useMotionValue, animate } from "framer-motion";
+import { motion, useInView, useMotionValue, animate, AnimatePresence } from "framer-motion";
 import { dict, TOKEN, MOCK, CONTACT, GALLERY, VIDEOS, type Lang } from "./content";
 import { CHAIN, solscanToken, solscanTx, fetchSupply, fetchBalance, fetchBurnHistory, getPhantom, type BurnRecord } from "./solana";
 
@@ -54,6 +54,7 @@ function CountUp({ to }: { to: number }) {
 export default function Home() {
   const [lang, setLang] = useState<Lang>("ru");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<"story" | "token" | "cafe" | "community" | "buy" | "contact">("story");
   const t = dict[lang];
 
   // Живые данные из блокчейна (devnet). null — ещё не загружено / недоступно.
@@ -107,18 +108,13 @@ export default function Home() {
     setWalletBal(null);
   };
 
-  const nav: { id: string; label: string }[] = [
-    { id: "story",   label: t.nav.story },
-    { id: "how",     label: t.nav.how },
-    { id: "token",   label: t.nav.token },
-    { id: "burns",   label: t.nav.burns },
-    { id: "proof",   label: t.nav.proof },
-    { id: "menu",    label: t.nav.menu },
-    { id: "gallery", label: t.nav.gallery },
-    { id: "buy",     label: t.nav.buy },
-    { id: "roadmap", label: t.nav.roadmap },
-    { id: "faq",     label: t.nav.faq },
-    { id: "contact", label: t.nav.contact },
+  const tabs: { id: typeof activeTab; label: string }[] = [
+    { id: "story",     label: lang === "ru" ? "Начало" : "Start" },
+    { id: "token",     label: lang === "ru" ? "Токен" : "Token" },
+    { id: "cafe",      label: lang === "ru" ? "Кофейня" : "Café" },
+    { id: "community", label: lang === "ru" ? "Сообщество" : "Community" },
+    { id: "buy",       label: lang === "ru" ? "Купить" : "Buy" },
+    { id: "contact",   label: lang === "ru" ? "Контакты" : "Contact" },
   ];
 
   return (
@@ -133,10 +129,16 @@ export default function Home() {
             </span>
           </a>
           <nav className="hidden items-center gap-4 xl:gap-5 lg:flex">
-            {nav.map((n) => (
-              <a key={n.id} href={`#${n.id}`} className="text-xs xl:text-sm text-cream/70 transition hover:text-gold">
-                {n.label}
-              </a>
+            {tabs.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => setActiveTab(t.id)}
+                className={`text-xs xl:text-sm transition ${
+                  activeTab === t.id ? "font-semibold text-gold" : "text-cream/70 hover:text-gold"
+                }`}
+              >
+                {t.label}
+              </button>
             ))}
           </nav>
           <div className="flex items-center gap-2">
@@ -172,19 +174,25 @@ export default function Home() {
           </div>
         </div>
 
-        {/* мобильное меню */}
+        {/* мобильное меню вкладок */}
         {menuOpen && (
           <nav className="border-t border-white/10 bg-ink/95 backdrop-blur-md lg:hidden">
             <div className="mx-auto grid max-w-6xl grid-cols-2 gap-x-4 gap-y-1 px-5 py-4">
-              {nav.map((n) => (
-                <a
-                  key={n.id}
-                  href={`#${n.id}`}
-                  onClick={() => setMenuOpen(false)}
-                  className="rounded-lg px-3 py-2 text-sm text-cream/75 transition hover:bg-white/5 hover:text-gold"
+              {tabs.map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => {
+                    setActiveTab(t.id);
+                    setMenuOpen(false);
+                  }}
+                  className={`rounded-lg px-3 py-2 text-sm transition ${
+                    activeTab === t.id
+                      ? "bg-gold/20 font-semibold text-gold"
+                      : "text-cream/75 hover:bg-white/5 hover:text-gold"
+                  }`}
                 >
-                  {n.label}
-                </a>
+                  {t.label}
+                </button>
               ))}
             </div>
           </nav>
@@ -245,9 +253,9 @@ export default function Home() {
                 {t.hero.ctaBuy}
                 <span className="rounded-full bg-ink/20 px-2 py-0.5 text-[10px] uppercase">{t.hero.soon}</span>
               </span>
-              <a href="#menu" className="rounded-full border border-cream/30 px-7 py-3 font-semibold text-cream transition hover:border-gold hover:text-gold">
+              <button onClick={() => setActiveTab("cafe")} className="rounded-full border border-cream/30 px-7 py-3 font-semibold text-cream transition hover:border-gold hover:text-gold">
                 {t.hero.ctaMenu}
-              </a>
+              </button>
             </div>
           </motion.div>
         </div>
@@ -280,476 +288,503 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ---------- VIDEOS (верхняя часть, сразу после hero) ---------- */}
-      <Section id="videos">
-        <Reveal>
-          <div className="text-center">
-            <Tag>{t.videos.tag}</Tag>
-            <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.videos.title}</h2>
-            <p className="mx-auto mt-4 max-w-2xl text-cream/70">{t.videos.sub}</p>
-          </div>
-        </Reveal>
-        <div className="mx-auto mt-10 grid max-w-3xl grid-cols-2 gap-4 sm:gap-6">
-          {VIDEOS.map((v, i) => (
-            <Reveal key={v.src} delay={i * 0.1}>
-              <div className="group relative aspect-[9/16] overflow-hidden rounded-3xl ring-1 ring-gold/20">
-                <video
-                  src={v.src}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  aria-label={v.alt}
-                  className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/50 to-transparent" />
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </Section>
-
-      {/* ---------- STORY ---------- */}
-      <Section id="story">
-        <div className="grid items-center gap-12 lg:grid-cols-2">
-          <Reveal>
-            <Tag>{t.story.tag}</Tag>
-            <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.story.title}</h2>
-            <div className="mt-6 space-y-4 text-cream/75">
-              {t.story.body.map((p, i) => (
-                <p key={i}>{p}</p>
-              ))}
-            </div>
-          </Reveal>
-          <Reveal delay={0.15}>
-            <div className="relative mx-auto aspect-[4/5] w-full max-w-md">
-              <div className="absolute inset-0 rounded-3xl bg-teal/10 blur-2xl" />
-              <Image src="/brand/bar-shelves.jpg" alt="Бариста DOFFA за стойкой" fill sizes="(max-width:768px) 90vw, 28rem" className="relative rounded-3xl object-cover ring-1 ring-gold/30" />
-            </div>
-          </Reveal>
-        </div>
-      </Section>
-
-      {/* ---------- HOW ---------- */}
-      <Section id="how">
-        <Reveal>
-          <div className="text-center">
-            <Tag>{t.how.tag}</Tag>
-            <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.how.title}</h2>
-            <p className="mx-auto mt-4 max-w-2xl text-cream/70">{t.how.sub}</p>
-          </div>
-        </Reveal>
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
-          {t.how.steps.map((s, i) => (
-            <Reveal key={i} delay={i * 0.12}>
-              <div className="card h-full rounded-2xl p-7">
-                <div className="display mb-4 text-3xl font-extrabold text-teal">0{i + 1}</div>
-                <h3 className="display text-xl font-bold text-cream-soft">{s.t}</h3>
-                <p className="mt-3 text-sm text-cream/70">{s.d}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </Section>
-
-      {/* ---------- TOKEN ---------- */}
-      <Section id="token">
-        <div className="grid gap-12 lg:grid-cols-2">
-          <Reveal>
-            <Tag>{t.token.tag}</Tag>
-            <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.token.title}</h2>
-            <p className="mt-4 text-cream/70">{t.token.sub}</p>
-            <dl className="mt-7 divide-y divide-white/10 overflow-hidden rounded-2xl border border-white/10">
-              {t.token.rows.map((r) => (
-                <div key={r.k} className="flex items-center justify-between bg-white/[0.02] px-5 py-3">
-                  <dt className="text-sm text-cream/60">{r.k}</dt>
-                  <dd className="display text-sm font-bold text-cream-soft">{r.v}</dd>
-                </div>
-              ))}
-            </dl>
-          </Reveal>
-          <Reveal delay={0.15}>
-            <div className="card rounded-2xl p-7">
-              <p className="display mb-6 text-lg font-bold text-cream-soft">Allocation</p>
-              <div className="space-y-5">
-                {t.token.alloc.map((a, i) => (
-                  <div key={a.name}>
-                    <div className="mb-1.5 flex justify-between text-sm">
-                      <span className="text-cream/75">{a.name}</span>
-                      <span className="display font-bold text-gold">{a.pct}%</span>
-                    </div>
-                    <div className="h-2.5 overflow-hidden rounded-full bg-white/10">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        whileInView={{ width: `${a.pct}%` }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 1, delay: i * 0.1, ease: "easeOut" }}
-                        className="h-full rounded-full bg-gradient-to-r from-amber to-gold"
-                      />
-                    </div>
+      {/* ---------- TAB CONTENT ---------- */}
+      <div className="relative">
+        <AnimatePresence mode="wait">
+          {/* TAB: STORY */}
+          {activeTab === "story" && (
+            <motion.div key="story" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}>
+              {/* VIDEOS */}
+              <Section id="videos">
+                <Reveal>
+                  <div className="text-center">
+                    <Tag>{t.videos.tag}</Tag>
+                    <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.videos.title}</h2>
+                    <p className="mx-auto mt-4 max-w-2xl text-cream/70">{t.videos.sub}</p>
                   </div>
-                ))}
-              </div>
-            </div>
-          </Reveal>
-        </div>
-      </Section>
-
-      {/* ---------- BURNS ---------- */}
-      <Section id="burns">
-        <Reveal>
-          <div className="text-center">
-            <Tag>{t.burns.tag}</Tag>
-            <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.burns.title}</h2>
-            {isLive && (
-              <span className="mt-4 inline-flex items-center gap-2 rounded-full border border-teal/40 bg-teal/10 px-3 py-1 text-xs font-semibold text-teal">
-                <span className="h-2 w-2 animate-pulse rounded-full bg-teal" />
-                {t.burns.live}
-              </span>
-            )}
-          </div>
-        </Reveal>
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          <Stat label={t.burns.supply} value={TOKEN.supply.toLocaleString("ru-RU")} unit={TOKEN.symbol} />
-          <Stat label={t.burns.burned} value={<CountUp to={burned} />} unit={`🔥 ${TOKEN.symbol}`} accent />
-          <Stat label={t.burns.left} value={remaining.toLocaleString("ru-RU")} unit={TOKEN.symbol} />
-          <Stat label={t.burns.cups} value={<CountUp to={cupsSold} />} unit="☕" />
-        </div>
-        <Reveal>
-          <div className="mt-8 h-3 overflow-hidden rounded-full bg-white/10">
-            <motion.div
-              initial={{ width: 0 }}
-              whileInView={{ width: `${Math.max(burnedPct, 1.5)}%` }}
-              viewport={{ once: true }}
-              transition={{ duration: 1.4, ease: "easeOut" }}
-              className="h-full rounded-full bg-gradient-to-r from-amber to-teal"
-            />
-          </div>
-          <p className="mt-4 text-center text-xs text-cream/50">{isLive ? t.burns.liveNote : t.burns.note}</p>
-          <div className="mt-3 text-center">
-            <a
-              href={solscanToken()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal transition hover:text-gold"
-            >
-              {t.burns.verify} ↗
-            </a>
-          </div>
-        </Reveal>
-      </Section>
-
-      {/* ---------- PROOF DASHBOARD ---------- */}
-      <Section id="proof">
-        <Reveal>
-          <div className="text-center">
-            <Tag>{t.proof.tag}</Tag>
-            <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.proof.title}</h2>
-            <p className="mx-auto mt-4 max-w-2xl text-cream/70">{t.proof.sub}</p>
-          </div>
-        </Reveal>
-
-        {/* Таблица истории сжиганий */}
-        <Reveal>
-          <div className="mt-10 overflow-hidden rounded-2xl border border-white/10">
-            {/* header */}
-            <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-3 border-b border-white/10 bg-white/[0.03] px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-cream/40">
-              <span>{t.proof.colTime}</span>
-              <span className="text-right">{t.proof.colAmount}</span>
-              <span className="hidden text-right sm:block">{t.proof.colSale}</span>
-              <span className="text-right">{t.proof.colHash}</span>
-              <span className="text-right">{t.proof.colVerify}</span>
-            </div>
-
-            {/* rows */}
-            {burns === null ? (
-              <div className="flex items-center justify-center gap-2 px-5 py-12 text-sm text-cream/40">
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-teal/40 border-t-teal" />
-                {t.proof.loading}
-              </div>
-            ) : burns.length === 0 ? (
-              <div className="px-5 py-12 text-center text-sm text-cream/40">{t.proof.empty}</div>
-            ) : (
-              burns.map((b, i) => (
-                <BurnRow key={b.sig} burn={b} even={i % 2 === 0} verifyLabel={t.proof.colVerify} />
-              ))
-            )}
-          </div>
-        </Reveal>
-
-        {/* Предупреждение при несовпадении */}
-        {burns && burns.length > 0 && isLive && burns.length !== burned && (
-          <Reveal>
-            <div className="mt-5 flex items-start gap-3 rounded-xl border border-amber/40 bg-amber/10 px-5 py-4 text-sm text-amber">
-              <span className="mt-0.5 shrink-0">⚠</span>
-              <div>
-                <p className="font-semibold">{t.proof.mismatchWarn}</p>
-                <p className="mt-1 text-xs text-amber/70">
-                  {lang === "ru"
-                    ? `Solana: ${burned.toLocaleString("ru-RU")} сожжено · On-chain мемо: ${burns.length} записей`
-                    : `Solana: ${burned.toLocaleString("en-US")} burned · On-chain memos: ${burns.length} records`}
-                </p>
-              </div>
-            </div>
-          </Reveal>
-        )}
-
-        {/* Блок объяснения системы доверия */}
-        <div className="mt-20">
-          <Reveal>
-            <div className="text-center">
-              <Tag>{t.proof.trustTag}</Tag>
-              <h3 className="display mt-5 text-3xl font-bold text-cream-soft sm:text-4xl">{t.proof.trustTitle}</h3>
-              <p className="mx-auto mt-4 max-w-2xl text-cream/70">{t.proof.trustSub}</p>
-            </div>
-          </Reveal>
-
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
-            {t.proof.trustSteps.map((s, i) => (
-              <Reveal key={i} delay={i * 0.1}>
-                <div className="card h-full rounded-2xl p-7">
-                  <div className="mb-4 text-4xl">{s.icon}</div>
-                  <h4 className="display text-lg font-bold text-cream-soft">{s.t}</h4>
-                  <p className="mt-3 text-sm leading-relaxed text-cream/70">{s.d}</p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-
-          {/* Схема потока данных */}
-          <Reveal>
-            <div className="mt-10 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] p-6">
-              <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-cream/40">
-                {lang === "ru" ? "Поток данных" : "Data flow"}
-              </p>
-              <div className="flex flex-wrap items-center gap-2 text-sm">
-                {[
-                  { icon: "☕", label: lang === "ru" ? "Продажа кофе" : "Coffee sale" },
-                  { icon: "→", label: null },
-                  { icon: "🧾", label: lang === "ru" ? "POS вебхук" : "POS webhook" },
-                  { icon: "→", label: null },
-                  { icon: "🔐", label: lang === "ru" ? "receipt_hash" : "receipt_hash" },
-                  { icon: "→", label: null },
-                  { icon: "⛓", label: lang === "ru" ? "Solana memo" : "Solana memo" },
-                  { icon: "→", label: null },
-                  { icon: "📊", label: lang === "ru" ? "Этот дашборд" : "This dashboard" },
-                ].map((step, i) =>
-                  step.label === null ? (
-                    <span key={i} className="text-cream/30">{step.icon}</span>
-                  ) : (
-                    <span key={i} className="inline-flex flex-col items-center gap-1 rounded-xl border border-white/10 px-4 py-3 text-center">
-                      <span className="text-xl">{step.icon}</span>
-                      <span className="text-xs text-cream/60">{step.label}</span>
-                    </span>
-                  ),
-                )}
-              </div>
-              <p className="mt-4 text-xs text-cream/40">
-                {lang === "ru"
-                  ? "Сайт не может редактировать историю сжиганий — она живёт только в Solana."
-                  : "The website cannot edit the burn history — it exists only on Solana."}
-              </p>
-            </div>
-          </Reveal>
-        </div>
-      </Section>
-
-      {/* ---------- MENU ---------- */}
-      <Section id="menu">
-        <Reveal>
-          <div className="text-center">
-            <Tag>{t.menu.tag}</Tag>
-            <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.menu.title}</h2>
-            <p className="mx-auto mt-4 max-w-2xl text-cream/70">{t.menu.sub}</p>
-          </div>
-        </Reveal>
-        <div className="mt-10 grid gap-5 md:grid-cols-3">
-          {t.menu.groups.map((group, gi) => (
-            <Reveal key={group.title} delay={gi * 0.1}>
-              <div className="card h-full rounded-2xl p-6">
-                <h3 className="display mb-4 text-lg font-bold text-teal">{group.title}</h3>
-                <ul className="divide-y divide-white/[0.06]">
-                  {group.items.map((item) => (
-                    <li key={item.name} className="flex items-baseline justify-between gap-3 py-2.5">
-                      <span className="text-sm text-cream/85">{item.name}</span>
-                      {item.price && <span className="display shrink-0 text-sm font-bold text-gold">{item.price}</span>}
-                    </li>
+                </Reveal>
+                <div className="mx-auto mt-10 grid max-w-3xl grid-cols-2 gap-4 sm:gap-6">
+                  {VIDEOS.map((v, i) => (
+                    <Reveal key={v.src} delay={i * 0.1}>
+                      <div className="group relative aspect-[9/16] overflow-hidden rounded-3xl ring-1 ring-gold/20">
+                        <video
+                          src={v.src}
+                          autoPlay
+                          muted
+                          loop
+                          playsInline
+                          aria-label={v.alt}
+                          className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-ink/50 to-transparent" />
+                      </div>
+                    </Reveal>
                   ))}
-                </ul>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-        <Reveal>
-          <p className="mt-6 text-center text-sm text-cream/55">{t.menu.note}</p>
-        </Reveal>
-        <div className="relative mt-8 overflow-hidden rounded-3xl">
-          <Image src="/brand/cups-four.jpg" alt="Латте-арт DOFFA" width={1200} height={800} className="h-48 w-full object-cover object-center sm:h-72" />
-          <div className="absolute inset-0 bg-gradient-to-t from-ink/80 to-transparent" />
-        </div>
-      </Section>
+                </div>
+              </Section>
 
-      {/* ---------- GALLERY ---------- */}
-      <Section id="gallery">
-        <Reveal>
-          <div className="text-center">
-            <Tag>{t.gallery.tag}</Tag>
-            <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.gallery.title}</h2>
-            <p className="mx-auto mt-4 max-w-2xl text-cream/70">{t.gallery.sub}</p>
-          </div>
-        </Reveal>
-        <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
-          {GALLERY.map((g, i) => (
-            <Reveal key={g.src} delay={(i % 3) * 0.08}>
-              <div className="group relative aspect-[4/5] overflow-hidden rounded-2xl ring-1 ring-white/10">
-                <Image
-                  src={g.src}
-                  alt={g.alt}
-                  fill
-                  sizes="(max-width:768px) 50vw, 33vw"
-                  className="object-cover transition duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/40 to-transparent opacity-0 transition group-hover:opacity-100" />
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </Section>
+              {/* STORY */}
+              <Section id="story">
+                <div className="grid items-center gap-12 lg:grid-cols-2">
+                  <Reveal>
+                    <Tag>{t.story.tag}</Tag>
+                    <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.story.title}</h2>
+                    <div className="mt-6 space-y-4 text-cream/75">
+                      {t.story.body.map((p, i) => (
+                        <p key={i}>{p}</p>
+                      ))}
+                    </div>
+                  </Reveal>
+                  <Reveal delay={0.15}>
+                    <div className="relative mx-auto aspect-[4/5] w-full max-w-md">
+                      <div className="absolute inset-0 rounded-3xl bg-teal/10 blur-2xl" />
+                      <Image src="/brand/bar-shelves.jpg" alt="Бариста DOFFA за стойкой" fill sizes="(max-width:768px) 90vw, 28rem" className="relative rounded-3xl object-cover ring-1 ring-gold/30" />
+                    </div>
+                  </Reveal>
+                </div>
+              </Section>
 
-      {/* ---------- BUY ---------- */}
-      <Section id="buy">
-        <div className="grid items-center gap-12 lg:grid-cols-2">
-          <Reveal>
-            <Tag>{t.buy.tag}</Tag>
-            <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.buy.title}</h2>
-            <p className="mt-4 text-cream/70">{t.buy.sub}</p>
-            <div className="mt-7">
-              {wallet ? (
-                <div className="space-y-3">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <span className="inline-flex items-center gap-2 rounded-full border border-teal/40 bg-teal/10 px-4 py-2 text-sm font-semibold text-teal">
-                      <span className="h-2 w-2 rounded-full bg-teal" />
-                      {t.buy.connected}: {wallet.slice(0, 4)}…{wallet.slice(-4)}
-                    </span>
-                    <button onClick={disconnectWallet} className="text-xs text-cream/50 underline transition hover:text-cream">
-                      {t.buy.disconnect}
-                    </button>
+              {/* HOW */}
+              <Section id="how">
+                <Reveal>
+                  <div className="text-center">
+                    <Tag>{t.how.tag}</Tag>
+                    <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.how.title}</h2>
+                    <p className="mx-auto mt-4 max-w-2xl text-cream/70">{t.how.sub}</p>
                   </div>
-                  <div className="rounded-xl border border-white/10 bg-white/[0.02] px-5 py-4">
-                    <div className="text-xs uppercase tracking-wider text-cream/50">{t.buy.balanceLabel}</div>
-                    <div className="display mt-1 text-2xl font-extrabold text-cream-soft">
-                      {walletBal === null ? "…" : walletBal.toLocaleString("ru-RU")}{" "}
-                      <span className="text-gold">{TOKEN.symbol}</span>
+                </Reveal>
+                <div className="mt-12 grid gap-6 md:grid-cols-3">
+                  {t.how.steps.map((s, i) => (
+                    <Reveal key={i} delay={i * 0.12}>
+                      <div className="card h-full rounded-2xl p-7">
+                        <div className="display mb-4 text-3xl font-extrabold text-teal">0{i + 1}</div>
+                        <h3 className="display text-xl font-bold text-cream-soft">{s.t}</h3>
+                        <p className="mt-3 text-sm text-cream/70">{s.d}</p>
+                      </div>
+                    </Reveal>
+                  ))}
+                </div>
+              </Section>
+            </motion.div>
+          )}
+
+          {/* TAB: TOKEN */}
+          {activeTab === "token" && (
+            <motion.div key="token" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}>
+              {/* TOKEN */}
+              <Section id="token">
+                <div className="grid gap-12 lg:grid-cols-2">
+                  <Reveal>
+                    <Tag>{t.token.tag}</Tag>
+                    <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.token.title}</h2>
+                    <p className="mt-4 text-cream/70">{t.token.sub}</p>
+                    <dl className="mt-7 divide-y divide-white/10 overflow-hidden rounded-2xl border border-white/10">
+                      {t.token.rows.map((r) => (
+                        <div key={r.k} className="flex items-center justify-between bg-white/[0.02] px-5 py-3">
+                          <dt className="text-sm text-cream/60">{r.k}</dt>
+                          <dd className="display text-sm font-bold text-cream-soft">{r.v}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </Reveal>
+                  <Reveal delay={0.15}>
+                    <div className="card rounded-2xl p-7">
+                      <p className="display mb-6 text-lg font-bold text-cream-soft">Allocation</p>
+                      <div className="space-y-5">
+                        {t.token.alloc.map((a, i) => (
+                          <div key={a.name}>
+                            <div className="mb-1.5 flex justify-between text-sm">
+                              <span className="text-cream/75">{a.name}</span>
+                              <span className="display font-bold text-gold">{a.pct}%</span>
+                            </div>
+                            <div className="h-2.5 overflow-hidden rounded-full bg-white/10">
+                              <motion.div
+                                initial={{ width: 0 }}
+                                whileInView={{ width: `${a.pct}%` }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 1, delay: i * 0.1, ease: "easeOut" }}
+                                className="h-full rounded-full bg-gradient-to-r from-amber to-gold"
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </Reveal>
+                </div>
+              </Section>
+
+              {/* BURNS */}
+              <Section id="burns">
+                <Reveal>
+                  <div className="text-center">
+                    <Tag>{t.burns.tag}</Tag>
+                    <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.burns.title}</h2>
+                    {isLive && (
+                      <span className="mt-4 inline-flex items-center gap-2 rounded-full border border-teal/40 bg-teal/10 px-3 py-1 text-xs font-semibold text-teal">
+                        <span className="h-2 w-2 animate-pulse rounded-full bg-teal" />
+                        {t.burns.live}
+                      </span>
+                    )}
+                  </div>
+                </Reveal>
+                <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                  <Stat label={t.burns.supply} value={TOKEN.supply.toLocaleString("ru-RU")} unit={TOKEN.symbol} />
+                  <Stat label={t.burns.burned} value={<CountUp to={burned} />} unit={`🔥 ${TOKEN.symbol}`} accent />
+                  <Stat label={t.burns.left} value={remaining.toLocaleString("ru-RU")} unit={TOKEN.symbol} />
+                  <Stat label={t.burns.cups} value={<CountUp to={cupsSold} />} unit="☕" />
+                </div>
+                <Reveal>
+                  <div className="mt-8 h-3 overflow-hidden rounded-full bg-white/10">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      whileInView={{ width: `${Math.max(burnedPct, 1.5)}%` }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 1.4, ease: "easeOut" }}
+                      className="h-full rounded-full bg-gradient-to-r from-amber to-teal"
+                    />
+                  </div>
+                  <p className="mt-4 text-center text-xs text-cream/50">{isLive ? t.burns.liveNote : t.burns.note}</p>
+                  <div className="mt-3 text-center">
+                    <a
+                      href={solscanToken()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal transition hover:text-gold"
+                    >
+                      {t.burns.verify} ↗
+                    </a>
+                  </div>
+                </Reveal>
+              </Section>
+
+              {/* PROOF */}
+              <Section id="proof">
+                <Reveal>
+                  <div className="text-center">
+                    <Tag>{t.proof.tag}</Tag>
+                    <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.proof.title}</h2>
+                    <p className="mx-auto mt-4 max-w-2xl text-cream/70">{t.proof.sub}</p>
+                  </div>
+                </Reveal>
+
+                <Reveal>
+                  <div className="mt-10 overflow-hidden rounded-2xl border border-white/10">
+                    <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-3 border-b border-white/10 bg-white/[0.03] px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-cream/40">
+                      <span>{t.proof.colTime}</span>
+                      <span className="text-right">{t.proof.colAmount}</span>
+                      <span className="hidden text-right sm:block">{t.proof.colSale}</span>
+                      <span className="text-right">{t.proof.colHash}</span>
+                      <span className="text-right">{t.proof.colVerify}</span>
+                    </div>
+
+                    {burns === null ? (
+                      <div className="flex items-center justify-center gap-2 px-5 py-12 text-sm text-cream/40">
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-teal/40 border-t-teal" />
+                        {t.proof.loading}
+                      </div>
+                    ) : burns.length === 0 ? (
+                      <div className="px-5 py-12 text-center text-sm text-cream/40">{t.proof.empty}</div>
+                    ) : (
+                      burns.map((b, i) => (
+                        <BurnRow key={b.sig} burn={b} even={i % 2 === 0} verifyLabel={t.proof.colVerify} />
+                      ))
+                    )}
+                  </div>
+                </Reveal>
+
+                {burns && burns.length > 0 && isLive && burns.length !== burned && (
+                  <Reveal>
+                    <div className="mt-5 flex items-start gap-3 rounded-xl border border-amber/40 bg-amber/10 px-5 py-4 text-sm text-amber">
+                      <span className="mt-0.5 shrink-0">⚠</span>
+                      <div>
+                        <p className="font-semibold">{t.proof.mismatchWarn}</p>
+                        <p className="mt-1 text-xs text-amber/70">
+                          {lang === "ru"
+                            ? `Solana: ${burned.toLocaleString("ru-RU")} сожжено · On-chain мемо: ${burns.length} записей`
+                            : `Solana: ${burned.toLocaleString("en-US")} burned · On-chain memos: ${burns.length} records`}
+                        </p>
+                      </div>
+                    </div>
+                  </Reveal>
+                )}
+
+                <div className="mt-20">
+                  <Reveal>
+                    <div className="text-center">
+                      <Tag>{t.proof.trustTag}</Tag>
+                      <h3 className="display mt-5 text-3xl font-bold text-cream-soft sm:text-4xl">{t.proof.trustTitle}</h3>
+                      <p className="mx-auto mt-4 max-w-2xl text-cream/70">{t.proof.trustSub}</p>
+                    </div>
+                  </Reveal>
+
+                  <div className="mt-10 grid gap-6 md:grid-cols-3">
+                    {t.proof.trustSteps.map((s, i) => (
+                      <Reveal key={i} delay={i * 0.1}>
+                        <div className="card h-full rounded-2xl p-7">
+                          <div className="mb-4 text-4xl">{s.icon}</div>
+                          <h4 className="display text-lg font-bold text-cream-soft">{s.t}</h4>
+                          <p className="mt-3 text-sm leading-relaxed text-cream/70">{s.d}</p>
+                        </div>
+                      </Reveal>
+                    ))}
+                  </div>
+
+                  <Reveal>
+                    <div className="mt-10 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] p-6">
+                      <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-cream/40">
+                        {lang === "ru" ? "Поток данных" : "Data flow"}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-2 text-sm">
+                        {[
+                          { icon: "☕", label: lang === "ru" ? "Продажа кофе" : "Coffee sale" },
+                          { icon: "→", label: null },
+                          { icon: "🧾", label: lang === "ru" ? "POS вебхук" : "POS webhook" },
+                          { icon: "→", label: null },
+                          { icon: "🔐", label: lang === "ru" ? "receipt_hash" : "receipt_hash" },
+                          { icon: "→", label: null },
+                          { icon: "⛓", label: lang === "ru" ? "Solana memo" : "Solana memo" },
+                          { icon: "→", label: null },
+                          { icon: "📊", label: lang === "ru" ? "Этот дашборд" : "This dashboard" },
+                        ].map((step, i) =>
+                          step.label === null ? (
+                            <span key={i} className="text-cream/30">{step.icon}</span>
+                          ) : (
+                            <span key={i} className="inline-flex flex-col items-center gap-1 rounded-xl border border-white/10 px-4 py-3 text-center">
+                              <span className="text-xl">{step.icon}</span>
+                              <span className="text-xs text-cream/60">{step.label}</span>
+                            </span>
+                          ),
+                        )}
+                      </div>
+                      <p className="mt-4 text-xs text-cream/40">
+                        {lang === "ru"
+                          ? "Сайт не может редактировать историю сжиганий — она живёт только в Solana."
+                          : "The website cannot edit the burn history — it exists only on Solana."}
+                      </p>
+                    </div>
+                  </Reveal>
+                </div>
+              </Section>
+            </motion.div>
+          )}
+
+          {/* TAB: CAFE */}
+          {activeTab === "cafe" && (
+            <motion.div key="cafe" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}>
+              {/* MENU */}
+              <Section id="menu">
+                <Reveal>
+                  <div className="text-center">
+                    <Tag>{t.menu.tag}</Tag>
+                    <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.menu.title}</h2>
+                    <p className="mx-auto mt-4 max-w-2xl text-cream/70">{t.menu.sub}</p>
+                  </div>
+                </Reveal>
+                <div className="mt-10 grid gap-5 md:grid-cols-3">
+                  {t.menu.groups.map((group, gi) => (
+                    <Reveal key={group.title} delay={gi * 0.1}>
+                      <div className="card h-full rounded-2xl p-6">
+                        <h3 className="display mb-4 text-lg font-bold text-teal">{group.title}</h3>
+                        <ul className="divide-y divide-white/[0.06]">
+                          {group.items.map((item) => (
+                            <li key={item.name} className="flex items-baseline justify-between gap-3 py-2.5">
+                              <span className="text-sm text-cream/85">{item.name}</span>
+                              {item.price && <span className="display shrink-0 text-sm font-bold text-gold">{item.price}</span>}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </Reveal>
+                  ))}
+                </div>
+                <Reveal>
+                  <p className="mt-6 text-center text-sm text-cream/55">{t.menu.note}</p>
+                </Reveal>
+                <div className="relative mt-8 overflow-hidden rounded-3xl">
+                  <Image src="/brand/cups-four.jpg" alt="Латте-арт DOFFA" width={1200} height={800} className="h-48 w-full object-cover object-center sm:h-72" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink/80 to-transparent" />
+                </div>
+              </Section>
+
+              {/* GALLERY */}
+              <Section id="gallery">
+                <Reveal>
+                  <div className="text-center">
+                    <Tag>{t.gallery.tag}</Tag>
+                    <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.gallery.title}</h2>
+                    <p className="mx-auto mt-4 max-w-2xl text-cream/70">{t.gallery.sub}</p>
+                  </div>
+                </Reveal>
+                <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
+                  {GALLERY.map((g, i) => (
+                    <Reveal key={g.src} delay={(i % 3) * 0.08}>
+                      <div className="group relative aspect-[4/5] overflow-hidden rounded-2xl ring-1 ring-white/10">
+                        <Image
+                          src={g.src}
+                          alt={g.alt}
+                          fill
+                          sizes="(max-width:768px) 50vw, 33vw"
+                          className="object-cover transition duration-700 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-ink/40 to-transparent opacity-0 transition group-hover:opacity-100" />
+                      </div>
+                    </Reveal>
+                  ))}
+                </div>
+              </Section>
+            </motion.div>
+          )}
+
+          {/* TAB: COMMUNITY */}
+          {activeTab === "community" && (
+            <motion.div key="community" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}>
+              {/* ROADMAP */}
+              <Section id="roadmap">
+                <Reveal>
+                  <Tag>{t.roadmap.tag}</Tag>
+                  <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.roadmap.title}</h2>
+                </Reveal>
+                <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                  {t.roadmap.phases.map((p, i) => (
+                    <Reveal key={p.n} delay={i * 0.08}>
+                      <div className={`h-full rounded-2xl border p-6 ${p.done ? "border-teal/50 bg-teal/[0.07]" : "border-white/10 bg-white/[0.02]"}`}>
+                        <div className="flex items-center justify-between">
+                          <span className="display text-2xl font-extrabold text-gold">{p.n}</span>
+                          {p.done && <span className="rounded-full bg-teal/20 px-2 py-0.5 text-[10px] font-bold uppercase text-teal">✓</span>}
+                        </div>
+                        <h3 className="display mt-3 text-lg font-bold text-cream-soft">{p.t}</h3>
+                        <p className="mt-2 text-sm text-cream/65">{p.d}</p>
+                      </div>
+                    </Reveal>
+                  ))}
+                </div>
+              </Section>
+
+              {/* FAQ */}
+              <Section id="faq">
+                <Reveal>
+                  <div className="text-center">
+                    <Tag>{t.faq.tag}</Tag>
+                    <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.faq.title}</h2>
+                  </div>
+                </Reveal>
+                <div className="mx-auto mt-10 max-w-3xl space-y-3">
+                  {t.faq.items.map((f, i) => (
+                    <Reveal key={i} delay={i * 0.06}>
+                      <details className="card group rounded-xl px-6 py-4">
+                        <summary className="flex cursor-pointer list-none items-center justify-between font-semibold text-cream-soft">
+                          {f.q}
+                          <span className="text-gold transition group-open:rotate-45">+</span>
+                        </summary>
+                        <p className="mt-3 text-sm text-cream/70">{f.a}</p>
+                      </details>
+                    </Reveal>
+                  ))}
+                </div>
+              </Section>
+            </motion.div>
+          )}
+
+          {/* TAB: BUY */}
+          {activeTab === "buy" && (
+            <motion.div key="buy" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}>
+              <Section id="buy">
+                <div className="grid items-center gap-12 lg:grid-cols-2">
+                  <Reveal>
+                    <Tag>{t.buy.tag}</Tag>
+                    <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.buy.title}</h2>
+                    <p className="mt-4 text-cream/70">{t.buy.sub}</p>
+                    <div className="mt-7">
+                      {wallet ? (
+                        <div className="space-y-3">
+                          <div className="flex flex-wrap items-center gap-3">
+                            <span className="inline-flex items-center gap-2 rounded-full border border-teal/40 bg-teal/10 px-4 py-2 text-sm font-semibold text-teal">
+                              <span className="h-2 w-2 rounded-full bg-teal" />
+                              {t.buy.connected}: {wallet.slice(0, 4)}…{wallet.slice(-4)}
+                            </span>
+                            <button onClick={disconnectWallet} className="text-xs text-cream/50 underline transition hover:text-cream">
+                              {t.buy.disconnect}
+                            </button>
+                          </div>
+                          <div className="rounded-xl border border-white/10 bg-white/[0.02] px-5 py-4">
+                            <div className="text-xs uppercase tracking-wider text-cream/50">{t.buy.balanceLabel}</div>
+                            <div className="display mt-1 text-2xl font-extrabold text-cream-soft">
+                              {walletBal === null ? "…" : walletBal.toLocaleString("ru-RU")}{" "}
+                              <span className="text-gold">{TOKEN.symbol}</span>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={connectWallet}
+                          className="inline-flex items-center gap-2 rounded-full bg-gold px-7 py-3 font-bold text-ink transition hover:brightness-110"
+                        >
+                          {t.buy.connect}
+                        </button>
+                      )}
+                      <p className="mt-3 max-w-md text-xs text-cream/50">{t.buy.demoNote}</p>
+                    </div>
+                  </Reveal>
+                  <Reveal delay={0.15}>
+                    <ul className="space-y-4">
+                      {t.buy.points.map((p, i) => (
+                        <li key={i} className="card flex items-start gap-3 rounded-xl p-5">
+                          <span className="mt-0.5 text-teal">✦</span>
+                          <span className="text-sm text-cream/80">{p}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </Reveal>
+                </div>
+              </Section>
+            </motion.div>
+          )}
+
+          {/* TAB: CONTACT */}
+          {activeTab === "contact" && (
+            <motion.div key="contact" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}>
+              <Section id="contact">
+                <Reveal>
+                  <div className="card rounded-3xl p-8 sm:p-12">
+                    <div className="grid gap-10 lg:grid-cols-2">
+                      <div>
+                        <Tag>{t.contact.tag}</Tag>
+                        <h2 className="display mt-5 text-4xl font-bold text-cream-soft">{t.contact.title}</h2>
+                        <p className="mt-4 text-cream/70">{t.contact.sub}</p>
+                        <div className="mt-6 flex flex-wrap gap-3">
+                          <a
+                            href={TOKEN.instagram}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-6 py-3 font-semibold text-gold transition hover:bg-gold hover:text-ink"
+                          >
+                            {t.contact.ig} {TOKEN.instagramHandle}
+                          </a>
+                          <a
+                            href={CONTACT.whatsapp}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 rounded-full border border-teal/40 bg-teal/10 px-6 py-3 font-semibold text-teal transition hover:bg-teal hover:text-ink"
+                          >
+                            WhatsApp
+                          </a>
+                        </div>
+                      </div>
+                      <div className="grid content-center gap-4">
+                        <InfoRow k={t.contact.address} v={t.contact.addressVal} href={CONTACT.map} />
+                        <InfoRow k={t.contact.phone} v={t.contact.phoneVal} href={`tel:${CONTACT.phoneTel}`} />
+                        <InfoRow k={t.contact.hours} v={t.contact.hoursVal} />
+                        <InfoRow k={t.contact.ig} v={TOKEN.instagramHandle} href={TOKEN.instagram} />
+                      </div>
                     </div>
                   </div>
-                </div>
-              ) : (
-                <button
-                  onClick={connectWallet}
-                  className="inline-flex items-center gap-2 rounded-full bg-gold px-7 py-3 font-bold text-ink transition hover:brightness-110"
-                >
-                  {t.buy.connect}
-                </button>
-              )}
-              <p className="mt-3 max-w-md text-xs text-cream/50">{t.buy.demoNote}</p>
-            </div>
-          </Reveal>
-          <Reveal delay={0.15}>
-            <ul className="space-y-4">
-              {t.buy.points.map((p, i) => (
-                <li key={i} className="card flex items-start gap-3 rounded-xl p-5">
-                  <span className="mt-0.5 text-teal">✦</span>
-                  <span className="text-sm text-cream/80">{p}</span>
-                </li>
-              ))}
-            </ul>
-          </Reveal>
-        </div>
-      </Section>
-
-      {/* ---------- ROADMAP ---------- */}
-      <Section id="roadmap">
-        <Reveal>
-          <Tag>{t.roadmap.tag}</Tag>
-          <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.roadmap.title}</h2>
-        </Reveal>
-        <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {t.roadmap.phases.map((p, i) => (
-            <Reveal key={p.n} delay={i * 0.08}>
-              <div className={`h-full rounded-2xl border p-6 ${p.done ? "border-teal/50 bg-teal/[0.07]" : "border-white/10 bg-white/[0.02]"}`}>
-                <div className="flex items-center justify-between">
-                  <span className="display text-2xl font-extrabold text-gold">{p.n}</span>
-                  {p.done && <span className="rounded-full bg-teal/20 px-2 py-0.5 text-[10px] font-bold uppercase text-teal">✓</span>}
-                </div>
-                <h3 className="display mt-3 text-lg font-bold text-cream-soft">{p.t}</h3>
-                <p className="mt-2 text-sm text-cream/65">{p.d}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </Section>
-
-      {/* ---------- FAQ ---------- */}
-      <Section id="faq">
-        <Reveal>
-          <div className="text-center">
-            <Tag>{t.faq.tag}</Tag>
-            <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.faq.title}</h2>
-          </div>
-        </Reveal>
-        <div className="mx-auto mt-10 max-w-3xl space-y-3">
-          {t.faq.items.map((f, i) => (
-            <Reveal key={i} delay={i * 0.06}>
-              <details className="card group rounded-xl px-6 py-4">
-                <summary className="flex cursor-pointer list-none items-center justify-between font-semibold text-cream-soft">
-                  {f.q}
-                  <span className="text-gold transition group-open:rotate-45">+</span>
-                </summary>
-                <p className="mt-3 text-sm text-cream/70">{f.a}</p>
-              </details>
-            </Reveal>
-          ))}
-        </div>
-      </Section>
-
-      {/* ---------- CONTACT ---------- */}
-      <Section id="contact">
-        <Reveal>
-          <div className="card rounded-3xl p-8 sm:p-12">
-            <div className="grid gap-10 lg:grid-cols-2">
-              <div>
-                <Tag>{t.contact.tag}</Tag>
-                <h2 className="display mt-5 text-4xl font-bold text-cream-soft">{t.contact.title}</h2>
-                <p className="mt-4 text-cream/70">{t.contact.sub}</p>
-                <div className="mt-6 flex flex-wrap gap-3">
-                  <a
-                    href={TOKEN.instagram}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-6 py-3 font-semibold text-gold transition hover:bg-gold hover:text-ink"
-                  >
-                    {t.contact.ig} {TOKEN.instagramHandle}
-                  </a>
-                  <a
-                    href={CONTACT.whatsapp}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-full border border-teal/40 bg-teal/10 px-6 py-3 font-semibold text-teal transition hover:bg-teal hover:text-ink"
-                  >
-                    WhatsApp
-                  </a>
-                </div>
-              </div>
-              <div className="grid content-center gap-4">
-                <InfoRow k={t.contact.address} v={t.contact.addressVal} href={CONTACT.map} />
-                <InfoRow k={t.contact.phone} v={t.contact.phoneVal} href={`tel:${CONTACT.phoneTel}`} />
-                <InfoRow k={t.contact.hours} v={t.contact.hoursVal} />
-                <InfoRow k={t.contact.ig} v={TOKEN.instagramHandle} href={TOKEN.instagram} />
-              </div>
-            </div>
-          </div>
-        </Reveal>
-      </Section>
+                </Reveal>
+              </Section>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       {/* ---------- FOOTER ---------- */}
       <footer className="border-t border-white/5 px-5 py-12">
