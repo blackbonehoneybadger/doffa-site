@@ -279,10 +279,10 @@ export default function Home() {
           </div>
         </Reveal>
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          <Stat label={t.burns.supply} value={TOKEN.supply.toLocaleString("ru-RU")} />
-          <Stat label={t.burns.burned} value={<><CountUp to={MOCK.burned} /> 🔥</>} accent />
-          <Stat label={t.burns.left} value={remaining.toLocaleString("ru-RU")} />
-          <Stat label={t.burns.cups} value={<><CountUp to={MOCK.cupsSold} /> ☕</>} />
+          <Stat label={t.burns.supply} value={TOKEN.supply.toLocaleString("ru-RU")} unit={TOKEN.symbol} />
+          <Stat label={t.burns.burned} value={<CountUp to={MOCK.burned} />} unit={`🔥 ${TOKEN.symbol}`} accent />
+          <Stat label={t.burns.left} value={remaining.toLocaleString("ru-RU")} unit={TOKEN.symbol} />
+          <Stat label={t.burns.cups} value={<CountUp to={MOCK.cupsSold} />} unit="☕" />
         </div>
         <Reveal>
           <div className="mt-8 h-3 overflow-hidden rounded-full bg-white/10">
@@ -346,13 +346,25 @@ export default function Home() {
           {GALLERY.map((g, i) => (
             <Reveal key={g.src} delay={(i % 3) * 0.08}>
               <div className="group relative aspect-[4/5] overflow-hidden rounded-2xl ring-1 ring-white/10">
-                <Image
-                  src={g.src}
-                  alt={g.alt}
-                  fill
-                  sizes="(max-width:768px) 50vw, 33vw"
-                  className="object-cover transition duration-700 group-hover:scale-105"
-                />
+                {g.video ? (
+                  <video
+                    src={g.src}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    aria-label={g.alt}
+                    className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                  />
+                ) : (
+                  <Image
+                    src={g.src}
+                    alt={g.alt}
+                    fill
+                    sizes="(max-width:768px) 50vw, 33vw"
+                    className="object-cover transition duration-700 group-hover:scale-105"
+                  />
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-ink/40 to-transparent opacity-0 transition group-hover:opacity-100" />
               </div>
             </Reveal>
@@ -497,11 +509,12 @@ function Section({ id, children }: { id: string; children: React.ReactNode }) {
   );
 }
 
-function Stat({ label, value, accent }: { label: string; value: React.ReactNode; accent?: boolean }) {
+function Stat({ label, value, unit, accent }: { label: string; value: React.ReactNode; unit?: string; accent?: boolean }) {
   return (
     <Reveal>
-      <div className={`rounded-2xl border p-6 text-center ${accent ? "border-amber/40 bg-amber/[0.07]" : "border-white/10 bg-white/[0.02]"}`}>
-        <div className="display text-3xl font-extrabold text-cream-soft sm:text-4xl">{value}</div>
+      <div className={`flex h-full flex-col rounded-2xl border p-6 text-center ${accent ? "border-amber/40 bg-amber/[0.07]" : "border-white/10 bg-white/[0.02]"}`}>
+        <div className="display text-2xl font-extrabold leading-tight text-cream-soft tabular-nums sm:text-3xl">{value}</div>
+        {unit && <div className="mt-1.5 text-sm font-semibold text-gold">{unit}</div>}
         <div className="mt-2 text-xs uppercase tracking-wider text-cream/50">{label}</div>
       </div>
     </Reveal>

@@ -21,14 +21,18 @@ export const CONTACT = {
   map: "https://maps.app.goo.gl/27uFoNANjXDcSHVX9",
 };
 
-// Фото кофейни для секции «Галерея» (лежат в public/brand/).
-export const GALLERY: { src: string; alt: string }[] = [
+// Медиа кофейни для секции «Галерея» (лежат в public/brand/).
+// video: true — отрисовать как зацикленный ролик без звука.
+export const GALLERY: { src: string; alt: string; video?: boolean }[] = [
+  { src: "/brand/icedlatte.mp4", alt: "Налив айс-латте", video: true },
   { src: "/brand/latteart-blue.jpg", alt: "Латте-арт в синей чашке" },
   { src: "/brand/interior-sunset.jpg", alt: "Зал кофейни на закате" },
   { src: "/brand/coldbrew-logo.jpg", alt: "Холодный кофе на фоне логотипа DOFFA" },
+  { src: "/brand/cat.mp4", alt: "Кот кофейни DOFFA", video: true },
   { src: "/brand/flatwhite-dark.jpg", alt: "Флэт уайт и стакан воды" },
   { src: "/brand/bar-golden.jpg", alt: "Барная стойка в золотой час" },
   { src: "/brand/flowercup.jpg", alt: "Капучино в цветочной чашке" },
+  { src: "/brand/logo-sign.jpg", alt: "Вывеска DOFFA Espresso Bar" },
 ];
 
 // Временные данные для дашборда (до mainnet-запуска).
