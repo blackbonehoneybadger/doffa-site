@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView, useMotionValue, animate } from "framer-motion";
-import { dict, TOKEN, MOCK, CONTACT, type Lang } from "./content";
+import { dict, TOKEN, MOCK, CONTACT, GALLERY, type Lang } from "./content";
 
 // Вертикальный ролик бариста в hero. Лежит в public/brand/barista.mp4.
 const HERO_VIDEO: string | null = "/brand/barista.mp4";
@@ -62,6 +62,7 @@ export default function Home() {
     { id: "token",   label: t.nav.token },
     { id: "burns",   label: t.nav.burns },
     { id: "menu",    label: t.nav.menu },
+    { id: "gallery", label: t.nav.gallery },
     { id: "buy",     label: t.nav.buy },
     { id: "roadmap", label: t.nav.roadmap },
     { id: "faq",     label: t.nav.faq },
@@ -196,9 +197,9 @@ export default function Home() {
             </div>
           </Reveal>
           <Reveal delay={0.15}>
-            <div className="relative mx-auto aspect-square w-full max-w-md">
+            <div className="relative mx-auto aspect-[4/5] w-full max-w-md">
               <div className="absolute inset-0 rounded-3xl bg-teal/10 blur-2xl" />
-              <Image src="/brand/doffa-logo.jpeg" alt="DOFFA Espresso Bar" fill sizes="(max-width:768px) 90vw, 28rem" className="relative rounded-3xl object-cover ring-1 ring-gold/30" />
+              <Image src="/brand/bar-shelves.jpg" alt="Бариста DOFFA за стойкой" fill sizes="(max-width:768px) 90vw, 28rem" className="relative rounded-3xl object-cover ring-1 ring-gold/30" />
             </div>
           </Reveal>
         </div>
@@ -303,29 +304,59 @@ export default function Home() {
           <div className="text-center">
             <Tag>{t.menu.tag}</Tag>
             <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.menu.title}</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-cream/70">{t.menu.sub}</p>
           </div>
         </Reveal>
-        <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {t.menu.items.map((item, i) => (
-            <Reveal key={item.name} delay={i * 0.06}>
-              <div className="card h-full rounded-2xl p-5">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <p className="display font-bold text-cream-soft">{item.name}</p>
-                    <p className="mt-1 text-xs text-cream/55">{item.desc}</p>
-                  </div>
-                  <span className="display shrink-0 text-sm font-bold text-gold">{item.price}</span>
-                </div>
+        <div className="mt-10 grid gap-5 md:grid-cols-3">
+          {t.menu.groups.map((group, gi) => (
+            <Reveal key={group.title} delay={gi * 0.1}>
+              <div className="card h-full rounded-2xl p-6">
+                <h3 className="display mb-4 text-lg font-bold text-teal">{group.title}</h3>
+                <ul className="divide-y divide-white/[0.06]">
+                  {group.items.map((item) => (
+                    <li key={item.name} className="flex items-baseline justify-between gap-3 py-2.5">
+                      <span className="text-sm text-cream/85">{item.name}</span>
+                      {item.price && <span className="display shrink-0 text-sm font-bold text-gold">{item.price}</span>}
+                    </li>
+                  ))}
+                </ul>
               </div>
             </Reveal>
           ))}
         </div>
+        <Reveal>
+          <p className="mt-6 text-center text-sm text-cream/55">{t.menu.note}</p>
+        </Reveal>
         <div className="relative mt-8 overflow-hidden rounded-3xl">
-          <Image src="/brand/cafe-night-1.png" alt="DOFFA" width={1200} height={800} className="h-48 w-full object-cover sm:h-64" />
+          <Image src="/brand/cups-four.jpg" alt="Латте-арт DOFFA" width={1200} height={800} className="h-48 w-full object-cover object-center sm:h-72" />
           <div className="absolute inset-0 bg-gradient-to-t from-ink/80 to-transparent" />
-          <div className="absolute bottom-0 left-0 p-6">
-            <p className="text-xs text-cream/50">{t.menu.sub}</p>
+        </div>
+      </Section>
+
+      {/* ---------- GALLERY ---------- */}
+      <Section id="gallery">
+        <Reveal>
+          <div className="text-center">
+            <Tag>{t.gallery.tag}</Tag>
+            <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.gallery.title}</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-cream/70">{t.gallery.sub}</p>
           </div>
+        </Reveal>
+        <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
+          {GALLERY.map((g, i) => (
+            <Reveal key={g.src} delay={(i % 3) * 0.08}>
+              <div className="group relative aspect-[4/5] overflow-hidden rounded-2xl ring-1 ring-white/10">
+                <Image
+                  src={g.src}
+                  alt={g.alt}
+                  fill
+                  sizes="(max-width:768px) 50vw, 33vw"
+                  className="object-cover transition duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/40 to-transparent opacity-0 transition group-hover:opacity-100" />
+              </div>
+            </Reveal>
+          ))}
         </div>
       </Section>
 

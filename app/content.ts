@@ -21,6 +21,16 @@ export const CONTACT = {
   map: "https://maps.app.goo.gl/27uFoNANjXDcSHVX9",
 };
 
+// Фото кофейни для секции «Галерея» (лежат в public/brand/).
+export const GALLERY: { src: string; alt: string }[] = [
+  { src: "/brand/latteart-blue.jpg", alt: "Латте-арт в синей чашке" },
+  { src: "/brand/interior-sunset.jpg", alt: "Зал кофейни на закате" },
+  { src: "/brand/coldbrew-logo.jpg", alt: "Холодный кофе на фоне логотипа DOFFA" },
+  { src: "/brand/flatwhite-dark.jpg", alt: "Флэт уайт и стакан воды" },
+  { src: "/brand/bar-golden.jpg", alt: "Барная стойка в золотой час" },
+  { src: "/brand/flowercup.jpg", alt: "Капучино в цветочной чашке" },
+];
+
 // Временные данные для дашборда (до mainnet-запуска).
 export const MOCK = {
   burned: 12_840,
@@ -29,13 +39,14 @@ export const MOCK = {
 };
 
 type Dict = {
-  nav: { story: string; how: string; token: string; burns: string; menu: string; buy: string; roadmap: string; faq: string; contact: string };
+  nav: { story: string; how: string; token: string; burns: string; menu: string; gallery: string; buy: string; roadmap: string; faq: string; contact: string };
   hero: { kicker: string; title1: string; title2: string; sub: string; ctaBuy: string; ctaMenu: string; soon: string; mediaCaption: string };
   story: { tag: string; title: string; body: string[] };
   how: { tag: string; title: string; sub: string; steps: { t: string; d: string }[] };
   token: { tag: string; title: string; sub: string; rows: { k: string; v: string }[]; alloc: { name: string; pct: number }[] };
   burns: { tag: string; title: string; supply: string; burned: string; left: string; cups: string; note: string };
-  menu: { tag: string; title: string; sub: string; items: { name: string; desc: string; price: string }[] };
+  menu: { tag: string; title: string; sub: string; note: string; groups: { title: string; items: { name: string; price: string }[] }[] };
+  gallery: { tag: string; title: string; sub: string };
   buy: { tag: string; title: string; sub: string; connect: string; soon: string; points: string[] };
   roadmap: { tag: string; title: string; phases: { n: string; t: string; d: string; done?: boolean }[] };
   faq: { tag: string; title: string; items: { q: string; a: string }[] };
@@ -45,7 +56,7 @@ type Dict = {
 
 export const dict: Record<Lang, Dict> = {
   ru: {
-    nav: { story: "История", how: "Как это работает", token: "Токеномика", burns: "Сжигания", menu: "Меню", buy: "Купить", roadmap: "Дорожная карта", faq: "FAQ", contact: "Контакты" },
+    nav: { story: "История", how: "Как это работает", token: "Токеномика", burns: "Сжигания", menu: "Меню", gallery: "Галерея", buy: "Купить", roadmap: "Дорожная карта", faq: "FAQ", contact: "Контакты" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "Каждая чашка",
@@ -107,17 +118,53 @@ export const dict: Record<Lang, Dict> = {
     menu: {
       tag: "Кофейня",
       title: "Меню",
-      sub: "Цены ориентировочные — уточняются у владельца.",
-      items: [
-        { name: "Эспрессо",       desc: "Двойной шот, 60 мл",               price: "150 ₽" },
-        { name: "Американо",      desc: "Эспрессо + вода, 200 мл",           price: "170 ₽" },
-        { name: "Капучино",       desc: "Эспрессо + молочная пенка, 200 мл", price: "220 ₽" },
-        { name: "Флэт Уайт",      desc: "Двойной шот + молоко, 180 мл",      price: "230 ₽" },
-        { name: "Латте",          desc: "Эспрессо + молоко, 300 мл",         price: "230 ₽" },
-        { name: "Раф",            desc: "Сливки + ваниль + эспрессо, 200 мл",price: "260 ₽" },
-        { name: "Матча Латте",    desc: "Матча + молоко, 300 мл",            price: "270 ₽" },
-        { name: "Фильтр",         desc: "Альтернативная заварка, 300 мл",    price: "200 ₽" },
+      sub: "Реальное меню кофейни DOFFA. Две цены — два объёма.",
+      note: "+ сироп 40 ₽ · + мёд 30 ₽",
+      groups: [
+        {
+          title: "Кофе",
+          items: [
+            { name: "Эспрессо",      price: "100 / 140 ₽" },
+            { name: "Американо",     price: "100 / 140 ₽" },
+            { name: "Макиато",       price: "100 ₽" },
+            { name: "Капучино",      price: "140 / 160 ₽" },
+            { name: "Латте",         price: "140 / 160 ₽" },
+            { name: "Макачино",      price: "150 / 170 ₽" },
+            { name: "Флэт уайт",     price: "180 ₽" },
+            { name: "Раф",           price: "190 ₽" },
+          ],
+        },
+        {
+          title: "Чай",
+          items: [
+            { name: "Ассам",         price: "80 / 200 ₽" },
+            { name: "Зелёный чай",   price: "80 / 200 ₽" },
+            { name: "Молочный улун", price: "90 / 220 ₽" },
+            { name: "Наглый фрукт",  price: "100 / 250 ₽" },
+            { name: "Облепиха",      price: "150 / 300 ₽" },
+            { name: "Малина",        price: "150 / 300 ₽" },
+            { name: "Имбирный",      price: "150 / 300 ₽" },
+          ],
+        },
+        {
+          title: "Холодные напитки",
+          items: [
+            { name: "Айс латте",         price: "" },
+            { name: "Фрапучино",         price: "" },
+            { name: "Фрапе",             price: "" },
+            { name: "Бамбл",             price: "" },
+            { name: "Бабл ти",           price: "" },
+            { name: "Колд брю",          price: "" },
+            { name: "Мохито",            price: "" },
+            { name: "Молочный коктейль", price: "" },
+          ],
+        },
       ],
+    },
+    gallery: {
+      tag: "Атмосфера",
+      title: "DOFFA вживую",
+      sub: "Кадры из кофейни: кофе, латте-арт, зал и виды на горы Карачаево-Черкесии.",
     },
     buy: {
       tag: "Купить и хранить",
@@ -170,7 +217,7 @@ export const dict: Record<Lang, Dict> = {
       "$DOFFA — утилити-токен, связанный с кофейней DOFFA. Это не ценная бумага, не инвестиционный продукт и не предложение о покупке ценных бумаг. Материалы сайта носят информационный характер и не являются финансовой, юридической или налоговой консультацией. Криптоактивы волатильны и рискованны. Участвуйте ответственно и в рамках законов вашей юрисдикции.",
   },
   en: {
-    nav: { story: "Story", how: "How it works", token: "Tokenomics", burns: "Burns", menu: "Menu", buy: "Buy", roadmap: "Roadmap", faq: "FAQ", contact: "Contact" },
+    nav: { story: "Story", how: "How it works", token: "Tokenomics", burns: "Burns", menu: "Menu", gallery: "Gallery", buy: "Buy", roadmap: "Roadmap", faq: "FAQ", contact: "Contact" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "Every cup",
@@ -232,17 +279,53 @@ export const dict: Record<Lang, Dict> = {
     menu: {
       tag: "Coffee bar",
       title: "Menu",
-      sub: "Prices are indicative — to be confirmed by the owner.",
-      items: [
-        { name: "Espresso",       desc: "Double shot, 60 ml",              price: "150 ₽" },
-        { name: "Americano",      desc: "Espresso + water, 200 ml",        price: "170 ₽" },
-        { name: "Cappuccino",     desc: "Espresso + milk foam, 200 ml",    price: "220 ₽" },
-        { name: "Flat White",     desc: "Double shot + milk, 180 ml",      price: "230 ₽" },
-        { name: "Latte",          desc: "Espresso + milk, 300 ml",         price: "230 ₽" },
-        { name: "Raf",            desc: "Cream + vanilla + espresso, 200 ml", price: "260 ₽" },
-        { name: "Matcha Latte",   desc: "Matcha + milk, 300 ml",           price: "270 ₽" },
-        { name: "Filter",         desc: "Alternative brew, 300 ml",        price: "200 ₽" },
+      sub: "DOFFA's real menu. Two prices — two sizes.",
+      note: "+ syrup 40 ₽ · + honey 30 ₽",
+      groups: [
+        {
+          title: "Coffee",
+          items: [
+            { name: "Espresso",     price: "100 / 140 ₽" },
+            { name: "Americano",    price: "100 / 140 ₽" },
+            { name: "Macchiato",    price: "100 ₽" },
+            { name: "Cappuccino",   price: "140 / 160 ₽" },
+            { name: "Latte",        price: "140 / 160 ₽" },
+            { name: "Mochaccino",   price: "150 / 170 ₽" },
+            { name: "Flat white",   price: "180 ₽" },
+            { name: "Raf",          price: "190 ₽" },
+          ],
+        },
+        {
+          title: "Tea",
+          items: [
+            { name: "Assam",        price: "80 / 200 ₽" },
+            { name: "Green tea",    price: "80 / 200 ₽" },
+            { name: "Milk oolong",  price: "90 / 220 ₽" },
+            { name: "Cheeky fruit", price: "100 / 250 ₽" },
+            { name: "Sea buckthorn",price: "150 / 300 ₽" },
+            { name: "Raspberry",    price: "150 / 300 ₽" },
+            { name: "Ginger",       price: "150 / 300 ₽" },
+          ],
+        },
+        {
+          title: "Ice drinks",
+          items: [
+            { name: "Iced latte",    price: "" },
+            { name: "Frappuccino",   price: "" },
+            { name: "Frappe",        price: "" },
+            { name: "Bumble",        price: "" },
+            { name: "Bubble tea",    price: "" },
+            { name: "Cold brew",     price: "" },
+            { name: "Mojito",        price: "" },
+            { name: "Milkshake",     price: "" },
+          ],
+        },
       ],
+    },
+    gallery: {
+      tag: "Atmosphere",
+      title: "DOFFA in real life",
+      sub: "Shots from the coffee bar: coffee, latte art, the room and views of the Karachay-Cherkessia mountains.",
     },
     buy: {
       tag: "Buy & hold",
