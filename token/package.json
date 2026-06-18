@@ -1,0 +1,29 @@
+{
+  "name": "doffa-token",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Скрипты выпуска и сжигания токена $DOFFA на Solana",
+  "scripts": {
+    "keygen": "tsx src/01-keygen.ts",
+    "airdrop": "tsx src/02-airdrop.ts",
+    "create": "tsx src/03-create-token.ts",
+    "burn": "tsx src/04-burn.ts",
+    "revoke": "tsx src/05-revoke.ts",
+    "verify": "tsx src/06-verify.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@metaplex-foundation/mpl-token-metadata": "^3.4.0",
+    "@metaplex-foundation/umi": "^1.5.1",
+    "@metaplex-foundation/umi-bundle-defaults": "^1.5.1",
+    "@solana/spl-token": "^0.4.14",
+    "@solana/web3.js": "^1.98.4",
+    "dotenv": "^16.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "tsx": "^4.22.4",
+    "typescript": "^5.9.3"
+  }
+}
