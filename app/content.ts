@@ -13,6 +13,14 @@ export const TOKEN = {
   instagramHandle: "@coffeedoffa",
 };
 
+// Контакты кофейни (реальные данные).
+export const CONTACT = {
+  phoneDisplay: "+7 928 764-27-68",
+  phoneTel: "+79287642768",
+  whatsapp: "https://wa.me/79287642768",
+  map: "https://maps.app.goo.gl/27uFoNANjXDcSHVX9",
+};
+
 // Временные данные для дашборда (до mainnet-запуска).
 export const MOCK = {
   burned: 12_840,
@@ -31,7 +39,7 @@ type Dict = {
   buy: { tag: string; title: string; sub: string; connect: string; soon: string; points: string[] };
   roadmap: { tag: string; title: string; phases: { n: string; t: string; d: string; done?: boolean }[] };
   faq: { tag: string; title: string; items: { q: string; a: string }[] };
-  contact: { tag: string; title: string; sub: string; address: string; addressVal: string; hours: string; hoursVal: string; ig: string };
+  contact: { tag: string; title: string; sub: string; address: string; addressVal: string; phone: string; phoneVal: string; hours: string; hoursVal: string; ig: string; mapCta: string };
   legal: string;
 };
 
@@ -148,12 +156,15 @@ export const dict: Record<Lang, Dict> = {
     contact: {
       tag: "Контакты",
       title: "Загляните в DOFFA",
-      sub: "Карачаево-Черкесская Республика. Точные адрес, телефон и часы добавим по уточнению от владельца.",
+      sub: "Эспрессо-бар в ауле Псаучье-Дахе, Хабезский район, Карачаево-Черкесия. Заходите на кофе или напишите нам.",
       address: "Адрес",
-      addressVal: "Карачаево-Черкесия, аул (уточняется)",
+      addressVal: "КЧР, аул Псаучье-Дахе, ул. Калмыкова, 10",
+      phone: "Телефон",
+      phoneVal: CONTACT.phoneDisplay,
       hours: "Часы работы",
-      hoursVal: "Ежедневно (уточняется)",
+      hoursVal: "Ежедневно, 07:00–22:00",
       ig: "Instagram",
+      mapCta: "Открыть на карте",
     },
     legal:
       "$DOFFA — утилити-токен, связанный с кофейней DOFFA. Это не ценная бумага, не инвестиционный продукт и не предложение о покупке ценных бумаг. Материалы сайта носят информационный характер и не являются финансовой, юридической или налоговой консультацией. Криптоактивы волатильны и рискованны. Участвуйте ответственно и в рамках законов вашей юрисдикции.",
@@ -270,12 +281,15 @@ export const dict: Record<Lang, Dict> = {
     contact: {
       tag: "Contact",
       title: "Drop by DOFFA",
-      sub: "Karachay-Cherkess Republic. Exact address, phone and hours will be added once confirmed by the owner.",
+      sub: "An espresso bar in the village of Psauche-Dakhe, Khabez district, Karachay-Cherkessia. Come for a coffee or message us.",
       address: "Address",
-      addressVal: "Karachay-Cherkessia, aul (TBC)",
+      addressVal: "Psauche-Dakhe, Kalmykova St. 10, Karachay-Cherkessia",
+      phone: "Phone",
+      phoneVal: CONTACT.phoneDisplay,
       hours: "Hours",
-      hoursVal: "Daily (TBC)",
+      hoursVal: "Daily, 07:00–22:00",
       ig: "Instagram",
+      mapCta: "Open in maps",
     },
     legal:
       "$DOFFA is a utility token connected to the DOFFA coffee bar. It is not a security, not an investment product, and not an offer to sell securities. Site materials are informational only and are not financial, legal or tax advice. Crypto assets are volatile and risky. Participate responsibly and within the laws of your jurisdiction.",

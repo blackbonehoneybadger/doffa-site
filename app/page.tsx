@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView, useMotionValue, animate } from "framer-motion";
-import { dict, TOKEN, MOCK, type Lang } from "./content";
+import { dict, TOKEN, MOCK, CONTACT, type Lang } from "./content";
 
 // Вертикальный ролик бариста в hero. Лежит в public/brand/barista.mp4.
 const HERO_VIDEO: string | null = "/brand/barista.mp4";
@@ -410,19 +410,30 @@ export default function Home() {
                 <Tag>{t.contact.tag}</Tag>
                 <h2 className="display mt-5 text-4xl font-bold text-cream-soft">{t.contact.title}</h2>
                 <p className="mt-4 text-cream/70">{t.contact.sub}</p>
-                <a
-                  href={TOKEN.instagram}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-6 inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-6 py-3 font-semibold text-gold transition hover:bg-gold hover:text-ink"
-                >
-                  {t.contact.ig} {TOKEN.instagramHandle}
-                </a>
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <a
+                    href={TOKEN.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-6 py-3 font-semibold text-gold transition hover:bg-gold hover:text-ink"
+                  >
+                    {t.contact.ig} {TOKEN.instagramHandle}
+                  </a>
+                  <a
+                    href={CONTACT.whatsapp}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-full border border-teal/40 bg-teal/10 px-6 py-3 font-semibold text-teal transition hover:bg-teal hover:text-ink"
+                  >
+                    WhatsApp
+                  </a>
+                </div>
               </div>
               <div className="grid content-center gap-4">
-                <InfoRow k={t.contact.address} v={t.contact.addressVal} />
+                <InfoRow k={t.contact.address} v={t.contact.addressVal} href={CONTACT.map} />
+                <InfoRow k={t.contact.phone} v={t.contact.phoneVal} href={`tel:${CONTACT.phoneTel}`} />
                 <InfoRow k={t.contact.hours} v={t.contact.hoursVal} />
-                <InfoRow k={t.contact.ig} v={TOKEN.instagramHandle} />
+                <InfoRow k={t.contact.ig} v={TOKEN.instagramHandle} href={TOKEN.instagram} />
               </div>
             </div>
           </div>
@@ -466,11 +477,22 @@ function Stat({ label, value, accent }: { label: string; value: React.ReactNode;
   );
 }
 
-function InfoRow({ k, v }: { k: string; v: string }) {
+function InfoRow({ k, v, href, cta }: { k: string; v: string; href?: string; cta?: string }) {
+  const external = href?.startsWith("http");
   return (
-    <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.02] px-5 py-4">
-      <span className="text-sm text-cream/55">{k}</span>
-      <span className="display text-sm font-bold text-cream-soft">{v}</span>
+    <div className="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.02] px-5 py-4">
+      <span className="shrink-0 text-sm text-cream/55">{k}</span>
+      {href ? (
+        <a
+          href={href}
+          {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+          className="display text-right text-sm font-bold text-cream-soft transition hover:text-gold"
+        >
+          {cta ?? v}
+        </a>
+      ) : (
+        <span className="display text-right text-sm font-bold text-cream-soft">{v}</span>
+      )}
     </div>
   );
 }
