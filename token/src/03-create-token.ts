@@ -20,6 +20,7 @@ const mint = generateSigner(umi);
 console.log(`Сеть: ${CFG.cluster}`);
 console.log(`Создаю токен ${CFG.name} (${CFG.symbol}), decimals=${CFG.decimals} ...`);
 
+// Финализируем создание минта, чтобы все узлы RPC увидели аккаунт (devnet — балансировщик).
 await createFungible(umi, {
   mint,
   name: CFG.name,
@@ -27,10 +28,13 @@ await createFungible(umi, {
   uri: CFG.metadataUri,
   sellerFeeBasisPoints: percentAmount(0),
   decimals: some(CFG.decimals),
-}).sendAndConfirm(umi);
+}).sendAndConfirm(umi, { confirm: { commitment: "finalized" } });
 
 const mintAddress = mint.publicKey.toString();
 console.log("✅ Минт создан:", mintAddress);
+
+// Сохраняем адрес сразу — на случай, если минтинг придётся повторить отдельно.
+writeFileSync(MINT_FILE, JSON.stringify({ mint: mintAddress, cluster: CFG.cluster }, null, 2));
 
 // Минтим весь объём в базовых единицах (supply * 10^decimals) владельцу.
 const amount = CFG.supply * 10n ** BigInt(CFG.decimals);
@@ -42,9 +46,7 @@ await mintV1(umi, {
   amount,
   tokenOwner: umi.identity.publicKey,
   tokenStandard: TokenStandard.Fungible,
-}).sendAndConfirm(umi);
-
-writeFileSync(MINT_FILE, JSON.stringify({ mint: mintAddress, cluster: CFG.cluster }, null, 2));
+}).sendAndConfirm(umi, { confirm: { commitment: "finalized" } });
 
 console.log("✅ Выпуск завершён.");
 console.log("   Сохранил адрес в", MINT_FILE);
