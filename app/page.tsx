@@ -52,6 +52,7 @@ function CountUp({ to }: { to: number }) {
 
 export default function Home() {
   const [lang, setLang] = useState<Lang>("ru");
+  const [menuOpen, setMenuOpen] = useState(false);
   const t = dict[lang];
   const remaining = TOKEN.supply - MOCK.burned;
   const burnedPct = (MOCK.burned / TOKEN.supply) * 100;
@@ -87,20 +88,56 @@ export default function Home() {
               </a>
             ))}
           </nav>
-          <div className="flex items-center gap-1 rounded-full border border-white/10 p-0.5">
-            {(["ru", "en"] as Lang[]).map((l) => (
-              <button
-                key={l}
-                onClick={() => setLang(l)}
-                className={`rounded-full px-3 py-1 text-xs font-bold uppercase transition ${
-                  lang === l ? "bg-gold text-ink" : "text-cream/60 hover:text-cream"
-                }`}
-              >
-                {l}
-              </button>
-            ))}
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 rounded-full border border-white/10 p-0.5">
+              {(["ru", "en"] as Lang[]).map((l) => (
+                <button
+                  key={l}
+                  onClick={() => setLang(l)}
+                  className={`rounded-full px-3 py-1 text-xs font-bold uppercase transition ${
+                    lang === l ? "bg-gold text-ink" : "text-cream/60 hover:text-cream"
+                  }`}
+                >
+                  {l}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => setMenuOpen((v) => !v)}
+              aria-label="Menu"
+              aria-expanded={menuOpen}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-cream/80 transition hover:text-gold lg:hidden"
+            >
+              {menuOpen ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <path d="M6 6l12 12M18 6L6 18" />
+                </svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <path d="M3 6h18M3 12h18M3 18h18" />
+                </svg>
+              )}
+            </button>
           </div>
         </div>
+
+        {/* мобильное меню */}
+        {menuOpen && (
+          <nav className="border-t border-white/10 bg-ink/95 backdrop-blur-md lg:hidden">
+            <div className="mx-auto grid max-w-6xl grid-cols-2 gap-x-4 gap-y-1 px-5 py-4">
+              {nav.map((n) => (
+                <a
+                  key={n.id}
+                  href={`#${n.id}`}
+                  onClick={() => setMenuOpen(false)}
+                  className="rounded-lg px-3 py-2 text-sm text-cream/75 transition hover:bg-white/5 hover:text-gold"
+                >
+                  {n.label}
+                </a>
+              ))}
+            </div>
+          </nav>
+        )}
       </header>
 
       {/* ---------- HERO ---------- */}
@@ -144,7 +181,15 @@ export default function Home() {
               <span className="text-amber text-glow">{t.hero.title2}</span>
             </h1>
             <p className="mt-7 max-w-xl text-lg text-cream/80">{t.hero.sub}</p>
-            <div className="mt-9 flex flex-wrap items-center gap-4">
+            <div className="mt-6 flex flex-wrap items-center gap-3 text-sm text-cream/75">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1.5">
+                📍 {lang === "ru" ? "Псаучье-Дахе, КЧР" : "Psauche-Dakhe"}
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1.5">
+                🕖 07:00–22:00
+              </span>
+            </div>
+            <div className="mt-8 flex flex-wrap items-center gap-4">
               <span className="inline-flex cursor-not-allowed items-center gap-2 rounded-full bg-gold px-7 py-3 font-bold text-ink opacity-90">
                 {t.hero.ctaBuy}
                 <span className="rounded-full bg-ink/20 px-2 py-0.5 text-[10px] uppercase">{t.hero.soon}</span>
