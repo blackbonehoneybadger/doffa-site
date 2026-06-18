@@ -3,10 +3,10 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView, useMotionValue, animate } from "framer-motion";
-import { dict, TOKEN, MOCK, CONTACT, GALLERY, type Lang } from "./content";
+import { dict, TOKEN, MOCK, CONTACT, GALLERY, VIDEOS, type Lang } from "./content";
 
-// Вертикальный ролик бариста в hero. Лежит в public/brand/barista.mp4.
-const HERO_VIDEO: string | null = "/brand/barista.mp4";
+// Главный ролик в hero — без вшитых субтитров. Лежит в public/brand/hero.mp4.
+const HERO_VIDEO: string | null = "/brand/hero.mp4";
 
 /* ---------- helpers ---------- */
 
@@ -184,6 +184,35 @@ export default function Home() {
         </div>
       </div>
 
+      {/* ---------- VIDEOS (верхняя часть, сразу после hero) ---------- */}
+      <Section id="videos">
+        <Reveal>
+          <div className="text-center">
+            <Tag>{t.videos.tag}</Tag>
+            <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.videos.title}</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-cream/70">{t.videos.sub}</p>
+          </div>
+        </Reveal>
+        <div className="mx-auto mt-10 grid max-w-3xl grid-cols-2 gap-4 sm:gap-6">
+          {VIDEOS.map((v, i) => (
+            <Reveal key={v.src} delay={i * 0.1}>
+              <div className="group relative aspect-[9/16] overflow-hidden rounded-3xl ring-1 ring-gold/20">
+                <video
+                  src={v.src}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  aria-label={v.alt}
+                  className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/50 to-transparent" />
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </Section>
+
       {/* ---------- STORY ---------- */}
       <Section id="story">
         <div className="grid items-center gap-12 lg:grid-cols-2">
@@ -346,25 +375,13 @@ export default function Home() {
           {GALLERY.map((g, i) => (
             <Reveal key={g.src} delay={(i % 3) * 0.08}>
               <div className="group relative aspect-[4/5] overflow-hidden rounded-2xl ring-1 ring-white/10">
-                {g.video ? (
-                  <video
-                    src={g.src}
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    aria-label={g.alt}
-                    className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                  />
-                ) : (
-                  <Image
-                    src={g.src}
-                    alt={g.alt}
-                    fill
-                    sizes="(max-width:768px) 50vw, 33vw"
-                    className="object-cover transition duration-700 group-hover:scale-105"
-                  />
-                )}
+                <Image
+                  src={g.src}
+                  alt={g.alt}
+                  fill
+                  sizes="(max-width:768px) 50vw, 33vw"
+                  className="object-cover transition duration-700 group-hover:scale-105"
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-ink/40 to-transparent opacity-0 transition group-hover:opacity-100" />
               </div>
             </Reveal>

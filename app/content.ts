@@ -21,16 +21,21 @@ export const CONTACT = {
   map: "https://maps.app.goo.gl/27uFoNANjXDcSHVX9",
 };
 
-// Медиа кофейни для секции «Галерея» (лежат в public/brand/).
-// video: true — отрисовать как зацикленный ролик без звука.
-export const GALLERY: { src: string; alt: string; video?: boolean }[] = [
-  { src: "/brand/icedlatte.mp4", alt: "Налив айс-латте", video: true },
+// Видео кофейни — показываются в верхней части сайта, сразу после hero.
+export const VIDEOS: { src: string; alt: string }[] = [
+  { src: "/brand/icedlatte.mp4", alt: "Налив айс-латте" },
+  { src: "/brand/cat.mp4", alt: "Кот кофейни DOFFA" },
+];
+
+// Фото кофейни для секции «Галерея» (лежат в public/brand/).
+export const GALLERY: { src: string; alt: string }[] = [
   { src: "/brand/latteart-blue.jpg", alt: "Латте-арт в синей чашке" },
   { src: "/brand/interior-sunset.jpg", alt: "Зал кофейни на закате" },
   { src: "/brand/coldbrew-logo.jpg", alt: "Холодный кофе на фоне логотипа DOFFA" },
-  { src: "/brand/cat.mp4", alt: "Кот кофейни DOFFA", video: true },
   { src: "/brand/flatwhite-dark.jpg", alt: "Флэт уайт и стакан воды" },
+  { src: "/brand/latteart-black.jpg", alt: "Латте-арт в чёрной чашке" },
   { src: "/brand/bar-golden.jpg", alt: "Барная стойка в золотой час" },
+  { src: "/brand/flatwhite-hand.jpg", alt: "Флэт уайт в руке" },
   { src: "/brand/flowercup.jpg", alt: "Капучино в цветочной чашке" },
   { src: "/brand/logo-sign.jpg", alt: "Вывеска DOFFA Espresso Bar" },
 ];
@@ -50,6 +55,7 @@ type Dict = {
   token: { tag: string; title: string; sub: string; rows: { k: string; v: string }[]; alloc: { name: string; pct: number }[] };
   burns: { tag: string; title: string; supply: string; burned: string; left: string; cups: string; note: string };
   menu: { tag: string; title: string; sub: string; note: string; groups: { title: string; items: { name: string; price: string }[] }[] };
+  videos: { tag: string; title: string; sub: string };
   gallery: { tag: string; title: string; sub: string };
   buy: { tag: string; title: string; sub: string; connect: string; soon: string; points: string[] };
   roadmap: { tag: string; title: string; phases: { n: string; t: string; d: string; done?: boolean }[] };
@@ -164,6 +170,11 @@ export const dict: Record<Lang, Dict> = {
           ],
         },
       ],
+    },
+    videos: {
+      tag: "В движении",
+      title: "Живые кадры",
+      sub: "Налив айс-латте и кот, который встречает гостей.",
     },
     gallery: {
       tag: "Атмосфера",
@@ -325,6 +336,11 @@ export const dict: Record<Lang, Dict> = {
           ],
         },
       ],
+    },
+    videos: {
+      tag: "In motion",
+      title: "Live shots",
+      sub: "An iced-latte pour and the cat that greets every guest.",
     },
     gallery: {
       tag: "Atmosphere",
