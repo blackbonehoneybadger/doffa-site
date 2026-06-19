@@ -11,6 +11,7 @@
     "burn": "tsx src/04-burn.ts",
     "revoke": "tsx src/05-revoke.ts",
     "verify": "tsx src/06-verify.ts",
+    "switch": "tsx src/07-switch-mainnet.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

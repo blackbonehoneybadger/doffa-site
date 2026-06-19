@@ -84,6 +84,8 @@ export default function Home() {
       .catch(() => setCompare(null));
   }, []);
 
+  const IS_DEVNET = CHAIN.cluster === "devnet";
+
   const isLive = liveSupply !== null;
   const burned = isLive ? Math.max(CHAIN.initialSupply - liveSupply!, 0) : MOCK.burned;
   const remaining = isLive ? liveSupply! : TOKEN.supply - MOCK.burned;
@@ -258,9 +260,11 @@ export default function Home() {
               <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1.5">
                 🕖 07:00–22:00
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber/40 bg-amber/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-amber">
-                {t.burns.demoBadge}
-              </span>
+              {IS_DEVNET && (
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-amber/40 bg-amber/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-amber">
+                  {t.burns.demoBadge}
+                </span>
+              )}
             </div>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <span className="inline-flex cursor-not-allowed items-center gap-2 rounded-full bg-gold px-7 py-3 font-bold text-ink opacity-90">
@@ -302,16 +306,18 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ---------- DEVNET DEMO BANNER (всегда виден) ---------- */}
-      <div className="border-b border-amber/20 bg-amber/[0.08] px-5 py-2">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-amber/40 bg-amber/15 px-3 py-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-amber">
-            <span className="h-1.5 w-1.5 rounded-full bg-amber" />
-            {t.burns.demoBadge}
-          </span>
-          <span className="text-[11px] text-amber/70">{t.burns.demoNote}</span>
+      {/* ---------- DEVNET DEMO BANNER (только на devnet) ---------- */}
+      {IS_DEVNET && (
+        <div className="border-b border-amber/20 bg-amber/[0.08] px-5 py-2">
+          <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-amber/40 bg-amber/15 px-3 py-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-amber">
+              <span className="h-1.5 w-1.5 rounded-full bg-amber" />
+              {t.burns.demoBadge}
+            </span>
+            <span className="text-[11px] text-amber/70">{t.burns.demoNote}</span>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ---------- TAB CONTENT ---------- */}
       <div className="relative">
