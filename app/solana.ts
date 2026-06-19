@@ -21,6 +21,12 @@ export function solscanTx(sig: string): string {
   return `https://solscan.io/tx/${sig}${suffix}`;
 }
 
+/** Ссылка на держателей токена — там виден кошелёк Burn Reserve и все сжигания. */
+export function solscanHolders(): string {
+  const suffix = CHAIN.cluster === "devnet" ? "?cluster=devnet" : "";
+  return `https://solscan.io/token/${CHAIN.mint}${suffix}#holders`;
+}
+
 async function rpc<T>(method: string, params: unknown[]): Promise<T> {
   const res = await fetch(CHAIN.rpc, {
     method: "POST",

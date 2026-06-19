@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView, useMotionValue, animate, AnimatePresence } from "framer-motion";
 import { dict, TOKEN, MOCK, CONTACT, GALLERY, VIDEOS, type Lang } from "./content";
-import { CHAIN, solscanToken, solscanTx, fetchSupply, fetchBalance, fetchBurnHistory, getPhantom, type BurnRecord } from "./solana";
+import { CHAIN, solscanToken, solscanTx, solscanHolders, fetchSupply, fetchBalance, fetchBurnHistory, getPhantom, type BurnRecord } from "./solana";
 
 // Главный ролик в hero — без вшитых субтитров. Лежит в public/brand/hero.mp4.
 const HERO_VIDEO: string | null = "/brand/hero.mp4";
@@ -71,6 +71,17 @@ export default function Home() {
     fetchBurnHistory(15)
       .then(setBurns)
       .catch(() => setBurns([]));
+  }, []);
+
+  // Сверка CloudShop (проданные чашки) ↔ Solana (сожжённые токены).
+  // Источник: /api/proof/compare. Пока CloudShop не подключён — status: "no_data".
+  type Compare = { cloudshop_cups: number; solana_burns: number; mismatch: number; status: string; message: string };
+  const [compare, setCompare] = useState<Compare | null>(null);
+  useEffect(() => {
+    fetch("/api/proof/compare")
+      .then((r) => r.json())
+      .then((d) => setCompare(d as Compare))
+      .catch(() => setCompare(null));
   }, []);
 
   const isLive = liveSupply !== null;
@@ -247,6 +258,9 @@ export default function Home() {
               <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1.5">
                 🕖 07:00–22:00
               </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber/40 bg-amber/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-amber">
+                {t.burns.demoBadge}
+              </span>
             </div>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <span className="inline-flex cursor-not-allowed items-center gap-2 rounded-full bg-gold px-7 py-3 font-bold text-ink opacity-90">
@@ -285,6 +299,17 @@ export default function Home() {
               <span>DOFFA</span><span className="text-teal">·</span>
             </span>
           ))}
+        </div>
+      </div>
+
+      {/* ---------- DEVNET DEMO BANNER (всегда виден) ---------- */}
+      <div className="border-b border-amber/20 bg-amber/[0.08] px-5 py-2">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-amber/40 bg-amber/15 px-3 py-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-amber">
+            <span className="h-1.5 w-1.5 rounded-full bg-amber" />
+            {t.burns.demoBadge}
+          </span>
+          <span className="text-[11px] text-amber/70">{t.burns.demoNote}</span>
         </div>
       </div>
 
@@ -438,7 +463,7 @@ export default function Home() {
                   <div className="mt-8 h-3 overflow-hidden rounded-full bg-white/10">
                     <motion.div
                       initial={{ width: 0 }}
-                      whileInView={{ width: `${Math.max(burnedPct, 1.5)}%` }}
+                      whileInView={{ width: `${burned > 0 ? Math.max(burnedPct, 1.5) : 0}%` }}
                       viewport={{ once: true }}
                       transition={{ duration: 1.4, ease: "easeOut" }}
                       className="h-full rounded-full bg-gradient-to-r from-amber to-teal"
@@ -470,11 +495,12 @@ export default function Home() {
 
                 <Reveal>
                   <div className="mt-10 overflow-hidden rounded-2xl border border-white/10">
-                    <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-3 border-b border-white/10 bg-white/[0.03] px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-cream/40">
+                    <div className="grid grid-cols-[1fr_auto_auto_auto] gap-3 border-b border-white/10 bg-white/[0.03] px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-cream/40 sm:grid-cols-[1fr_auto_auto_auto_auto_auto]">
                       <span>{t.proof.colTime}</span>
                       <span className="text-right">{t.proof.colAmount}</span>
                       <span className="hidden text-right sm:block">{t.proof.colSale}</span>
                       <span className="text-right">{t.proof.colHash}</span>
+                      <span className="hidden text-right sm:block">{t.proof.colStatus}</span>
                       <span className="text-right">{t.proof.colVerify}</span>
                     </div>
 
@@ -487,13 +513,13 @@ export default function Home() {
                       <div className="px-5 py-12 text-center text-sm text-cream/40">{t.proof.empty}</div>
                     ) : (
                       burns.map((b, i) => (
-                        <BurnRow key={b.sig} burn={b} even={i % 2 === 0} verifyLabel={t.proof.colVerify} />
+                        <BurnRow key={b.sig} burn={b} even={i % 2 === 0} verifyLabel={t.proof.colVerify} statusLabel={t.proof.statusVerified} />
                       ))
                     )}
                   </div>
                 </Reveal>
 
-                {burns && burns.length > 0 && isLive && burns.length !== burned && (
+                {compare && (compare.status === "warning" || compare.status === "error") && (
                   <Reveal>
                     <div className="mt-5 flex items-start gap-3 rounded-xl border border-amber/40 bg-amber/10 px-5 py-4 text-sm text-amber">
                       <span className="mt-0.5 shrink-0">⚠</span>
@@ -501,8 +527,26 @@ export default function Home() {
                         <p className="font-semibold">{t.proof.mismatchWarn}</p>
                         <p className="mt-1 text-xs text-amber/70">
                           {lang === "ru"
-                            ? `Solana: ${burned.toLocaleString("ru-RU")} сожжено · On-chain мемо: ${burns.length} записей`
-                            : `Solana: ${burned.toLocaleString("en-US")} burned · On-chain memos: ${burns.length} records`}
+                            ? `CloudShop: ${compare.cloudshop_cups.toLocaleString("ru-RU")} чашек · Solana: ${compare.solana_burns.toLocaleString("ru-RU")} сожжено · разница ${compare.mismatch.toLocaleString("ru-RU")}`
+                            : `CloudShop: ${compare.cloudshop_cups.toLocaleString("en-US")} cups · Solana: ${compare.solana_burns.toLocaleString("en-US")} burned · diff ${compare.mismatch.toLocaleString("en-US")}`}
+                        </p>
+                      </div>
+                    </div>
+                  </Reveal>
+                )}
+
+                {compare && compare.status === "perfect" && (
+                  <Reveal>
+                    <div className="mt-5 flex items-start gap-3 rounded-xl border border-teal/40 bg-teal/10 px-5 py-4 text-sm text-teal">
+                      <span className="mt-0.5 shrink-0">✓</span>
+                      <div>
+                        <p className="font-semibold">
+                          {lang === "ru" ? "CloudShop и блокчейн синхронны" : "CloudShop and the blockchain are in sync"}
+                        </p>
+                        <p className="mt-1 text-xs text-teal/70">
+                          {lang === "ru"
+                            ? `${compare.cloudshop_cups.toLocaleString("ru-RU")} чашек = ${compare.solana_burns.toLocaleString("ru-RU")} сожжённых $DOFFA`
+                            : `${compare.cloudshop_cups.toLocaleString("en-US")} cups = ${compare.solana_burns.toLocaleString("en-US")} burned $DOFFA`}
                         </p>
                       </div>
                     </div>
@@ -537,11 +581,11 @@ export default function Home() {
                       </p>
                       <div className="flex flex-wrap items-center gap-2 text-sm">
                         {[
-                          { icon: "☕", label: lang === "ru" ? "Продажа кофе" : "Coffee sale" },
+                          { icon: "☕", label: lang === "ru" ? "Оплата кофе" : "Coffee paid" },
                           { icon: "→", label: null },
-                          { icon: "🧾", label: lang === "ru" ? "POS вебхук" : "POS webhook" },
+                          { icon: "🧾", label: lang === "ru" ? "Чек CloudShop (PAID)" : "CloudShop receipt (PAID)" },
                           { icon: "→", label: null },
-                          { icon: "🔐", label: lang === "ru" ? "receipt_hash" : "receipt_hash" },
+                          { icon: "🔐", label: "receipt_hash" },
                           { icon: "→", label: null },
                           { icon: "⛓", label: lang === "ru" ? "Solana memo" : "Solana memo" },
                           { icon: "→", label: null },
@@ -563,6 +607,43 @@ export default function Home() {
                           : "The website cannot edit the burn history — it exists only on Solana."}
                       </p>
                     </div>
+                  </Reveal>
+                </div>
+              </Section>
+
+              {/* VERIFY */}
+              <Section id="verify">
+                <Reveal>
+                  <div className="text-center">
+                    <Tag>{t.verify.tag}</Tag>
+                    <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.verify.title}</h2>
+                    <p className="mx-auto mt-4 max-w-2xl text-cream/70">{t.verify.sub}</p>
+                  </div>
+                </Reveal>
+                <div className="mx-auto mt-10 grid max-w-4xl gap-5 md:grid-cols-3">
+                  <Reveal>
+                    <VerifyCard
+                      label={t.verify.mintLabel}
+                      value={CHAIN.mint}
+                      href={solscanToken()}
+                      cta={t.verify.viewToken}
+                    />
+                  </Reveal>
+                  <Reveal delay={0.08}>
+                    <VerifyCard
+                      label={t.verify.reserveLabel}
+                      value={t.verify.reserveNote}
+                      href={solscanHolders()}
+                      cta={t.verify.viewHolders}
+                      mono={false}
+                    />
+                  </Reveal>
+                  <Reveal delay={0.16}>
+                    <VerifyCard
+                      label={t.verify.clusterLabel}
+                      value={t.verify.clusterVal}
+                      mono={false}
+                    />
                   </Reveal>
                 </div>
               </Section>
@@ -824,7 +905,7 @@ function Stat({ label, value, unit, accent }: { label: string; value: React.Reac
   );
 }
 
-function BurnRow({ burn, even, verifyLabel }: { burn: BurnRecord; even: boolean; verifyLabel: string }) {
+function BurnRow({ burn, even, verifyLabel, statusLabel }: { burn: BurnRecord; even: boolean; verifyLabel: string; statusLabel: string }) {
   const date = burn.blockTime
     ? new Date(burn.blockTime * 1000).toLocaleString("ru-RU", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })
     : "—";
@@ -832,13 +913,19 @@ function BurnRow({ burn, even, verifyLabel }: { burn: BurnRecord; even: boolean;
   const shortSale = burn.saleId ? (burn.saleId.length > 14 ? burn.saleId.slice(0, 14) + "…" : burn.saleId) : "—";
 
   return (
-    <div className={`grid grid-cols-[1fr_auto_auto_auto_auto] items-center gap-3 px-5 py-3 text-sm ${even ? "bg-transparent" : "bg-white/[0.015]"}`}>
+    <div className={`grid grid-cols-[1fr_auto_auto_auto] items-center gap-3 px-5 py-3 text-sm sm:grid-cols-[1fr_auto_auto_auto_auto_auto] ${even ? "bg-transparent" : "bg-white/[0.015]"}`}>
       <span className="text-cream/60 tabular-nums">{date}</span>
       <span className="display text-right font-bold text-amber tabular-nums">
         {burn.amount > 0 ? burn.amount.toLocaleString("ru-RU") : "?"} 🔥
       </span>
       <span className="hidden text-right font-mono text-xs text-cream/50 sm:block" title={burn.saleId}>{shortSale}</span>
       <span className="font-mono text-right text-xs text-cream/50" title={burn.receiptHash}>{shortHash}</span>
+      <span className="hidden justify-self-end sm:block">
+        <span className="inline-flex items-center gap-1 rounded-full border border-teal/40 bg-teal/10 px-2 py-0.5 text-[10px] font-semibold text-teal">
+          <span className="h-1.5 w-1.5 rounded-full bg-teal" />
+          {statusLabel}
+        </span>
+      </span>
       <a
         href={solscanTx(burn.sig)}
         target="_blank"
@@ -848,6 +935,62 @@ function BurnRow({ burn, even, verifyLabel }: { burn: BurnRecord; even: boolean;
       >
         {verifyLabel} ↗
       </a>
+    </div>
+  );
+}
+
+function VerifyCard({
+  label,
+  value,
+  href,
+  cta,
+  mono = true,
+}: {
+  label: string;
+  value: string;
+  href?: string;
+  cta?: string;
+  mono?: boolean;
+}) {
+  const [copied, setCopied] = useState(false);
+  const canCopy = mono;
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      /* clipboard недоступен */
+    }
+  };
+  return (
+    <div className="card flex h-full flex-col rounded-2xl p-5">
+      <div className="text-xs font-semibold uppercase tracking-wider text-cream/45">{label}</div>
+      <div
+        className={`mt-2 flex-1 break-all text-sm text-cream/80 ${mono ? "font-mono text-xs leading-relaxed" : ""}`}
+      >
+        {value}
+      </div>
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        {href && (
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal transition hover:text-gold"
+          >
+            {cta} ↗
+          </a>
+        )}
+        {canCopy && (
+          <button
+            onClick={copy}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-cream/50 transition hover:text-cream"
+          >
+            {copied ? "✓ скопировано" : "копировать"}
+          </button>
+        )}
+      </div>
     </div>
   );
 }

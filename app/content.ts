@@ -40,10 +40,12 @@ export const GALLERY: { src: string; alt: string }[] = [
   { src: "/brand/logo-sign.jpg", alt: "Вывеска DOFFA Espresso Bar" },
 ];
 
-// Временные данные для дашборда (до mainnet-запуска).
+// Состояние дашборда до запуска реальных сжиганий.
+// Честный ноль: пока никто не сжёг ни одного токена — burned = 0, в обороте весь выпуск.
+// Никаких выдуманных цифр: всё, что показывается, либо читается из блокчейна, либо это явный ноль.
 export const MOCK = {
-  burned: 12_840,
-  cupsSold: 12_840,
+  burned: 0,
+  cupsSold: 0,
   reserve: 30_000_000,
 };
 
@@ -53,7 +55,7 @@ type Dict = {
   story: { tag: string; title: string; body: string[] };
   how: { tag: string; title: string; sub: string; steps: { t: string; d: string }[] };
   token: { tag: string; title: string; sub: string; rows: { k: string; v: string }[]; alloc: { name: string; pct: number }[] };
-  burns: { tag: string; title: string; supply: string; burned: string; left: string; cups: string; note: string; live: string; verify: string; liveNote: string };
+  burns: { tag: string; title: string; supply: string; burned: string; left: string; cups: string; note: string; live: string; verify: string; liveNote: string; demoBadge: string; demoNote: string };
   proof: {
     tag: string;
     title: string;
@@ -63,6 +65,8 @@ type Dict = {
     colSale: string;
     colHash: string;
     colVerify: string;
+    colStatus: string;
+    statusVerified: string;
     empty: string;
     loading: string;
     mismatchWarn: string;
@@ -70,6 +74,18 @@ type Dict = {
     trustTitle: string;
     trustSub: string;
     trustSteps: { icon: string; t: string; d: string }[];
+  };
+  verify: {
+    tag: string;
+    title: string;
+    sub: string;
+    mintLabel: string;
+    reserveLabel: string;
+    reserveNote: string;
+    clusterLabel: string;
+    clusterVal: string;
+    viewToken: string;
+    viewHolders: string;
   };
   menu: { tag: string; title: string; sub: string; note: string; groups: { title: string; items: { name: string; price: string }[] }[] };
   videos: { tag: string; title: string; sub: string };
@@ -116,14 +132,14 @@ export const dict: Record<Lang, Dict> = {
     token: {
       tag: "Токеномика",
       title: "$DOFFA на Solana",
-      sub: "Прозрачное распределение. Mint и freeze authority отзываются после запуска — никто не сможет допечатать или заморозить токены.",
+      sub: "Прозрачное распределение. На mainnet mint и freeze authority будут отозваны при запуске — статус всегда можно проверить в Solscan. Сейчас токен живёт на devnet (тест).",
       rows: [
-        { k: "Сеть", v: "Solana (SPL)" },
+        { k: "Сеть", v: "Solana · devnet (тест)" },
         { k: "Тикер", v: "$DOFFA" },
         { k: "Decimals", v: "6" },
         { k: "Общий выпуск", v: "100 000 000" },
-        { k: "Mint authority", v: "Отозван" },
-        { k: "Freeze authority", v: "Отозван" },
+        { k: "Mint authority", v: "Devnet ✓ · Mainnet: ожидается" },
+        { k: "Freeze authority", v: "Devnet ✓ · Mainnet: ожидается" },
       ],
       alloc: [
         { name: "Ликвидность DEX", pct: 40 },
@@ -140,10 +156,12 @@ export const dict: Record<Lang, Dict> = {
       burned: "Сожжено",
       left: "Осталось",
       cups: "Продано чашек",
-      note: "Демо-данные до запуска токена. После mainnet здесь будут реальные цифры из блокчейна.",
+      note: "Пока сожжений нет: в обороте весь выпуск. Цифры появятся, когда система начнёт сжигать токены за реальные продажи в mainnet.",
       live: "Live · devnet",
       verify: "Проверить в Solscan",
       liveNote: "Цифры читаются напрямую из блокчейна Solana (тест-токен на devnet). Их никто не вписывает вручную — любой может перепроверить в Solscan.",
+      demoBadge: "DEVNET DEMO · НЕ РЕАЛЬНЫЕ ДЕНЬГИ",
+      demoNote: "Это демонстрация на тестовой сети Solana (devnet). Токены здесь не имеют ценности, реальные деньги не задействованы.",
     },
     proof: {
       tag: "Публичный аудит",
@@ -154,7 +172,9 @@ export const dict: Record<Lang, Dict> = {
       colSale: "ID продажи",
       colHash: "Хеш квитанции",
       colVerify: "TX",
-      empty: "Пока нет сжиганий с on-chain подтверждением. Первая запись появится после запуска системы.",
+      colStatus: "Статус",
+      statusVerified: "Подтверждено",
+      empty: "Подтверждённых сжиганий пока нет — devnet demo. Первая запись появится, когда система начнёт сжигать токены за оплаченные чеки CloudShop.",
       loading: "Читаем блокчейн…",
       mismatchWarn: "⚠ Продажи в CloudShop не совпадают с burns в блокчейне",
       trustTag: "Система доверия",
@@ -177,6 +197,18 @@ export const dict: Record<Lang, Dict> = {
           d: "Дашборд показывает: сколько чашек продали в CloudShop vs сколько токенов сожгли в Solana. Мисматч = ошибка на сервере. Любой может перепроверить в Solscan и в CloudShop API.",
         },
       ],
+    },
+    verify: {
+      tag: "Проверка",
+      title: "Проверь сам",
+      sub: "Не верь на слово — проверяй в блокчейне. Все адреса ниже открыты в Solscan.",
+      mintLabel: "Адрес токена (mint)",
+      reserveLabel: "Кошелёк Burn Reserve",
+      reserveNote: "Кошелёк, из которого сжигаются токены за проданные чашки. Держателей и сжигания видно в Solscan.",
+      clusterLabel: "Сеть",
+      clusterVal: "Solana devnet (тест)",
+      viewToken: "Открыть токен в Solscan",
+      viewHolders: "Смотреть держателей",
     },
     menu: {
       tag: "Кофейня",
@@ -287,7 +319,7 @@ export const dict: Record<Lang, Dict> = {
       mapCta: "Открыть на карте",
     },
     legal:
-      "$DOFFA — утилити-токен, связанный с кофейней DOFFA. Это не ценная бумага, не инвестиционный продукт и не предложение о покупке ценных бумаг. Материалы сайта носят информационный характер и не являются финансовой, юридической или налоговой консультацией. Криптоактивы волатильны и рискованны. Участвуйте ответственно и в рамках законов вашей юрисдикции.",
+      "$DOFFA — экспериментальный комьюнити/утилити-токен, связанный с кофейней DOFFA. Это НЕ инвестиция и НЕ обещание прибыли. Токен не является ценной бумагой, инвестиционным продуктом или предложением о покупке ценных бумаг. Мы не гарантируем никакого дохода и не даём финансовых советов. Продажи кофе не обеспечивают и не гарантируют цену токена — связь между чашкой и сжиганием носит символический характер. Криптоактивы крайне волатильны и рискованны: можно потерять все вложенные средства. Сейчас проект работает на тестовой сети (devnet), где токены не имеют денежной ценности. Материалы сайта носят информационный характер и не являются финансовой, юридической или налоговой консультацией. Участвуйте только из интереса к проекту, ответственно и в рамках законов вашей юрисдикции.",
   },
   en: {
     nav: { story: "Story", how: "How it works", token: "Tokenomics", burns: "Burns", proof: "Proof", menu: "Menu", gallery: "Gallery", buy: "Buy", roadmap: "Roadmap", faq: "FAQ", contact: "Contact" },
@@ -323,14 +355,14 @@ export const dict: Record<Lang, Dict> = {
     token: {
       tag: "Tokenomics",
       title: "$DOFFA on Solana",
-      sub: "Transparent distribution. Mint and freeze authority are revoked after launch — no one can print or freeze tokens.",
+      sub: "Transparent distribution. On mainnet, mint and freeze authority will be revoked at launch — the status is always verifiable on Solscan. Right now the token lives on devnet (test).",
       rows: [
-        { k: "Network", v: "Solana (SPL)" },
+        { k: "Network", v: "Solana · devnet (test)" },
         { k: "Ticker", v: "$DOFFA" },
         { k: "Decimals", v: "6" },
         { k: "Total supply", v: "100,000,000" },
-        { k: "Mint authority", v: "Revoked" },
-        { k: "Freeze authority", v: "Revoked" },
+        { k: "Mint authority", v: "Devnet ✓ · Mainnet: pending" },
+        { k: "Freeze authority", v: "Devnet ✓ · Mainnet: pending" },
       ],
       alloc: [
         { name: "DEX liquidity", pct: 40 },
@@ -347,10 +379,12 @@ export const dict: Record<Lang, Dict> = {
       burned: "Burned",
       left: "Remaining",
       cups: "Cups sold",
-      note: "Demo data before token launch. After mainnet these will be real on-chain numbers.",
+      note: "No burns yet: the full supply is in circulation. Numbers appear once the system starts burning tokens for real mainnet sales.",
       live: "Live · devnet",
       verify: "Verify on Solscan",
       liveNote: "These numbers are read straight from the Solana blockchain (devnet test token). Nobody types them in by hand — anyone can re-check them on Solscan.",
+      demoBadge: "DEVNET DEMO · NO REAL MONEY",
+      demoNote: "This is a demo on Solana's test network (devnet). Tokens here have no value and no real money is involved.",
     },
     proof: {
       tag: "Public audit",
@@ -361,7 +395,9 @@ export const dict: Record<Lang, Dict> = {
       colSale: "Sale ID",
       colHash: "Receipt hash",
       colVerify: "TX",
-      empty: "No on-chain burn records yet. The first entry will appear once the system goes live.",
+      colStatus: "Status",
+      statusVerified: "Verified",
+      empty: "No verified burns yet — devnet demo. The first entry appears once the system starts burning tokens for paid CloudShop receipts.",
       loading: "Reading the blockchain…",
       mismatchWarn: "⚠ CloudShop sales don't match the blockchain burns",
       trustTag: "Trust system",
@@ -384,6 +420,18 @@ export const dict: Record<Lang, Dict> = {
           d: "The dashboard shows: cups sold in CloudShop vs tokens burned in Solana. A mismatch signals a server error. Anyone can verify both on Solscan and CloudShop's API.",
         },
       ],
+    },
+    verify: {
+      tag: "Verify",
+      title: "Check it yourself",
+      sub: "Don't take our word for it — verify on-chain. Every address below opens in Solscan.",
+      mintLabel: "Token address (mint)",
+      reserveLabel: "Burn Reserve wallet",
+      reserveNote: "The wallet tokens are burned from for cups sold. Holders and burns are visible on Solscan.",
+      clusterLabel: "Network",
+      clusterVal: "Solana devnet (test)",
+      viewToken: "Open token on Solscan",
+      viewHolders: "View holders",
     },
     menu: {
       tag: "Coffee bar",
@@ -494,6 +542,6 @@ export const dict: Record<Lang, Dict> = {
       mapCta: "Open in maps",
     },
     legal:
-      "$DOFFA is a utility token connected to the DOFFA coffee bar. It is not a security, not an investment product, and not an offer to sell securities. Site materials are informational only and are not financial, legal or tax advice. Crypto assets are volatile and risky. Participate responsibly and within the laws of your jurisdiction.",
+      "$DOFFA is an experimental community/utility token connected to the DOFFA coffee bar. It is NOT an investment and NOT a promise of profit. The token is not a security, not an investment product, and not an offer to sell securities. We promise no returns and give no financial advice. Coffee sales do not back or guarantee the token price — the link between a cup and a burn is symbolic. Crypto assets are highly volatile and risky: you can lose everything you put in. The project currently runs on a test network (devnet), where tokens have no monetary value. Site materials are informational only and are not financial, legal or tax advice. Take part out of interest in the project, responsibly, and within the laws of your jurisdiction.",
   },
 };
