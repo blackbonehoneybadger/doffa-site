@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView, useMotionValue, animate, AnimatePresence } from "framer-motion";
-import { dict, TOKEN, MOCK, CONTACT, GALLERY, VIDEOS, type Lang } from "./content";
+import { dict, LANGS, TOKEN, MOCK, CONTACT, GALLERY, VIDEOS, type Lang } from "./content";
 import { CHAIN, solscanToken, solscanTx, solscanHolders, fetchSupply, fetchBalance, fetchBurnHistory, getPhantom, type BurnRecord } from "./solana";
 
 // Главный ролик в hero — без вшитых субтитров. Лежит в public/brand/hero.mp4.
@@ -32,7 +32,7 @@ function Tag({ children }: { children: React.ReactNode }) {
   );
 }
 
-function CountUp({ to }: { to: number }) {
+function CountUp({ to, locale = "ru-RU" }: { to: number; locale?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true });
   const mv = useMotionValue(0);
@@ -46,7 +46,7 @@ function CountUp({ to }: { to: number }) {
       unsub();
     };
   }, [inView, to, mv]);
-  return <span ref={ref}>{val.toLocaleString("ru-RU")}</span>;
+  return <span ref={ref}>{val.toLocaleString(locale)}</span>;
 }
 
 /* ---------- page ---------- */
@@ -85,6 +85,13 @@ export default function Home() {
   }, []);
 
   const IS_DEVNET = CHAIN.cluster === "devnet";
+  const loc = t.locale;
+
+  // Направление письма и атрибут языка — для арабского (rtl) и доступности.
+  useEffect(() => {
+    document.documentElement.lang = lang;
+    document.documentElement.dir = t.dir ?? "ltr";
+  }, [lang, t.dir]);
 
   const isLive = liveSupply !== null;
   const burned = isLive ? Math.max(CHAIN.initialSupply - liveSupply!, 0) : MOCK.burned;
@@ -122,12 +129,12 @@ export default function Home() {
   };
 
   const tabs: { id: typeof activeTab; label: string }[] = [
-    { id: "story",     label: lang === "ru" ? "Начало" : "Start" },
-    { id: "token",     label: lang === "ru" ? "Токен" : "Token" },
-    { id: "cafe",      label: lang === "ru" ? "Кофейня" : "Café" },
-    { id: "community", label: lang === "ru" ? "Сообщество" : "Community" },
-    { id: "buy",       label: lang === "ru" ? "Купить" : "Buy" },
-    { id: "contact",   label: lang === "ru" ? "Контакты" : "Contact" },
+    { id: "story",     label: t.tabs.story },
+    { id: "token",     label: t.tabs.token },
+    { id: "cafe",      label: t.tabs.cafe },
+    { id: "community", label: t.tabs.community },
+    { id: "buy",       label: t.tabs.buy },
+    { id: "contact",   label: t.tabs.contact },
   ];
 
   return (
@@ -155,19 +162,28 @@ export default function Home() {
             ))}
           </nav>
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 rounded-full border border-white/10 p-0.5">
-              {(["ru", "en"] as Lang[]).map((l) => (
-                <button
-                  key={l}
-                  onClick={() => setLang(l)}
-                  className={`rounded-full px-3 py-1 text-xs font-bold uppercase transition ${
-                    lang === l ? "bg-gold text-ink" : "text-cream/60 hover:text-cream"
-                  }`}
-                >
-                  {l}
-                </button>
-              ))}
-            </div>
+            <label className="relative flex items-center">
+              <span className="sr-only">Language</span>
+              <svg className="pointer-events-none absolute left-2.5 h-3.5 w-3.5 text-cream/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18" />
+              </svg>
+              <select
+                value={lang}
+                onChange={(e) => setLang(e.target.value as Lang)}
+                aria-label="Выбор языка"
+                className="cursor-pointer appearance-none rounded-full border border-white/10 bg-ink/60 py-1.5 pl-7 pr-7 text-xs font-bold text-cream/80 outline-none transition hover:border-gold/50 hover:text-cream focus:border-gold/60"
+              >
+                {LANGS.map((l) => (
+                  <option key={l.code} value={l.code} className="bg-ink text-cream">
+                    {l.label}
+                  </option>
+                ))}
+              </select>
+              <svg className="pointer-events-none absolute right-2.5 h-3 w-3 text-cream/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </label>
             <button
               onClick={() => setMenuOpen((v) => !v)}
               aria-label="Menu"
@@ -255,7 +271,7 @@ export default function Home() {
             <p className="mt-7 max-w-xl text-lg text-cream/80">{t.hero.sub}</p>
             <div className="mt-6 flex flex-wrap items-center gap-3 text-sm text-cream/75">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1.5">
-                📍 {lang === "ru" ? "Псаучье-Дахе, КЧР" : "Psauche-Dakhe"}
+                📍 {t.ui.location}
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1.5">
                 🕖 07:00–22:00
@@ -420,7 +436,7 @@ export default function Home() {
                   </Reveal>
                   <Reveal delay={0.15}>
                     <div className="card rounded-2xl p-7">
-                      <p className="display mb-6 text-lg font-bold text-cream-soft">Allocation</p>
+                      <p className="display mb-6 text-lg font-bold text-cream-soft">{t.ui.allocation}</p>
                       <div className="space-y-5">
                         {t.token.alloc.map((a, i) => (
                           <div key={a.name}>
@@ -460,10 +476,10 @@ export default function Home() {
                   </div>
                 </Reveal>
                 <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                  <Stat label={t.burns.supply} value={TOKEN.supply.toLocaleString("ru-RU")} unit={TOKEN.symbol} />
-                  <Stat label={t.burns.burned} value={<CountUp to={burned} />} unit={`🔥 ${TOKEN.symbol}`} accent />
-                  <Stat label={t.burns.left} value={remaining.toLocaleString("ru-RU")} unit={TOKEN.symbol} />
-                  <Stat label={t.burns.cups} value={<CountUp to={cupsSold} />} unit="☕" />
+                  <Stat label={t.burns.supply} value={TOKEN.supply.toLocaleString(loc)} unit={TOKEN.symbol} />
+                  <Stat label={t.burns.burned} value={<CountUp to={burned} locale={loc} />} unit={`🔥 ${TOKEN.symbol}`} accent />
+                  <Stat label={t.burns.left} value={remaining.toLocaleString(loc)} unit={TOKEN.symbol} />
+                  <Stat label={t.burns.cups} value={<CountUp to={cupsSold} locale={loc} />} unit="☕" />
                 </div>
                 <Reveal>
                   <div className="mt-8 h-3 overflow-hidden rounded-full bg-white/10">
@@ -519,7 +535,7 @@ export default function Home() {
                       <div className="px-5 py-12 text-center text-sm text-cream/40">{t.proof.empty}</div>
                     ) : (
                       burns.map((b, i) => (
-                        <BurnRow key={b.sig} burn={b} even={i % 2 === 0} verifyLabel={t.proof.colVerify} statusLabel={t.proof.statusVerified} />
+                        <BurnRow key={b.sig} burn={b} even={i % 2 === 0} verifyLabel={t.proof.colVerify} statusLabel={t.proof.statusVerified} locale={loc} />
                       ))
                     )}
                   </div>
@@ -532,9 +548,7 @@ export default function Home() {
                       <div>
                         <p className="font-semibold">{t.proof.mismatchWarn}</p>
                         <p className="mt-1 text-xs text-amber/70">
-                          {lang === "ru"
-                            ? `CloudShop: ${compare.cloudshop_cups.toLocaleString("ru-RU")} чашек · Solana: ${compare.solana_burns.toLocaleString("ru-RU")} сожжено · разница ${compare.mismatch.toLocaleString("ru-RU")}`
-                            : `CloudShop: ${compare.cloudshop_cups.toLocaleString("en-US")} cups · Solana: ${compare.solana_burns.toLocaleString("en-US")} burned · diff ${compare.mismatch.toLocaleString("en-US")}`}
+                          {`CloudShop: ${compare.cloudshop_cups.toLocaleString(loc)} ${t.ui.cupsWord} · Solana: ${compare.solana_burns.toLocaleString(loc)} ${t.ui.burnedWord} · ${t.ui.diffWord} ${compare.mismatch.toLocaleString(loc)}`}
                         </p>
                       </div>
                     </div>
@@ -546,13 +560,9 @@ export default function Home() {
                     <div className="mt-5 flex items-start gap-3 rounded-xl border border-teal/40 bg-teal/10 px-5 py-4 text-sm text-teal">
                       <span className="mt-0.5 shrink-0">✓</span>
                       <div>
-                        <p className="font-semibold">
-                          {lang === "ru" ? "CloudShop и блокчейн синхронны" : "CloudShop and the blockchain are in sync"}
-                        </p>
+                        <p className="font-semibold">{t.ui.inSyncTitle}</p>
                         <p className="mt-1 text-xs text-teal/70">
-                          {lang === "ru"
-                            ? `${compare.cloudshop_cups.toLocaleString("ru-RU")} чашек = ${compare.solana_burns.toLocaleString("ru-RU")} сожжённых $DOFFA`
-                            : `${compare.cloudshop_cups.toLocaleString("en-US")} cups = ${compare.solana_burns.toLocaleString("en-US")} burned $DOFFA`}
+                          {`${compare.cloudshop_cups.toLocaleString(loc)} ${t.ui.cupsWord} = ${compare.solana_burns.toLocaleString(loc)} ${t.ui.burnedWord} $DOFFA`}
                         </p>
                       </div>
                     </div>
@@ -583,19 +593,19 @@ export default function Home() {
                   <Reveal>
                     <div className="mt-10 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] p-6">
                       <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-cream/40">
-                        {lang === "ru" ? "Поток данных" : "Data flow"}
+                        {t.ui.dataFlow}
                       </p>
                       <div className="flex flex-wrap items-center gap-2 text-sm">
                         {[
-                          { icon: "☕", label: lang === "ru" ? "Оплата кофе" : "Coffee paid" },
+                          { icon: "☕", label: t.ui.flowPaid },
                           { icon: "→", label: null },
-                          { icon: "🧾", label: lang === "ru" ? "Чек CloudShop (PAID)" : "CloudShop receipt (PAID)" },
+                          { icon: "🧾", label: t.ui.flowReceipt },
                           { icon: "→", label: null },
                           { icon: "🔐", label: "receipt_hash" },
                           { icon: "→", label: null },
-                          { icon: "⛓", label: lang === "ru" ? "Solana memo" : "Solana memo" },
+                          { icon: "⛓", label: t.ui.flowMemo },
                           { icon: "→", label: null },
-                          { icon: "📊", label: lang === "ru" ? "Этот дашборд" : "This dashboard" },
+                          { icon: "📊", label: t.ui.flowDashboard },
                         ].map((step, i) =>
                           step.label === null ? (
                             <span key={i} className="text-cream/30">{step.icon}</span>
@@ -607,11 +617,7 @@ export default function Home() {
                           ),
                         )}
                       </div>
-                      <p className="mt-4 text-xs text-cream/40">
-                        {lang === "ru"
-                          ? "Сайт не может редактировать историю сжиганий — она живёт только в Solana."
-                          : "The website cannot edit the burn history — it exists only on Solana."}
-                      </p>
+                      <p className="mt-4 text-xs text-cream/40">{t.ui.dataFlowNote}</p>
                     </div>
                   </Reveal>
                 </div>
@@ -633,6 +639,8 @@ export default function Home() {
                       value={CHAIN.mint}
                       href={solscanToken()}
                       cta={t.verify.viewToken}
+                      copiedLabel={t.ui.copied}
+                      copyLabel={t.ui.copy}
                     />
                   </Reveal>
                   <Reveal delay={0.08}>
@@ -642,6 +650,8 @@ export default function Home() {
                       href={solscanHolders()}
                       cta={t.verify.viewHolders}
                       mono={false}
+                      copiedLabel={t.ui.copied}
+                      copyLabel={t.ui.copy}
                     />
                   </Reveal>
                   <Reveal delay={0.16}>
@@ -797,7 +807,7 @@ export default function Home() {
                           <div className="rounded-xl border border-white/10 bg-white/[0.02] px-5 py-4">
                             <div className="text-xs uppercase tracking-wider text-cream/50">{t.buy.balanceLabel}</div>
                             <div className="display mt-1 text-2xl font-extrabold text-cream-soft">
-                              {walletBal === null ? "…" : walletBal.toLocaleString("ru-RU")}{" "}
+                              {walletBal === null ? "…" : walletBal.toLocaleString(loc)}{" "}
                               <span className="text-gold">{TOKEN.symbol}</span>
                             </div>
                           </div>
@@ -911,9 +921,9 @@ function Stat({ label, value, unit, accent }: { label: string; value: React.Reac
   );
 }
 
-function BurnRow({ burn, even, verifyLabel, statusLabel }: { burn: BurnRecord; even: boolean; verifyLabel: string; statusLabel: string }) {
+function BurnRow({ burn, even, verifyLabel, statusLabel, locale = "ru-RU" }: { burn: BurnRecord; even: boolean; verifyLabel: string; statusLabel: string; locale?: string }) {
   const date = burn.blockTime
-    ? new Date(burn.blockTime * 1000).toLocaleString("ru-RU", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })
+    ? new Date(burn.blockTime * 1000).toLocaleString(locale, { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })
     : "—";
   const shortHash = burn.receiptHash ? burn.receiptHash.slice(0, 8) + "…" : "—";
   const shortSale = burn.saleId ? (burn.saleId.length > 14 ? burn.saleId.slice(0, 14) + "…" : burn.saleId) : "—";
@@ -922,7 +932,7 @@ function BurnRow({ burn, even, verifyLabel, statusLabel }: { burn: BurnRecord; e
     <div className={`grid grid-cols-[1fr_auto_auto_auto] items-center gap-3 px-5 py-3 text-sm sm:grid-cols-[1fr_auto_auto_auto_auto_auto] ${even ? "bg-transparent" : "bg-white/[0.015]"}`}>
       <span className="text-cream/60 tabular-nums">{date}</span>
       <span className="display text-right font-bold text-amber tabular-nums">
-        {burn.amount > 0 ? burn.amount.toLocaleString("ru-RU") : "?"} 🔥
+        {burn.amount > 0 ? burn.amount.toLocaleString(locale) : "?"} 🔥
       </span>
       <span className="hidden text-right font-mono text-xs text-cream/50 sm:block" title={burn.saleId}>{shortSale}</span>
       <span className="font-mono text-right text-xs text-cream/50" title={burn.receiptHash}>{shortHash}</span>
@@ -951,12 +961,16 @@ function VerifyCard({
   href,
   cta,
   mono = true,
+  copiedLabel = "✓ copied",
+  copyLabel = "copy",
 }: {
   label: string;
   value: string;
   href?: string;
   cta?: string;
   mono?: boolean;
+  copiedLabel?: string;
+  copyLabel?: string;
 }) {
   const [copied, setCopied] = useState(false);
   const canCopy = mono;
@@ -993,7 +1007,7 @@ function VerifyCard({
             onClick={copy}
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-cream/50 transition hover:text-cream"
           >
-            {copied ? "✓ скопировано" : "копировать"}
+            {copied ? copiedLabel : copyLabel}
           </button>
         )}
       </div>
