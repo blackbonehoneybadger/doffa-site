@@ -7,6 +7,8 @@ import {
   signerIdentity,
   type Umi,
 } from "@metaplex-foundation/umi";
+import { mplTokenMetadata } from "@metaplex-foundation/mpl-token-metadata";
+import { mplToolbox } from "@metaplex-foundation/mpl-toolbox";
 
 export type Cluster = "devnet" | "mainnet-beta";
 
@@ -51,6 +53,8 @@ export function loadKeypair(): Keypair {
 /** Создаёт Umi-инстанс с владельцем в качестве подписанта (identity). */
 export function makeUmi(): Umi {
   const umi = createUmi(rpcEndpoint());
+  umi.use(mplToolbox());
+  umi.use(mplTokenMetadata());
   const kp = umi.eddsa.createKeypairFromSecretKey(loadSecretKey());
   const signer = createSignerFromKeypair(umi, kp);
   umi.use(signerIdentity(signer));
