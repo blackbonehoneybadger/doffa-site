@@ -1,11 +1,10 @@
-// Команда /sale — пробить продажу.
+// Команда /sale — пробить продажу и автоматически сжечь $DOFFA на Solana.
 //   /sale 150            — продажа на 150 ₽, 1 чашка
 //   /sale 150 Капучино   — то же, с заметкой
 //   /sale 300 x2 Латте   — 300 ₽, 2 чашки, заметка "Латте"
-//
-// Каждая чашка = BURN_PER_CUP токенов $DOFFA к сжиганию.
 import type { Context } from "telegraf";
-import { getOpenShift, addSale } from "../db.js";
+import { getOpenShift, addSale, markAsBurned } from "../db.js";
+import { burnCoffee, isBurnConfigured } from "../burn.js";
 import { CONFIG } from "../config.js";
 import { formatRub } from "../format.js";
 
@@ -50,13 +49,46 @@ export async function handleSale(ctx: Context, arg: string): Promise<void> {
   const sale = addSale({ shiftId: open.id, userId, amountCents, cups, note });
   const toBurn = cups * CONFIG.burnPerCup;
 
+  // Сразу пишем что продажа записана и запускаем burn
   await ctx.reply(
     `☕ Продажа #${sale.id} записана\n` +
       `Сумма: ${formatRub(amountCents)}\n` +
       `Чашек: ${cups}` +
       (note ? `\nЗаметка: ${note}` : "") +
-      `\n\n🔥 К сжиганию: ${toBurn} $DOFFA` +
-      `\nОтпечаток чека: ${sale.receipt_hash}` +
-      `\n\nОшиблись? Отменить последний: /cancel`
+      `\n\n🔥 Сжигаю ${toBurn} $DOFFA...`,
   );
+
+  // Автоматическое сжигание на Solana
+  if (!isBurnConfigured()) {
+    await ctx.reply(
+      `⚠️ OWNER_KEYPAIR не задан — burn отложен.\n` +
+        `Чек: sale#${sale.id} | ${sale.receipt_hash}\n` +
+        `Добавь OWNER_KEYPAIR в Railway Variables.`,
+    );
+    return;
+  }
+
+  try {
+    const result = await burnCoffee({
+      qty: toBurn,
+      saleId: sale.id,
+      receiptHash: sale.receipt_hash,
+    });
+
+    markAsBurned(sale.id, result.sig);
+
+    await ctx.reply(
+      `✅ ${toBurn} $DOFFA сожжено!\n` +
+        `TX: ${result.solscan}\n\n` +
+        `Запись навсегда в блокчейне Solana.\n` +
+        `Ошиблись? /cancel`,
+    );
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    await ctx.reply(
+      `⚠️ Продажа записана, но burn не прошёл:\n${msg}\n\n` +
+        `Чек: sale#${sale.id} | ${sale.receipt_hash}\n` +
+        `Можно сжечь вручную позже.`,
+    );
+  }
 }
