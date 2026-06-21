@@ -1,12 +1,12 @@
 // Лёгкая интеграция с Solana без тяжёлых библиотек:
 // читаем данные токена через публичный JSON-RPC и подключаем Phantom через
-// встроенный в браузер провайдер. Сейчас всё на devnet (тест-токен).
+// встроенный в браузер провайдер. Токен на mainnet-beta.
 
 export const CHAIN = {
-  cluster: "devnet" as const,
-  rpc: "https://api.devnet.solana.com",
-  // Адрес тест-минта $DOFFA на devnet. На mainnet заменим на боевой.
-  mint: "FVERje4sz25gD1w4hTYV5VevSLPPDFhoNDHax1gvMVKU",
+  cluster: "mainnet-beta" as "devnet" | "mainnet-beta",
+  rpc: "https://api.mainnet-beta.solana.com",
+  // Боевой адрес минта $DOFFA на mainnet.
+  mint: "6cAtKTM8ZPUgRgmzsgkRfZsq4jZTXymA7cLqjz9qYMFS",
   // Сколько всего было выпущено (для расчёта «сожжено = выпуск − текущий объём»).
   initialSupply: 100_000_000,
 };
