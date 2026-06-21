@@ -141,10 +141,10 @@ export default function Home() {
     <main className="relative z-0">
       {/* ---------- NAV ---------- */}
       <header className="fixed inset-x-0 top-0 z-50 border-b border-white/5 bg-ink/70 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
-          <a href="#top" className="flex items-center gap-3">
-            <Image src="/brand/doffa-logo.jpeg" alt="DOFFA" width={40} height={40} className="rounded-full ring-1 ring-gold/40" />
-            <span className="display text-lg font-extrabold tracking-tight text-cream-soft">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-5 sm:py-3">
+          <a href="#top" className="flex items-center gap-2.5 sm:gap-3">
+            <Image src="/brand/doffa-logo.jpeg" alt="DOFFA" width={36} height={36} className="rounded-full ring-1 ring-gold/40 sm:w-[40px] sm:h-[40px]" />
+            <span className="display text-base font-extrabold tracking-tight text-cream-soft sm:text-lg">
               DOFFA<span className="text-teal">.</span>
             </span>
           </a>
@@ -161,7 +161,7 @@ export default function Home() {
               </button>
             ))}
           </nav>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3 sm:gap-2">
             <label className="relative flex items-center">
               <span className="sr-only">Language</span>
               <svg className="pointer-events-none absolute left-2.5 h-3.5 w-3.5 text-cream/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -903,7 +903,7 @@ export default function Home() {
 
 function Section({ id, children }: { id: string; children: React.ReactNode }) {
   return (
-    <section id={id} className="relative mx-auto max-w-6xl scroll-mt-20 px-5 py-24">
+    <section id={id} className="relative mx-auto max-w-6xl scroll-mt-28 sm:scroll-mt-20 px-5 py-24">
       {children}
     </section>
   );
