@@ -168,17 +168,87 @@ export async function fetchBurnHistory(limit = 15): Promise<BurnRecord[]> {
   return records;
 }
 
-/* ---------- Phantom wallet ---------- */
+/* ---------- Wallet providers ---------- */
 
-type PhantomProvider = {
+type StandardProvider = {
   isPhantom?: boolean;
   connect: () => Promise<{ publicKey: { toString: () => string } }>;
   disconnect: () => Promise<void>;
 };
 
-export function getPhantom(): PhantomProvider | null {
+type SolflareProvider = {
+  isSolflare?: boolean;
+  connect: () => Promise<void>;
+  disconnect: () => Promise<void>;
+  publicKey: { toString: () => string } | null;
+};
+
+declare global {
+  interface Window {
+    phantom?: { solana?: StandardProvider };
+    solana?: StandardProvider;
+    solflare?: SolflareProvider;
+    trustwallet?: { solana?: StandardProvider };
+    backpack?: StandardProvider;
+  }
+}
+
+export function getPhantom(): StandardProvider | null {
   if (typeof window === "undefined") return null;
-  const w = window as unknown as { phantom?: { solana?: PhantomProvider }; solana?: PhantomProvider };
-  const p = w.phantom?.solana ?? w.solana;
+  const p = window.phantom?.solana ?? window.solana;
   return p?.isPhantom ? p : null;
+}
+
+export function getSolflare(): SolflareProvider | null {
+  if (typeof window === "undefined") return null;
+  return window.solflare?.isSolflare ? window.solflare : null;
+}
+
+export function getTrust(): StandardProvider | null {
+  if (typeof window === "undefined") return null;
+  return window.trustwallet?.solana ?? null;
+}
+
+export function getBackpack(): StandardProvider | null {
+  if (typeof window === "undefined") return null;
+  return window.backpack ?? null;
+}
+
+export async function connectWalletById(id: string): Promise<string | null> {
+  try {
+    if (id === "phantom") {
+      const p = getPhantom();
+      if (!p) { window.open("https://phantom.app/", "_blank", "noopener,noreferrer"); return null; }
+      const r = await p.connect();
+      return r.publicKey.toString();
+    }
+    if (id === "solflare") {
+      const p = getSolflare();
+      if (!p) { window.open("https://solflare.com/", "_blank", "noopener,noreferrer"); return null; }
+      await p.connect();
+      return p.publicKey?.toString() ?? null;
+    }
+    if (id === "trust") {
+      const p = getTrust();
+      if (!p) { window.open("https://trustwallet.com/", "_blank", "noopener,noreferrer"); return null; }
+      const r = await p.connect();
+      return r.publicKey.toString();
+    }
+    if (id === "backpack") {
+      const p = getBackpack();
+      if (!p) { window.open("https://backpack.app/", "_blank", "noopener,noreferrer"); return null; }
+      const r = await p.connect();
+      return r.publicKey.toString();
+    }
+  } catch { /* user declined */ }
+  return null;
+}
+
+export async function disconnectWalletById(id: string): Promise<void> {
+  try {
+    if (id === "phantom") await getPhantom()?.disconnect();
+    else if (id === "solflare") await getSolflare()?.disconnect();
+    else if (id === "trust") await getTrust()?.disconnect();
+    else if (id === "backpack") await getBackpack()?.disconnect();
+  } catch { /* ignore */ }
 }

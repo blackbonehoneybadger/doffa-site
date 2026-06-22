@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView, useMotionValue, animate, AnimatePresence } from "framer-motion";
 import { dict, LANGS, TOKEN, MOCK, CONTACT, GALLERY, VIDEOS, type Lang } from "./content";
-import { CHAIN, solscanToken, solscanTx, solscanHolders, fetchSupply, fetchBalance, fetchBurnHistory, getPhantom, type BurnRecord } from "./solana";
+import { CHAIN, solscanToken, solscanTx, solscanHolders, fetchSupply, fetchBalance, fetchBurnHistory, connectWalletById, disconnectWalletById, type BurnRecord } from "./solana";
 
 // Главный ролик в hero — без вшитых субтитров. Лежит в public/brand/hero.mp4.
 const HERO_VIDEO: string | null = "/brand/hero.mp4";
@@ -98,33 +98,35 @@ export default function Home() {
   const cupsSold = isLive ? burned : MOCK.cupsSold;
   const burnedPct = (burned / TOKEN.supply) * 100;
 
-  // Кошелёк (Phantom, devnet-демо).
+  // Кошелёк — Phantom, Solflare, Trust Wallet, Backpack (+ Ledger через Phantom/Solflare).
   const [wallet, setWallet] = useState<string | null>(null);
   const [walletBal, setWalletBal] = useState<number | null>(null);
-  const connectWallet = async () => {
-    const p = getPhantom();
-    if (!p) {
-      window.open("https://phantom.app/", "_blank", "noopener,noreferrer");
-      return;
-    }
-    try {
-      const resp = await p.connect();
-      const addr = resp.publicKey.toString();
-      setWallet(addr);
-      setWalletBal(null);
-      fetchBalance(addr).then(setWalletBal).catch(() => setWalletBal(0));
-    } catch {
-      /* пользователь отклонил подключение */
-    }
+  const [walletId, setWalletId] = useState<string | null>(null);
+  const [walletModal, setWalletModal] = useState(false);
+
+  const WALLET_OPTS = [
+    { id: "phantom",  name: "Phantom",      note: "Ledger ✓" },
+    { id: "solflare", name: "Solflare",     note: "Ledger ✓" },
+    { id: "trust",    name: "Trust Wallet", note: null },
+    { id: "backpack", name: "Backpack",     note: null },
+  ] as const;
+
+  const connectWallet = async (id: string) => {
+    setWalletModal(false);
+    const addr = await connectWalletById(id);
+    if (!addr) return;
+    setWallet(addr);
+    setWalletId(id);
+    setWalletBal(null);
+    fetchBalance(addr).then(setWalletBal).catch(() => setWalletBal(0));
   };
+
   const disconnectWallet = async () => {
-    try {
-      await getPhantom()?.disconnect();
-    } catch {
-      /* ignore */
-    }
+    if (walletId) await disconnectWalletById(walletId);
     setWallet(null);
     setWalletBal(null);
+    setWalletId(null);
+    setWalletModal(false);
   };
 
   const tabs: { id: typeof activeTab; label: string }[] = [
@@ -161,6 +163,66 @@ export default function Home() {
             ))}
           </nav>
           <div className="flex items-center gap-3 sm:gap-2">
+            {/* Wallet connect button */}
+            <div className="relative hidden sm:block">
+              {wallet ? (
+                <>
+                  <button
+                    onClick={() => setWalletModal((v) => !v)}
+                    className="flex items-center gap-1.5 rounded-full border border-teal/40 bg-teal/10 px-3 py-1.5 text-xs font-semibold text-teal transition hover:border-teal/60"
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full bg-teal" />
+                    {wallet.slice(0, 4)}…{wallet.slice(-4)}
+                  </button>
+                  {walletModal && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setWalletModal(false)} />
+                      <div className="absolute right-0 top-10 z-50 w-52 rounded-xl border border-white/10 bg-ink/95 p-3 shadow-xl backdrop-blur-md">
+                        <p className="mb-1 text-[10px] uppercase tracking-wider text-cream/40">{WALLET_OPTS.find((w) => w.id === walletId)?.name}</p>
+                        <p className="mb-3 font-mono text-[11px] text-cream/50 break-all">{wallet.slice(0, 8)}…{wallet.slice(-8)}</p>
+                        {walletBal !== null && (
+                          <p className="mb-3 text-xs font-semibold text-gold">{walletBal.toLocaleString()} $DOFFA</p>
+                        )}
+                        <button onClick={disconnectWallet} className="w-full rounded-lg bg-white/5 px-3 py-2 text-xs text-cream/70 hover:bg-white/10">
+                          {t.buy.disconnect}
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => setWalletModal((v) => !v)}
+                    className="flex items-center gap-1.5 rounded-full border border-gold/40 bg-gold/10 px-3 py-1.5 text-xs font-semibold text-gold transition hover:border-gold/60"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-80"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+                    {t.buy.connect}
+                  </button>
+                  {walletModal && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setWalletModal(false)} />
+                      <div className="absolute right-0 top-10 z-50 w-52 rounded-xl border border-white/10 bg-ink/95 p-3 shadow-xl backdrop-blur-md">
+                        <p className="mb-2 text-[10px] uppercase tracking-wider text-cream/40">Выбери кошелёк</p>
+                        <div className="flex flex-col gap-1">
+                          {WALLET_OPTS.map((w) => (
+                            <button
+                              key={w.id}
+                              onClick={() => connectWallet(w.id)}
+                              className="flex items-center justify-between rounded-lg bg-white/5 px-3 py-2 text-left text-sm text-cream transition hover:bg-white/10"
+                            >
+                              <span>{w.name}</span>
+                              {w.note && <span className="text-[10px] text-teal">{w.note}</span>}
+                            </button>
+                          ))}
+                        </div>
+                        <p className="mt-2 text-[10px] text-cream/30">Аппаратный кошелёк (Ledger) работает через Phantom или Solflare</p>
+                      </div>
+                    </>
+                  )}
+                </>
+              )}
+            </div>
             <label className="relative flex items-center">
               <span className="sr-only">Language</span>
               <svg className="pointer-events-none absolute left-2.5 h-3.5 w-3.5 text-cream/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -813,7 +875,7 @@ export default function Home() {
                         </div>
                       ) : (
                         <button
-                          onClick={connectWallet}
+                          onClick={() => setWalletModal(true)}
                           className="inline-flex items-center gap-2 rounded-full bg-gold px-7 py-3 font-bold text-ink transition hover:brightness-110"
                         >
                           {t.buy.connect}
