@@ -14,7 +14,7 @@ export async function handleSale(ctx: Context, arg: string): Promise<void> {
 
   const open = getOpenShift();
   if (!open) {
-    await ctx.reply("⚠️ Сначала открой смену: /shift open");
+    await ctx.reply("⚠️ Сначала открой смену: /go");
     return;
   }
 

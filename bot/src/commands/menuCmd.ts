@@ -27,7 +27,7 @@ function itemsKeyboard(catId: string) {
 export async function handleMenuCommand(ctx: Context): Promise<void> {
   const open = getOpenShift();
   if (!open) {
-    await ctx.reply("⚠️ Сначала открой смену: /shift open");
+    await ctx.reply("⚠️ Сначала открой смену: /go");
     return;
   }
   await ctx.reply("Выбери напиток:", categoryKeyboard());
@@ -70,7 +70,7 @@ export async function handleMenuCallback(ctx: Context): Promise<void> {
     const open = getOpenShift();
     if (!open) {
       await ctx.answerCbQuery("Нет открытой смены!");
-      await ctx.reply("⚠️ Сначала открой смену: /shift open");
+      await ctx.reply("⚠️ Сначала открой смену: /go");
       return;
     }
 

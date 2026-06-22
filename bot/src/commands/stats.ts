@@ -7,7 +7,7 @@ import { formatRub, formatTime } from "../format.js";
 export async function handleStats(ctx: Context): Promise<void> {
   const open = getOpenShift();
   if (!open) {
-    await ctx.reply("Нет открытой смены. Открой: /shift open");
+    await ctx.reply("Нет открытой смены. Открой: /go");
     return;
   }
   const sum = shiftSummary(open.id);

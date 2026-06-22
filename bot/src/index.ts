@@ -32,12 +32,12 @@ bot.start(async (ctx) => {
   await ctx.reply(
     "👋 DOFFA POS — касса бариста.\n\n" +
       "Команды:\n" +
-      "/shift open — открыть смену\n" +
+      "/go — открыть смену\n" +
       "/menu — выбрать напиток из меню 🎯\n" +
       "/sale 150 Капучино — пробить вручную\n" +
       "/stats — итог смены\n" +
       "/cancel — отменить последнюю продажу\n" +
-      "/shift close — закрыть смену\n" +
+      "/stop — закрыть смену\n" +
       "/help — подсказка"
   );
 });
@@ -45,17 +45,19 @@ bot.start(async (ctx) => {
 bot.help(async (ctx) => {
   await ctx.reply(
     "Как пользоваться:\n\n" +
-      "1) Утром: /shift open\n" +
+      "1) Утром: /go\n" +
       "2) Продажа через меню: /menu 🎯\n" +
       "   Или вручную: /sale 150 Капучино\n" +
       "   Несколько чашек: /sale 300 x2 Латте\n" +
       "3) Проверить итог: /stats\n" +
       "4) Ошиблись: /cancel\n" +
-      "5) Вечером: /shift close"
+      "5) Вечером: /stop"
   );
 });
 
 bot.command("shift", (ctx) => handleShift(ctx, args(ctx.message.text)));
+bot.command("go", (ctx) => handleShift(ctx, "open"));
+bot.command("stop", (ctx) => handleShift(ctx, "close"));
 bot.command("sale", (ctx) => handleSale(ctx, args(ctx.message.text)));
 bot.command("stats", (ctx) => handleStats(ctx));
 bot.command("menu", (ctx) => handleMenuCommand(ctx));
