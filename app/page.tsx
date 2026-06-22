@@ -803,12 +803,12 @@ export default function Home() {
                   <Tag>{t.roadmap.tag}</Tag>
                   <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.roadmap.title}</h2>
                 </Reveal>
-                <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
                   {t.roadmap.phases.map((p, i) => (
                     <Reveal key={p.n} delay={i * 0.08}>
                       <div className={`h-full rounded-2xl border p-6 ${p.done ? "border-teal/50 bg-teal/[0.07]" : "border-white/10 bg-white/[0.02]"}`}>
                         <div className="flex items-center justify-between">
-                          <span className="display text-2xl font-extrabold text-gold">{p.n}</span>
+                          <span className="display text-base font-extrabold text-gold">{p.n}</span>
                           {p.done && <span className="rounded-full bg-teal/20 px-2 py-0.5 text-[10px] font-bold uppercase text-teal">✓</span>}
                         </div>
                         <h3 className="display mt-3 text-lg font-bold text-cream-soft">{p.t}</h3>
