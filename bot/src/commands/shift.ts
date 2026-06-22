@@ -16,7 +16,7 @@ export async function handleShift(ctx: Context, arg: string): Promise<void> {
   // /shift open
   if (action === "open" || action === "открыть") {
     if (open) {
-      await ctx.reply(`⚠️ Смена уже открыта (с ${formatTime(open.opened_at)}). Закрой её: /shift close`);
+      await ctx.reply(`⚠️ Смена уже открыта (с ${formatTime(open.opened_at)}). Закрой её: /off`);
       return;
     }
     const shift = openShift(userId);

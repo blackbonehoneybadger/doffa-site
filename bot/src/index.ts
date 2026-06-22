@@ -37,7 +37,7 @@ bot.start(async (ctx) => {
       "/sale 150 Капучино — пробить вручную\n" +
       "/stats — итог смены\n" +
       "/cancel — отменить последнюю продажу\n" +
-      "/stop — закрыть смену\n" +
+      "/off — закрыть смену\n" +
       "/help — подсказка"
   );
 });
@@ -51,13 +51,13 @@ bot.help(async (ctx) => {
       "   Несколько чашек: /sale 300 x2 Латте\n" +
       "3) Проверить итог: /stats\n" +
       "4) Ошиблись: /cancel\n" +
-      "5) Вечером: /stop"
+      "5) Вечером: /off"
   );
 });
 
 bot.command("shift", (ctx) => handleShift(ctx, args(ctx.message.text)));
 bot.command("go", (ctx) => handleShift(ctx, "open"));
-bot.command("stop", (ctx) => handleShift(ctx, "close"));
+bot.command("off", (ctx) => handleShift(ctx, "close"));
 bot.command("sale", (ctx) => handleSale(ctx, args(ctx.message.text)));
 bot.command("stats", (ctx) => handleStats(ctx));
 bot.command("menu", (ctx) => handleMenuCommand(ctx));
