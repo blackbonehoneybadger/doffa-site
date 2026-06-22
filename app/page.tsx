@@ -501,9 +501,14 @@ export default function Home() {
                       <div className="space-y-5">
                         {t.token.alloc.map((a, i) => (
                           <div key={a.name}>
-                            <div className="mb-1.5 flex justify-between text-sm">
+                            <div className="mb-1.5 flex items-center justify-between gap-2 text-sm">
                               <span className="text-cream/75">{a.name}</span>
-                              <span className="display font-bold text-gold">{a.pct}%</span>
+                              <div className="flex shrink-0 items-center gap-2">
+                                <span className="rounded border border-white/10 bg-white/[0.04] px-1.5 py-0.5 font-mono text-[10px] text-cream/40">
+                                  {((TOKEN.supply * a.pct) / 100).toLocaleString()} {TOKEN.symbol}
+                                </span>
+                                <span className="display font-bold text-gold">{a.pct}%</span>
+                              </div>
                             </div>
                             <div className="h-2.5 overflow-hidden rounded-full bg-white/10">
                               <motion.div
@@ -577,28 +582,49 @@ export default function Home() {
                 </Reveal>
 
                 <Reveal>
-                  <div className="mt-10 overflow-hidden rounded-2xl border border-white/10">
-                    <div className="grid grid-cols-[1fr_auto_auto_auto] gap-3 border-b border-white/10 bg-white/[0.03] px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-cream/40 sm:grid-cols-[1fr_auto_auto_auto_auto_auto]">
-                      <span>{t.proof.colTime}</span>
-                      <span className="text-right">{t.proof.colAmount}</span>
-                      <span className="hidden text-right sm:block">{t.proof.colSale}</span>
-                      <span className="text-right">{t.proof.colHash}</span>
-                      <span className="hidden text-right sm:block">{t.proof.colStatus}</span>
-                      <span className="text-right">{t.proof.colVerify}</span>
+                  <div className="mt-10 overflow-hidden rounded-2xl border border-white/10 bg-black/20">
+                    {/* Заголовок потока */}
+                    <div className="flex items-center justify-between border-b border-white/10 bg-white/[0.03] px-4 py-3">
+                      <h3 className="text-sm font-semibold text-cream/70">{t.proof.title}</h3>
+                      <span className="flex items-center gap-1.5 text-xs text-cream/40">
+                        <span className="h-1.5 w-1.5 rounded-full bg-teal" />
+                        {t.burns.live}
+                      </span>
                     </div>
-
-                    {burns === null ? (
-                      <div className="flex items-center justify-center gap-2 px-5 py-12 text-sm text-cream/40">
-                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-teal/40 border-t-teal" />
-                        {t.proof.loading}
-                      </div>
-                    ) : burns.length === 0 ? (
-                      <div className="px-5 py-12 text-center text-sm text-cream/40">{t.proof.empty}</div>
-                    ) : (
-                      burns.map((b, i) => (
-                        <BurnRow key={b.sig} burn={b} even={i % 2 === 0} verifyLabel={t.proof.colVerify} statusLabel={t.proof.statusVerified} locale={loc} />
-                      ))
-                    )}
+                    {/* Таблица */}
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse text-left text-xs">
+                        <thead>
+                          <tr className="border-b border-white/[0.06] bg-white/[0.02] text-[10px] uppercase tracking-wider text-cream/30">
+                            <th className="px-4 py-3 font-medium">{t.proof.colTime}</th>
+                            <th className="px-4 py-3 font-medium">{t.proof.colEvent}</th>
+                            <th className="px-4 py-3 font-medium">{t.proof.colSale}</th>
+                            <th className="px-4 py-3 text-right font-medium">{t.proof.colAmount}</th>
+                            <th className="px-4 py-3 text-center font-medium">{t.proof.colHash}</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/[0.04]">
+                          {burns === null ? (
+                            <tr>
+                              <td colSpan={5} className="px-4 py-12 text-center text-cream/40">
+                                <span className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-teal/40 border-t-teal align-middle" />
+                                {t.proof.loading}
+                              </td>
+                            </tr>
+                          ) : burns.length === 0 ? (
+                            <tr>
+                              <td colSpan={5} className="px-4 py-12 text-center text-cream/40">
+                                {t.proof.empty}
+                              </td>
+                            </tr>
+                          ) : (
+                            burns.map((b, i) => (
+                              <BurnRow key={b.sig} burn={b} even={i % 2 === 0} locale={loc} eventLabel={t.proof.colEvent} />
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </Reveal>
 
@@ -803,19 +829,36 @@ export default function Home() {
                   <Tag>{t.roadmap.tag}</Tag>
                   <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.roadmap.title}</h2>
                 </Reveal>
-                <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-                  {t.roadmap.phases.map((p, i) => (
-                    <Reveal key={p.n} delay={i * 0.08}>
-                      <div className={`h-full rounded-2xl border p-6 ${p.done ? "border-teal/50 bg-teal/[0.07]" : "border-white/10 bg-white/[0.02]"}`}>
-                        <div className="flex items-center justify-between">
-                          <span className="display text-base font-extrabold text-gold">{p.n}</span>
-                          {p.done && <span className="rounded-full bg-teal/20 px-2 py-0.5 text-[10px] font-bold uppercase text-teal">✓</span>}
+                <div className="relative mt-12">
+                  {/* vertical line */}
+                  <div className="absolute left-5 top-0 h-full w-0.5 bg-gradient-to-b from-gold/50 via-teal/30 to-transparent" />
+                  <div className="space-y-8">
+                    {t.roadmap.phases.map((p, i) => (
+                      <Reveal key={p.n} delay={i * 0.1}>
+                        <div className="relative flex gap-5">
+                          {/* dot */}
+                          <div className={`relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 ${p.done ? "border-teal bg-teal/20" : "border-gold/60 bg-gold/10"}`}>
+                            {p.done ? (
+                              <span className="text-xs font-bold text-teal">✓</span>
+                            ) : (
+                              <span className="text-xs font-bold text-gold">{i + 1}</span>
+                            )}
+                          </div>
+                          {/* card */}
+                          <div className={`flex-1 rounded-2xl border p-5 ${p.done ? "border-teal/40 bg-teal/[0.06]" : "border-white/10 bg-white/[0.02]"}`}>
+                            <div className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-gold/70">{p.n}</div>
+                            <h3 className="display text-base font-bold text-cream-soft">{p.t}</h3>
+                            <p className="mt-2 text-sm leading-relaxed text-cream/65">{p.d}</p>
+                            {p.done && (
+                              <span className="mt-3 inline-block rounded-full bg-teal/20 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-teal">
+                                ✓ Done
+                              </span>
+                            )}
+                          </div>
                         </div>
-                        <h3 className="display mt-3 text-lg font-bold text-cream-soft">{p.t}</h3>
-                        <p className="mt-2 text-sm text-cream/65">{p.d}</p>
-                      </div>
-                    </Reveal>
-                  ))}
+                      </Reveal>
+                    ))}
+                  </div>
                 </div>
               </Section>
 
@@ -982,37 +1025,33 @@ function Stat({ label, value, unit, accent }: { label: string; value: React.Reac
   );
 }
 
-function BurnRow({ burn, even, verifyLabel, statusLabel, locale = "ru-RU" }: { burn: BurnRecord; even: boolean; verifyLabel: string; statusLabel: string; locale?: string }) {
+function BurnRow({ burn, even, locale = "ru-RU", eventLabel = "Burn" }: { burn: BurnRecord; even: boolean; locale?: string; eventLabel?: string }) {
   const date = burn.blockTime
     ? new Date(burn.blockTime * 1000).toLocaleString(locale, { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })
     : "—";
-  const shortHash = burn.receiptHash ? burn.receiptHash.slice(0, 8) + "…" : "—";
-  const shortSale = burn.saleId ? (burn.saleId.length > 14 ? burn.saleId.slice(0, 14) + "…" : burn.saleId) : "—";
+  const shortSig = burn.sig ? burn.sig.slice(0, 4) + "…" + burn.sig.slice(-4) : "—";
+  const saleLabel = burn.saleId ? `POS #${burn.saleId}` : "—";
 
   return (
-    <div className={`grid grid-cols-[1fr_auto_auto_auto] items-center gap-3 px-5 py-3 text-sm sm:grid-cols-[1fr_auto_auto_auto_auto_auto] ${even ? "bg-transparent" : "bg-white/[0.015]"}`}>
-      <span className="text-cream/60 tabular-nums">{date}</span>
-      <span className="display text-right font-bold text-amber tabular-nums">
-        {burn.amount > 0 ? burn.amount.toLocaleString(locale) : "?"} 🔥
-      </span>
-      <span className="hidden text-right font-mono text-xs text-cream/50 sm:block" title={burn.saleId}>{shortSale}</span>
-      <span className="font-mono text-right text-xs text-cream/50" title={burn.receiptHash}>{shortHash}</span>
-      <span className="hidden justify-self-end sm:block">
-        <span className="inline-flex items-center gap-1 rounded-full border border-teal/40 bg-teal/10 px-2 py-0.5 text-[10px] font-semibold text-teal">
-          <span className="h-1.5 w-1.5 rounded-full bg-teal" />
-          {statusLabel}
-        </span>
-      </span>
-      <a
-        href={solscanTx(burn.sig)}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-right text-xs font-semibold text-teal transition hover:text-gold"
-        title={burn.sig}
-      >
-        {verifyLabel} ↗
-      </a>
-    </div>
+    <tr className={`transition-colors hover:bg-white/[0.03] ${even ? "" : "bg-white/[0.015]"}`}>
+      <td className="px-4 py-3 text-cream/50 tabular-nums">{date}</td>
+      <td className="px-4 py-3 font-medium text-amber">🔥 {eventLabel}</td>
+      <td className="px-4 py-3 text-cream/60">{saleLabel}</td>
+      <td className="px-4 py-3 text-right font-bold tabular-nums text-cream/80">
+        −{burn.amount > 0 ? burn.amount.toLocaleString(locale) : "?"} $DOFFA
+      </td>
+      <td className="px-4 py-3 text-center">
+        <a
+          href={solscanTx(burn.sig)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-mono text-cream/50 underline transition hover:text-teal"
+          title={burn.sig}
+        >
+          {shortSig}
+        </a>
+      </td>
+    </tr>
   );
 }
 

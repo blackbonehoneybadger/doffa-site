@@ -98,6 +98,7 @@ type Dict = {
     colVerify: string;
     colStatus: string;
     statusVerified: string;
+    colEvent: string;
     empty: string;
     loading: string;
     mismatchWarn: string;
@@ -222,6 +223,7 @@ export const dict: Record<Lang, Dict> = {
       colVerify: "TX",
       colStatus: "Статус",
       statusVerified: "Подтверждено",
+      colEvent: "Событие",
       empty: "Подтверждённых сжиганий пока нет — devnet demo. Первая запись появится, когда система начнёт сжигать токены за оплаченные чеки Telegram POS.",
       loading: "Читаем блокчейн…",
       mismatchWarn: "⚠ Продажи в Telegram POS не совпадают с burns в блокчейне",
@@ -456,6 +458,7 @@ export const dict: Record<Lang, Dict> = {
       colVerify: "TX",
       colStatus: "Status",
       statusVerified: "Verified",
+      colEvent: "Event",
       empty: "No verified burns yet — devnet demo. The first entry appears once the system starts burning tokens for paid Telegram POS receipts.",
       loading: "Reading the blockchain…",
       mismatchWarn: "⚠ Telegram POS sales don't match the blockchain burns",
@@ -691,6 +694,7 @@ export const dict: Record<Lang, Dict> = {
       colVerify: "TX",
       colStatus: "الحالة",
       statusVerified: "مؤكَّد",
+      colEvent: "الحدث",
       empty: "لا عمليات حرق مؤكَّدة بعد — عرض devnet. سيظهر أول سجلّ عندما يبدأ النظام بحرق العملات مقابل فواتير Telegram POS المدفوعة.",
       loading: "نقرأ البلوكشين…",
       mismatchWarn: "⚠ مبيعات Telegram POS لا تطابق عمليات الحرق على البلوكشين",
@@ -925,6 +929,7 @@ export const dict: Record<Lang, Dict> = {
       colVerify: "TX",
       colStatus: "Durum",
       statusVerified: "Doğrulandı",
+      colEvent: "Olay",
       empty: "Henüz doğrulanmış yakım yok — devnet demo. Sistem ödenmiş Telegram POS fişleri için token yakmaya başlayınca ilk kayıt görünecek.",
       loading: "Blok zinciri okunuyor…",
       mismatchWarn: "⚠ Telegram POS satışları zincirdeki yakımlarla eşleşmiyor",
@@ -1159,6 +1164,7 @@ export const dict: Record<Lang, Dict> = {
       colVerify: "TX",
       colStatus: "Estado",
       statusVerified: "Verificado",
+      colEvent: "Evento",
       empty: "Aún no hay quemas verificadas — demo devnet. La primera entrada aparecerá cuando el sistema empiece a quemar tokens por recibos pagados de Telegram POS.",
       loading: "Leyendo la blockchain…",
       mismatchWarn: "⚠ Las ventas de Telegram POS no coinciden con las quemas en la cadena",
@@ -1393,6 +1399,7 @@ export const dict: Record<Lang, Dict> = {
       colVerify: "TX",
       colStatus: "Statut",
       statusVerified: "Vérifié",
+      colEvent: "Événement",
       empty: "Aucun brûlage vérifié pour l'instant — démo devnet. La première entrée apparaîtra quand le système commencera à brûler des jetons pour les reçus payés de Telegram POS.",
       loading: "Lecture de la blockchain…",
       mismatchWarn: "⚠ Les ventes Telegram POS ne correspondent pas aux brûlages sur la chaîne",
@@ -1627,6 +1634,7 @@ export const dict: Record<Lang, Dict> = {
       colVerify: "TX",
       colStatus: "Status",
       statusVerified: "Bestätigt",
+      colEvent: "Ereignis",
       empty: "Noch keine bestätigten Burns – devnet-Demo. Der erste Eintrag erscheint, sobald das System Tokens für bezahlte Telegram POS-Belege verbrennt.",
       loading: "Blockchain wird gelesen…",
       mismatchWarn: "⚠ Telegram POS-Verkäufe stimmen nicht mit den Burns on-chain überein",
@@ -1861,6 +1869,7 @@ export const dict: Record<Lang, Dict> = {
       colVerify: "TX",
       colStatus: "状态",
       statusVerified: "已确认",
+      colEvent: "事件",
       empty: "尚无已确认的销毁——devnet 演示。当系统开始为已付的 Telegram POS 小票销毁代币时，第一条记录便会出现。",
       loading: "正在读取区块链…",
       mismatchWarn: "⚠ Telegram POS 销售与链上销毁不一致",
@@ -2095,6 +2104,7 @@ export const dict: Record<Lang, Dict> = {
       colVerify: "TX",
       colStatus: "स्थिति",
       statusVerified: "सत्यापित",
+      colEvent: "घटना",
       empty: "अभी कोई सत्यापित बर्न नहीं — devnet डेमो। पहली प्रविष्टि तब दिखेगी जब सिस्टम भुगतान की गई Telegram POS रसीदों के लिए टोकन जलाना शुरू करेगा।",
       loading: "ब्लॉकचेन पढ़ रहे हैं…",
       mismatchWarn: "⚠ Telegram POS की बिक्री ब्लॉकचेन के बर्न से मेल नहीं खाती",
@@ -2329,6 +2339,7 @@ export const dict: Record<Lang, Dict> = {
       colVerify: "TX",
       colStatus: "Status",
       statusVerified: "Verificado",
+      colEvent: "Evento",
       empty: "Ainda sem queimas verificadas — demo devnet. A primeira entrada aparece quando o sistema começar a queimar tokens por recibos pagos do Telegram POS.",
       loading: "Lendo a blockchain…",
       mismatchWarn: "⚠ As vendas do Telegram POS não batem com as queimas na cadeia",
@@ -2563,6 +2574,7 @@ export const dict: Record<Lang, Dict> = {
       colVerify: "TX",
       colStatus: "Stato",
       statusVerified: "Verificato",
+      colEvent: "Evento",
       empty: "Ancora nessun burn verificato — demo devnet. La prima voce compare quando il sistema inizia a bruciare token per scontrini Telegram POS pagati.",
       loading: "Lettura della blockchain…",
       mismatchWarn: "⚠ Le vendite Telegram POS non corrispondono ai burn sulla catena",
@@ -2797,6 +2809,7 @@ export const dict: Record<Lang, Dict> = {
       colVerify: "TX",
       colStatus: "ステータス",
       statusVerified: "確認済み",
+      colEvent: "イベント",
       empty: "まだ確認済みのバーンはありません——devnet デモ。システムが支払済みの Telegram POS レシートに対しトークンをバーンし始めると、最初の記録が表示されます。",
       loading: "ブロックチェーンを読み込み中…",
       mismatchWarn: "⚠ Telegram POS の販売がチェーン上のバーンと一致しません",
