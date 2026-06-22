@@ -1,6 +1,6 @@
 // DOFFA POS — точка входа Telegram-бота.
 // Запуск: npm run dev (или npm start)
-import { Telegraf } from "telegraf";
+import { Telegraf, Markup, type Context } from "telegraf";
 import { CONFIG, isAdmin } from "./config.js";
 import { getOpenShift, getLastSale, deleteSale } from "./db.js";
 import { handleShift } from "./commands/shift.js";
@@ -9,6 +9,13 @@ import { handleStats } from "./commands/stats.js";
 import { handleMenuCommand, handleMenuCallback } from "./commands/menuCmd.js";
 
 const bot = new Telegraf(CONFIG.botToken);
+
+// Постоянная клавиатура внизу — всегда подсказывает что делать.
+const KB = Markup.keyboard([
+  ["☕ Пробить продажу"],
+  ["🔔 Открыть смену", "🔒 Закрыть смену"],
+  ["📊 Итог смены", "↩️ Отменить"],
+]).resize();
 
 // --- Защита: бот отвечает только администраторам ---
 bot.use(async (ctx, next) => {
@@ -31,14 +38,15 @@ function args(text: string | undefined): string {
 bot.start(async (ctx) => {
   await ctx.reply(
     "👋 DOFFA POS — касса бариста.\n\n" +
-      "Команды:\n" +
-      "/go — открыть смену\n" +
-      "/menu — выбрать напиток из меню 🎯\n" +
-      "/sale 150 Капучино — пробить вручную\n" +
-      "/stats — итог смены\n" +
-      "/cancel — отменить последнюю продажу\n" +
-      "/off — закрыть смену\n" +
-      "/help — подсказка"
+      "Пользуйся кнопками внизу 👇 или командами:\n\n" +
+      "🔔 /go — открыть смену\n" +
+      "☕ /menu — выбрать напиток из меню\n" +
+      "✍️ /sale 150 Капучино — пробить вручную\n" +
+      "📊 /stats — итог смены\n" +
+      "↩️ /cancel — отменить последнюю продажу\n" +
+      "🔒 /off — закрыть смену\n" +
+      "❓ /help — подсказка",
+    KB,
   );
 });
 
@@ -63,8 +71,15 @@ bot.command("stats", (ctx) => handleStats(ctx));
 bot.command("menu", (ctx) => handleMenuCommand(ctx));
 bot.on("callback_query", (ctx) => handleMenuCallback(ctx));
 
-// /cancel — удалить последнюю продажу текущей смены
-bot.command("cancel", async (ctx) => {
+// --- Кнопки нижней клавиатуры → те же действия, что и команды ---
+bot.hears("🔔 Открыть смену", (ctx) => handleShift(ctx, "open"));
+bot.hears("🔒 Закрыть смену", (ctx) => handleShift(ctx, "close"));
+bot.hears("☕ Пробить продажу", (ctx) => handleMenuCommand(ctx));
+bot.hears("📊 Итог смены", (ctx) => handleStats(ctx));
+bot.hears("↩️ Отменить", (ctx) => cancelLastSale(ctx));
+
+// Отмена последней продажи текущей смены — общая функция для /cancel и кнопки.
+async function cancelLastSale(ctx: Context): Promise<void> {
   const open = getOpenShift();
   if (!open) {
     await ctx.reply("Нет открытой смены.");
@@ -77,10 +92,25 @@ bot.command("cancel", async (ctx) => {
   }
   deleteSale(last.id);
   await ctx.reply(`↩️ Продажа #${last.id} отменена.`);
-});
+}
+
+bot.command("cancel", (ctx) => cancelLastSale(ctx));
 
 // --- Запуск ---
-bot.launch(() => {
+bot.launch(async () => {
+  // Меню команд Telegram — появляется по кнопке «меню» и при вводе «/».
+  try {
+    await bot.telegram.setMyCommands([
+      { command: "menu", description: "☕ Пробить продажу из меню" },
+      { command: "go", description: "🔔 Открыть смену" },
+      { command: "off", description: "🔒 Закрыть смену" },
+      { command: "stats", description: "📊 Итог смены" },
+      { command: "cancel", description: "↩️ Отменить последнюю продажу" },
+      { command: "help", description: "❓ Подсказка" },
+    ]);
+  } catch (err) {
+    console.error("setMyCommands error:", err);
+  }
   console.log(`✅ DOFFA POS бот запущен. Админов: ${CONFIG.adminIds.length}. База: ${CONFIG.dbPath}`);
 });
 

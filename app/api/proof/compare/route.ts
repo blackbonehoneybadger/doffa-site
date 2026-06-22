@@ -26,14 +26,13 @@ export async function GET() {
     return Response.json({
       pos_sales: totalSales,
       solana_burns: totalBurns,
-      // Обратная совместимость с компонентами сайта
-      cloudshop_cups: totalSales,
+      pos_cups: totalSales,
       mismatch: 0,
       mismatch_percent: 0,
       status,
       message,
       solana_transactions: burns.slice(0, 20),
-      cloudshop_sales: burns.slice(0, 20).map((b) => ({
+      pos_sales_list: burns.slice(0, 20).map((b) => ({
         check_id: b.saleId,
         quantity: b.amount,
         timestamp: (b.blockTime ?? 0) * 1000,
@@ -46,13 +45,13 @@ export async function GET() {
       {
         pos_sales: 0,
         solana_burns: 0,
-        cloudshop_cups: 0,
+        pos_cups: 0,
         mismatch: 0,
         mismatch_percent: 0,
         status: "no_data" as const,
         message: "Данные из Solana временно недоступны",
         solana_transactions: [],
-        cloudshop_sales: [],
+        pos_sales_list: [],
       },
       { status: 200 },
     );

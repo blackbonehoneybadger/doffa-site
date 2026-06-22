@@ -74,7 +74,7 @@ export default function Home() {
   }, []);
 
   // Сверка POS-продаж ↔ Solana burns. Данные из блокчейна через /api/proof/compare.
-  type Compare = { cloudshop_cups: number; solana_burns: number; mismatch: number; status: string; message: string };
+  type Compare = { pos_cups: number; solana_burns: number; mismatch: number; status: string; message: string };
   const [compare, setCompare] = useState<Compare | null>(null);
   useEffect(() => {
     fetch("/api/proof/compare")
@@ -609,7 +609,7 @@ export default function Home() {
                       <div>
                         <p className="font-semibold">{t.proof.mismatchWarn}</p>
                         <p className="mt-1 text-xs text-amber/70">
-                          {`POS: ${compare.cloudshop_cups.toLocaleString(loc)} ${t.ui.cupsWord} · Solana: ${compare.solana_burns.toLocaleString(loc)} ${t.ui.burnedWord} · ${t.ui.diffWord} ${compare.mismatch.toLocaleString(loc)}`}
+                          {`POS: ${compare.pos_cups.toLocaleString(loc)} ${t.ui.cupsWord} · Solana: ${compare.solana_burns.toLocaleString(loc)} ${t.ui.burnedWord} · ${t.ui.diffWord} ${compare.mismatch.toLocaleString(loc)}`}
                         </p>
                       </div>
                     </div>
@@ -623,7 +623,7 @@ export default function Home() {
                       <div>
                         <p className="font-semibold">{t.ui.inSyncTitle}</p>
                         <p className="mt-1 text-xs text-teal/70">
-                          {`${compare.cloudshop_cups.toLocaleString(loc)} ${t.ui.cupsWord} → ${compare.solana_burns.toLocaleString(loc)} ${t.ui.burnedWord} $DOFFA`}
+                          {`${compare.pos_cups.toLocaleString(loc)} ${t.ui.cupsWord} → ${compare.solana_burns.toLocaleString(loc)} ${t.ui.burnedWord} $DOFFA`}
                         </p>
                       </div>
                     </div>
