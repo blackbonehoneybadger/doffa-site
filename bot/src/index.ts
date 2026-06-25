@@ -108,21 +108,42 @@ async function cancelLastSale(ctx: Context): Promise<void> {
 bot.command("cancel", (ctx) => cancelLastSale(ctx));
 
 // --- Запуск ---
-bot.launch(async () => {
-  // Меню команд Telegram — появляется по кнопке «меню» и при вводе «/».
-  try {
-    await bot.telegram.setMyCommands([
-      { command: "menu", description: "☕ Пробить продажу из меню" },
-      { command: "go", description: "🔔 Открыть смену" },
-      { command: "off", description: "🔒 Закрыть смену" },
-      { command: "stats", description: "📊 Итог смены" },
-      { command: "cancel", description: "↩️ Отменить последнюю продажу" },
-      { command: "help", description: "❓ Подсказка" },
-    ]);
-  } catch (err) {
-    console.error("setMyCommands error:", err);
-  }
-  console.log(`✅ DOFFA POS бот запущен. Админов: ${CONFIG.adminIds.length}. База: ${CONFIG.dbPath}`);
+// Видно в логах Railway сразу при старте контейнера — даже до подключения к Telegram.
+console.log(
+  `🚀 DOFFA POS стартует… Node ${process.version}. ` +
+    `Админов: ${CONFIG.adminIds.length}. База: ${CONFIG.dbPath}. ` +
+    `Mint: ${CONFIG.mint.slice(0, 6)}…`,
+);
+
+bot
+  .launch(async () => {
+    // Меню команд Telegram — появляется по кнопке «меню» и при вводе «/».
+    try {
+      await bot.telegram.setMyCommands([
+        { command: "menu", description: "☕ Пробить продажу из меню" },
+        { command: "go", description: "🔔 Открыть смену" },
+        { command: "off", description: "🔒 Закрыть смену" },
+        { command: "stats", description: "📊 Итог смены" },
+        { command: "cancel", description: "↩️ Отменить последнюю продажу" },
+        { command: "help", description: "❓ Подсказка" },
+      ]);
+    } catch (err) {
+      console.error("setMyCommands error:", err);
+    }
+    console.log(`✅ DOFFA POS бот запущен и слушает Telegram. Админов: ${CONFIG.adminIds.length}.`);
+  })
+  .catch((err) => {
+    // Если Telegram отверг токен или сеть недоступна — видно в логах, контейнер перезапустится.
+    console.error("⛔ Не удалось запустить бота:", err instanceof Error ? err.message : err);
+    process.exit(1);
+  });
+
+// Чтобы любой необработанный сбой был виден в логах, а не «тихо молчал».
+process.on("unhandledRejection", (reason) => {
+  console.error("unhandledRejection:", reason);
+});
+process.on("uncaughtException", (err) => {
+  console.error("uncaughtException:", err);
 });
 
 // Корректное завершение
