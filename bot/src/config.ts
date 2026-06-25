@@ -28,7 +28,8 @@ export const CONFIG = {
   botToken: required("DOFFA_BOT_TOKEN"),
   adminIds: parseAdminIds(required("ADMIN_IDS")),
   dbPath: process.env.DB_PATH?.trim() || "./data/doffa.db",
-  mint: process.env.DOFFA_MINT?.trim() || "6cAtKTM8ZPUgRgmzsgkRfZsq4jZTXymA7cLqjz9qYMFS",
+  // По умолчанию — devnet тест-токен (бесплатно). На mainnet зададим DOFFA_MINT.
+  mint: process.env.DOFFA_MINT?.trim() || "FVERje4sz25gD1w4hTYV5VevSLPPDFhoNDHax1gvMVKU",
   burnPerCup: Number(process.env.BURN_PER_CUP ?? "1") || 1,
 };
 
