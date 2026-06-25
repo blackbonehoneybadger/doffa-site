@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView, useMotionValue, animate, AnimatePresence } from "framer-motion";
 import { dict, LANGS, TOKEN, MOCK, CONTACT, GALLERY, VIDEOS, type Lang } from "./content";
-import { CHAIN, solscanToken, solscanTx, solscanHolders, fetchSupply, fetchBalance, fetchBurnHistory, getPhantom, type BurnRecord } from "./solana";
+import { CHAIN, solscanToken, solscanTx, solscanHolders, fetchSupply, fetchBalance, fetchBurnHistory, connectWalletById, disconnectWalletById, type BurnRecord } from "./solana";
 
 // Главный ролик в hero — без вшитых субтитров. Лежит в public/brand/hero.mp4.
 const HERO_VIDEO: string | null = "/brand/hero.mp4";
@@ -73,9 +73,8 @@ export default function Home() {
       .catch(() => setBurns([]));
   }, []);
 
-  // Сверка CloudShop (проданные чашки) ↔ Solana (сожжённые токены).
-  // Источник: /api/proof/compare. Пока CloudShop не подключён — status: "no_data".
-  type Compare = { cloudshop_cups: number; solana_burns: number; mismatch: number; status: string; message: string };
+  // Сверка POS-продаж ↔ Solana burns. Данные из блокчейна через /api/proof/compare.
+  type Compare = { pos_cups: number; solana_burns: number; mismatch: number; status: string; message: string };
   const [compare, setCompare] = useState<Compare | null>(null);
   useEffect(() => {
     fetch("/api/proof/compare")
@@ -99,33 +98,35 @@ export default function Home() {
   const cupsSold = isLive ? burned : MOCK.cupsSold;
   const burnedPct = (burned / TOKEN.supply) * 100;
 
-  // Кошелёк (Phantom, devnet-демо).
+  // Кошелёк — Phantom, Solflare, Trust Wallet, Backpack (+ Ledger через Phantom/Solflare).
   const [wallet, setWallet] = useState<string | null>(null);
   const [walletBal, setWalletBal] = useState<number | null>(null);
-  const connectWallet = async () => {
-    const p = getPhantom();
-    if (!p) {
-      window.open("https://phantom.app/", "_blank", "noopener,noreferrer");
-      return;
-    }
-    try {
-      const resp = await p.connect();
-      const addr = resp.publicKey.toString();
-      setWallet(addr);
-      setWalletBal(null);
-      fetchBalance(addr).then(setWalletBal).catch(() => setWalletBal(0));
-    } catch {
-      /* пользователь отклонил подключение */
-    }
+  const [walletId, setWalletId] = useState<string | null>(null);
+  const [walletModal, setWalletModal] = useState(false);
+
+  const WALLET_OPTS = [
+    { id: "phantom",  name: "Phantom",      note: "Ledger ✓" },
+    { id: "solflare", name: "Solflare",     note: "Ledger ✓" },
+    { id: "trust",    name: "Trust Wallet", note: null },
+    { id: "backpack", name: "Backpack",     note: null },
+  ] as const;
+
+  const connectWallet = async (id: string) => {
+    setWalletModal(false);
+    const addr = await connectWalletById(id);
+    if (!addr) return;
+    setWallet(addr);
+    setWalletId(id);
+    setWalletBal(null);
+    fetchBalance(addr).then(setWalletBal).catch(() => setWalletBal(0));
   };
+
   const disconnectWallet = async () => {
-    try {
-      await getPhantom()?.disconnect();
-    } catch {
-      /* ignore */
-    }
+    if (walletId) await disconnectWalletById(walletId);
     setWallet(null);
     setWalletBal(null);
+    setWalletId(null);
+    setWalletModal(false);
   };
 
   const tabs: { id: typeof activeTab; label: string }[] = [
@@ -141,10 +142,10 @@ export default function Home() {
     <main className="relative z-0">
       {/* ---------- NAV ---------- */}
       <header className="fixed inset-x-0 top-0 z-50 border-b border-white/5 bg-ink/70 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3">
-          <a href="#top" className="flex items-center gap-3">
-            <Image src="/brand/doffa-logo.jpeg" alt="DOFFA" width={40} height={40} className="rounded-full ring-1 ring-gold/40" />
-            <span className="display text-lg font-extrabold tracking-tight text-cream-soft">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-5 sm:py-3">
+          <a href="#top" className="flex items-center gap-2.5 sm:gap-3">
+            <Image src="/brand/doffa-logo.jpeg" alt="DOFFA" width={36} height={36} className="rounded-full ring-1 ring-gold/40 sm:w-[40px] sm:h-[40px]" />
+            <span className="display text-base font-extrabold tracking-tight text-cream-soft sm:text-lg">
               DOFFA<span className="text-teal">.</span>
             </span>
           </a>
@@ -161,7 +162,67 @@ export default function Home() {
               </button>
             ))}
           </nav>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3 sm:gap-2">
+            {/* Wallet connect button */}
+            <div className="relative hidden sm:block">
+              {wallet ? (
+                <>
+                  <button
+                    onClick={() => setWalletModal((v) => !v)}
+                    className="flex items-center gap-1.5 rounded-full border border-teal/40 bg-teal/10 px-3 py-1.5 text-xs font-semibold text-teal transition hover:border-teal/60"
+                  >
+                    <span className="h-1.5 w-1.5 rounded-full bg-teal" />
+                    {wallet.slice(0, 4)}…{wallet.slice(-4)}
+                  </button>
+                  {walletModal && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setWalletModal(false)} />
+                      <div className="absolute right-0 top-10 z-50 w-52 rounded-xl border border-white/10 bg-ink/95 p-3 shadow-xl backdrop-blur-md">
+                        <p className="mb-1 text-[10px] uppercase tracking-wider text-cream/40">{WALLET_OPTS.find((w) => w.id === walletId)?.name}</p>
+                        <p className="mb-3 font-mono text-[11px] text-cream/50 break-all">{wallet.slice(0, 8)}…{wallet.slice(-8)}</p>
+                        {walletBal !== null && (
+                          <p className="mb-3 text-xs font-semibold text-gold">{walletBal.toLocaleString()} $DOFFA</p>
+                        )}
+                        <button onClick={disconnectWallet} className="w-full rounded-lg bg-white/5 px-3 py-2 text-xs text-cream/70 hover:bg-white/10">
+                          {t.buy.disconnect}
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => setWalletModal((v) => !v)}
+                    className="flex items-center gap-1.5 rounded-full border border-gold/40 bg-gold/10 px-3 py-1.5 text-xs font-semibold text-gold transition hover:border-gold/60"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-80"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+                    {t.buy.connect}
+                  </button>
+                  {walletModal && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setWalletModal(false)} />
+                      <div className="absolute right-0 top-10 z-50 w-52 rounded-xl border border-white/10 bg-ink/95 p-3 shadow-xl backdrop-blur-md">
+                        <p className="mb-2 text-[10px] uppercase tracking-wider text-cream/40">Выбери кошелёк</p>
+                        <div className="flex flex-col gap-1">
+                          {WALLET_OPTS.map((w) => (
+                            <button
+                              key={w.id}
+                              onClick={() => connectWallet(w.id)}
+                              className="flex items-center justify-between rounded-lg bg-white/5 px-3 py-2 text-left text-sm text-cream transition hover:bg-white/10"
+                            >
+                              <span>{w.name}</span>
+                              {w.note && <span className="text-[10px] text-teal">{w.note}</span>}
+                            </button>
+                          ))}
+                        </div>
+                        <p className="mt-2 text-[10px] text-cream/30">Аппаратный кошелёк (Ledger) работает через Phantom или Solflare</p>
+                      </div>
+                    </>
+                  )}
+                </>
+              )}
+            </div>
             <label className="relative flex items-center">
               <span className="sr-only">Language</span>
               <svg className="pointer-events-none absolute left-2.5 h-3.5 w-3.5 text-cream/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -440,9 +501,14 @@ export default function Home() {
                       <div className="space-y-5">
                         {t.token.alloc.map((a, i) => (
                           <div key={a.name}>
-                            <div className="mb-1.5 flex justify-between text-sm">
+                            <div className="mb-1.5 flex items-center justify-between gap-2 text-sm">
                               <span className="text-cream/75">{a.name}</span>
-                              <span className="display font-bold text-gold">{a.pct}%</span>
+                              <div className="flex shrink-0 items-center gap-2">
+                                <span className="rounded border border-white/10 bg-white/[0.04] px-1.5 py-0.5 font-mono text-[10px] text-cream/40">
+                                  {((TOKEN.supply * a.pct) / 100).toLocaleString()} {TOKEN.symbol}
+                                </span>
+                                <span className="display font-bold text-gold">{a.pct}%</span>
+                              </div>
                             </div>
                             <div className="h-2.5 overflow-hidden rounded-full bg-white/10">
                               <motion.div
@@ -516,28 +582,49 @@ export default function Home() {
                 </Reveal>
 
                 <Reveal>
-                  <div className="mt-10 overflow-hidden rounded-2xl border border-white/10">
-                    <div className="grid grid-cols-[1fr_auto_auto_auto] gap-3 border-b border-white/10 bg-white/[0.03] px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-cream/40 sm:grid-cols-[1fr_auto_auto_auto_auto_auto]">
-                      <span>{t.proof.colTime}</span>
-                      <span className="text-right">{t.proof.colAmount}</span>
-                      <span className="hidden text-right sm:block">{t.proof.colSale}</span>
-                      <span className="text-right">{t.proof.colHash}</span>
-                      <span className="hidden text-right sm:block">{t.proof.colStatus}</span>
-                      <span className="text-right">{t.proof.colVerify}</span>
+                  <div className="mt-10 overflow-hidden rounded-2xl border border-white/10 bg-black/20">
+                    {/* Заголовок потока */}
+                    <div className="flex items-center justify-between border-b border-white/10 bg-white/[0.03] px-4 py-3">
+                      <h3 className="text-sm font-semibold text-cream/70">{t.proof.title}</h3>
+                      <span className="flex items-center gap-1.5 text-xs text-cream/40">
+                        <span className="h-1.5 w-1.5 rounded-full bg-teal" />
+                        {t.burns.live}
+                      </span>
                     </div>
-
-                    {burns === null ? (
-                      <div className="flex items-center justify-center gap-2 px-5 py-12 text-sm text-cream/40">
-                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-teal/40 border-t-teal" />
-                        {t.proof.loading}
-                      </div>
-                    ) : burns.length === 0 ? (
-                      <div className="px-5 py-12 text-center text-sm text-cream/40">{t.proof.empty}</div>
-                    ) : (
-                      burns.map((b, i) => (
-                        <BurnRow key={b.sig} burn={b} even={i % 2 === 0} verifyLabel={t.proof.colVerify} statusLabel={t.proof.statusVerified} locale={loc} />
-                      ))
-                    )}
+                    {/* Таблица */}
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse text-left text-xs">
+                        <thead>
+                          <tr className="border-b border-white/[0.06] bg-white/[0.02] text-[10px] uppercase tracking-wider text-cream/30">
+                            <th className="px-4 py-3 font-medium">{t.proof.colTime}</th>
+                            <th className="px-4 py-3 font-medium">{t.proof.colEvent}</th>
+                            <th className="px-4 py-3 font-medium">{t.proof.colSale}</th>
+                            <th className="px-4 py-3 text-right font-medium">{t.proof.colAmount}</th>
+                            <th className="px-4 py-3 text-center font-medium">{t.proof.colHash}</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/[0.04]">
+                          {burns === null ? (
+                            <tr>
+                              <td colSpan={5} className="px-4 py-12 text-center text-cream/40">
+                                <span className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-teal/40 border-t-teal align-middle" />
+                                {t.proof.loading}
+                              </td>
+                            </tr>
+                          ) : burns.length === 0 ? (
+                            <tr>
+                              <td colSpan={5} className="px-4 py-12 text-center text-cream/40">
+                                {t.proof.empty}
+                              </td>
+                            </tr>
+                          ) : (
+                            burns.map((b, i) => (
+                              <BurnRow key={b.sig} burn={b} even={i % 2 === 0} locale={loc} eventLabel={t.proof.colEvent} />
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </Reveal>
 
@@ -548,7 +635,7 @@ export default function Home() {
                       <div>
                         <p className="font-semibold">{t.proof.mismatchWarn}</p>
                         <p className="mt-1 text-xs text-amber/70">
-                          {`CloudShop: ${compare.cloudshop_cups.toLocaleString(loc)} ${t.ui.cupsWord} · Solana: ${compare.solana_burns.toLocaleString(loc)} ${t.ui.burnedWord} · ${t.ui.diffWord} ${compare.mismatch.toLocaleString(loc)}`}
+                          {`POS: ${compare.pos_cups.toLocaleString(loc)} ${t.ui.cupsWord} · Solana: ${compare.solana_burns.toLocaleString(loc)} ${t.ui.burnedWord} · ${t.ui.diffWord} ${compare.mismatch.toLocaleString(loc)}`}
                         </p>
                       </div>
                     </div>
@@ -562,7 +649,7 @@ export default function Home() {
                       <div>
                         <p className="font-semibold">{t.ui.inSyncTitle}</p>
                         <p className="mt-1 text-xs text-teal/70">
-                          {`${compare.cloudshop_cups.toLocaleString(loc)} ${t.ui.cupsWord} = ${compare.solana_burns.toLocaleString(loc)} ${t.ui.burnedWord} $DOFFA`}
+                          {`${compare.pos_cups.toLocaleString(loc)} ${t.ui.cupsWord} → ${compare.solana_burns.toLocaleString(loc)} ${t.ui.burnedWord} $DOFFA`}
                         </p>
                       </div>
                     </div>
@@ -742,19 +829,36 @@ export default function Home() {
                   <Tag>{t.roadmap.tag}</Tag>
                   <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.roadmap.title}</h2>
                 </Reveal>
-                <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-                  {t.roadmap.phases.map((p, i) => (
-                    <Reveal key={p.n} delay={i * 0.08}>
-                      <div className={`h-full rounded-2xl border p-6 ${p.done ? "border-teal/50 bg-teal/[0.07]" : "border-white/10 bg-white/[0.02]"}`}>
-                        <div className="flex items-center justify-between">
-                          <span className="display text-2xl font-extrabold text-gold">{p.n}</span>
-                          {p.done && <span className="rounded-full bg-teal/20 px-2 py-0.5 text-[10px] font-bold uppercase text-teal">✓</span>}
+                <div className="relative mt-12">
+                  {/* vertical line */}
+                  <div className="absolute left-5 top-0 h-full w-0.5 bg-gradient-to-b from-gold/50 via-teal/30 to-transparent" />
+                  <div className="space-y-8">
+                    {t.roadmap.phases.map((p, i) => (
+                      <Reveal key={p.n} delay={i * 0.1}>
+                        <div className="relative flex gap-5">
+                          {/* dot */}
+                          <div className={`relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 ${p.done ? "border-teal bg-teal/20" : "border-gold/60 bg-gold/10"}`}>
+                            {p.done ? (
+                              <span className="text-xs font-bold text-teal">✓</span>
+                            ) : (
+                              <span className="text-xs font-bold text-gold">{i + 1}</span>
+                            )}
+                          </div>
+                          {/* card */}
+                          <div className={`flex-1 rounded-2xl border p-5 ${p.done ? "border-teal/40 bg-teal/[0.06]" : "border-white/10 bg-white/[0.02]"}`}>
+                            <div className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-gold/70">{p.n}</div>
+                            <h3 className="display text-base font-bold text-cream-soft">{p.t}</h3>
+                            <p className="mt-2 text-sm leading-relaxed text-cream/65">{p.d}</p>
+                            {p.done && (
+                              <span className="mt-3 inline-block rounded-full bg-teal/20 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-teal">
+                                ✓ Done
+                              </span>
+                            )}
+                          </div>
                         </div>
-                        <h3 className="display mt-3 text-lg font-bold text-cream-soft">{p.t}</h3>
-                        <p className="mt-2 text-sm text-cream/65">{p.d}</p>
-                      </div>
-                    </Reveal>
-                  ))}
+                      </Reveal>
+                    ))}
+                  </div>
                 </div>
               </Section>
 
@@ -814,7 +918,7 @@ export default function Home() {
                         </div>
                       ) : (
                         <button
-                          onClick={connectWallet}
+                          onClick={() => setWalletModal(true)}
                           className="inline-flex items-center gap-2 rounded-full bg-gold px-7 py-3 font-bold text-ink transition hover:brightness-110"
                         >
                           {t.buy.connect}
@@ -903,7 +1007,7 @@ export default function Home() {
 
 function Section({ id, children }: { id: string; children: React.ReactNode }) {
   return (
-    <section id={id} className="relative mx-auto max-w-6xl scroll-mt-20 px-5 py-24">
+    <section id={id} className="relative mx-auto max-w-6xl scroll-mt-28 sm:scroll-mt-20 px-5 py-24">
       {children}
     </section>
   );
@@ -921,37 +1025,33 @@ function Stat({ label, value, unit, accent }: { label: string; value: React.Reac
   );
 }
 
-function BurnRow({ burn, even, verifyLabel, statusLabel, locale = "ru-RU" }: { burn: BurnRecord; even: boolean; verifyLabel: string; statusLabel: string; locale?: string }) {
+function BurnRow({ burn, even, locale = "ru-RU", eventLabel = "Burn" }: { burn: BurnRecord; even: boolean; locale?: string; eventLabel?: string }) {
   const date = burn.blockTime
     ? new Date(burn.blockTime * 1000).toLocaleString(locale, { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })
     : "—";
-  const shortHash = burn.receiptHash ? burn.receiptHash.slice(0, 8) + "…" : "—";
-  const shortSale = burn.saleId ? (burn.saleId.length > 14 ? burn.saleId.slice(0, 14) + "…" : burn.saleId) : "—";
+  const shortSig = burn.sig ? burn.sig.slice(0, 4) + "…" + burn.sig.slice(-4) : "—";
+  const saleLabel = burn.saleId ? `POS #${burn.saleId}` : "—";
 
   return (
-    <div className={`grid grid-cols-[1fr_auto_auto_auto] items-center gap-3 px-5 py-3 text-sm sm:grid-cols-[1fr_auto_auto_auto_auto_auto] ${even ? "bg-transparent" : "bg-white/[0.015]"}`}>
-      <span className="text-cream/60 tabular-nums">{date}</span>
-      <span className="display text-right font-bold text-amber tabular-nums">
-        {burn.amount > 0 ? burn.amount.toLocaleString(locale) : "?"} 🔥
-      </span>
-      <span className="hidden text-right font-mono text-xs text-cream/50 sm:block" title={burn.saleId}>{shortSale}</span>
-      <span className="font-mono text-right text-xs text-cream/50" title={burn.receiptHash}>{shortHash}</span>
-      <span className="hidden justify-self-end sm:block">
-        <span className="inline-flex items-center gap-1 rounded-full border border-teal/40 bg-teal/10 px-2 py-0.5 text-[10px] font-semibold text-teal">
-          <span className="h-1.5 w-1.5 rounded-full bg-teal" />
-          {statusLabel}
-        </span>
-      </span>
-      <a
-        href={solscanTx(burn.sig)}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-right text-xs font-semibold text-teal transition hover:text-gold"
-        title={burn.sig}
-      >
-        {verifyLabel} ↗
-      </a>
-    </div>
+    <tr className={`transition-colors hover:bg-white/[0.03] ${even ? "" : "bg-white/[0.015]"}`}>
+      <td className="px-4 py-3 text-cream/50 tabular-nums">{date}</td>
+      <td className="px-4 py-3 font-medium text-amber">🔥 {eventLabel}</td>
+      <td className="px-4 py-3 text-cream/60">{saleLabel}</td>
+      <td className="px-4 py-3 text-right font-bold tabular-nums text-cream/80">
+        −{burn.amount > 0 ? burn.amount.toLocaleString(locale) : "?"} $DOFFA
+      </td>
+      <td className="px-4 py-3 text-center">
+        <a
+          href={solscanTx(burn.sig)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-mono text-cream/50 underline transition hover:text-teal"
+          title={burn.sig}
+        >
+          {shortSig}
+        </a>
+      </td>
+    </tr>
   );
 }
 

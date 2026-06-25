@@ -1,32 +1,74 @@
-# DOFFA — Espresso Bar × Web3 (Solana)
+# DOFFA — кофейня × Solana × Telegram
 
-Сайт кофейни **COFFEE DOFFA** (Карачаево-Черкесия, since 2021) и утилити-токен
-`$DOFFA` на Solana. Идея: **1 проданная чашка = 1 сожжённый токен** → дефицит.
+Один репозиторий, три части:
 
-## Структура
-- **корень** — сам сайт (Next.js 16 + TypeScript + Tailwind + framer-motion). Деплоится на Vercel.
-- **`token/`** — скрипты выпуска/сжигания токена на Solana (см. `token/README.md` и `token/RUN-ON-YOUR-COMPUTER.md`).
-- **`plan/`** — мастер-план проекта (PDF/Markdown).
+```
+doffa-site/
+├── app/          ← сайт (Next.js) — деплой на Vercel
+├── bot/          ← касса-бот (Telegram) — деплой на Railway
+├── token/        ← скрипты выпуска токена (запуск локально, один раз)
+├── plan/         ← мастер-план проекта
+└── public/       ← картинки, видео, логотип для сайта
+```
 
-## Запуск сайта локально
+---
+
+## Сайт (`/`)
+
+**Стек:** Next.js + TypeScript + Tailwind + Framer Motion  
+**Деплой:** Vercel (автоматически при пуше в main)  
+**Root Directory в Vercel:** `/` (корень)
+
 ```bash
 npm install
 npm run dev      # http://localhost:3000
 ```
 
-## Деплой на Vercel
-1. Подключи этот репозиторий к Vercel (Add New → Project → Import).
-2. **Root Directory: оставь корень** (`/`) — сайт лежит в корне.
-3. Framework определится как Next.js → Deploy.
+---
 
-## Брендовые материалы
-`public/brand/` — логотип, ночные фото кофейни, видео бариста (hero).
+## Бот-касса (`/bot/`)
 
-## Токен (кратко)
-`$DOFFA`, Solana SPL, 6 decimals, 100 000 000. Сначала тест в devnet, потом mainnet.
-Реальный выпуск, ликвидность и приём средств — необратимые шаги, делаются осознанно
-и после консультации с юристом (см. `plan/`).
+**Стек:** Telegraf + TypeScript + SQLite (better-sqlite3) + Solana  
+**Деплой:** Railway (автоматически при пуше)  
+**Root Directory в Railway:** `bot`
+
+Как работает:
+1. `/go` — открыть смену
+2. `/menu` — выбрать напиток из меню (кнопки)
+3. После каждой продажи — автоматически сжигает `BURN_PER_CUP` токенов `$DOFFA` на Solana
+4. `/stats` — итог смены
+5. `/stop` — закрыть смену
+
+```bash
+cd bot
+npm install
+cp .env.example .env   # заполни переменные
+npm run dev
+```
+
+**Переменные Railway:**
+| Имя | Описание |
+|-----|----------|
+| `DOFFA_BOT_TOKEN` | Токен от @BotFather |
+| `ADMIN_IDS` | Telegram ID бариста через запятую |
+| `DOFFA_MINT` | Адрес контракта токена $DOFFA |
+| `OWNER_KEYPAIR` | Приватный ключ кошелька (JSON-массив) |
+| `SOLANA_RPC` | RPC Solana (devnet или mainnet) |
+| `BURN_PER_CUP` | Сколько токенов сжигать за чашку |
+| `DB_PATH` | Путь к SQLite (`/data/doffa.db`) |
 
 ---
-© DOFFA. Материалы носят информационный характер и не являются финансовой или
-юридической консультацией.
+
+## Токен (`/token/`)
+
+Одноразовые скрипты выпуска токена на Solana devnet/mainnet.  
+Запускаются локально, не деплоятся никуда.  
+См. `token/RUN-ON-YOUR-COMPUTER.md`.
+
+---
+
+## Идея
+
+**1 проданная чашка = 1 сожжённый токен $DOFFA → дефицит.**
+
+Каждая транзакция навсегда записана в блокчейне Solana.
