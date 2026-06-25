@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView, useMotionValue, animate, AnimatePresence } from "framer-motion";
 import { dict, LANGS, TOKEN, MOCK, CONTACT, GALLERY, VIDEOS, type Lang } from "./content";
-import { CHAIN, solscanToken, solscanTx, solscanHolders, fetchSupply, fetchBalance, fetchBurnHistory, connectWalletById, disconnectWalletById, type BurnRecord } from "./solana";
+import { CHAIN, REAL, solscanToken, solscanTokenOf, solscanWalletOf, solscanTx, solscanHolders, fetchSupply, fetchSupplyOf, fetchBalance, fetchBurnHistory, connectWalletById, disconnectWalletById, type BurnRecord } from "./solana";
 
 // Главный ролик в hero — без вшитых субтитров. Лежит в public/brand/hero.mp4.
 const HERO_VIDEO: string | null = "/brand/hero.mp4";
@@ -65,6 +65,15 @@ export default function Home() {
       .catch(() => setLiveSupply(null));
   }, []);
 
+  // Объём НАСТОЯЩЕГО токена (mainnet). null — mint ещё не задан (токен не выпущен).
+  const [realSupply, setRealSupply] = useState<number | null>(null);
+  useEffect(() => {
+    if (!REAL.mint) return;
+    fetchSupplyOf(REAL)
+      .then(setRealSupply)
+      .catch(() => setRealSupply(null));
+  }, []);
+
   // История сжиганий — читается напрямую из Solana (мемо "DOFFA coffee burn | ...").
   const [burns, setBurns] = useState<BurnRecord[] | null>(null);
   useEffect(() => {
@@ -97,6 +106,12 @@ export default function Home() {
   const remaining = isLive ? liveSupply! : TOKEN.supply - MOCK.burned;
   const cupsSold = isLive ? burned : MOCK.cupsSold;
   const burnedPct = (burned / TOKEN.supply) * 100;
+
+  // Настоящий токен (mainnet). Выпущен ли уже mint?
+  const realMinted = REAL.mint !== null;
+  // Сколько в обороте: live из mainnet, иначе планируемая эмиссия (нетронуто).
+  const realCirculating = realSupply !== null ? realSupply : REAL.initialSupply;
+  const realBurned = Math.max(REAL.initialSupply - realCirculating, 0);
 
   // Кошелёк — Phantom, Solflare, Trust Wallet, Backpack (+ Ledger через Phantom/Solflare).
   const [wallet, setWallet] = useState<string | null>(null);
@@ -541,32 +556,84 @@ export default function Home() {
                     )}
                   </div>
                 </Reveal>
-                <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                  <Stat label={t.burns.supply} value={TOKEN.supply.toLocaleString(loc)} unit={TOKEN.symbol} />
-                  <Stat label={t.burns.burned} value={<CountUp to={burned} locale={loc} />} unit={`🔥 ${TOKEN.symbol}`} accent />
-                  <Stat label={t.burns.left} value={remaining.toLocaleString(loc)} unit={TOKEN.symbol} />
-                  <Stat label={t.burns.cups} value={<CountUp to={cupsSold} locale={loc} />} unit="☕" />
-                </div>
+                {/* Демо-токен (devnet) — живые сжигания, всё работает сейчас */}
                 <Reveal>
-                  <div className="mt-8 h-3 overflow-hidden rounded-full bg-white/10">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      whileInView={{ width: `${burned > 0 ? Math.max(burnedPct, 1.5) : 0}%` }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 1.4, ease: "easeOut" }}
-                      className="h-full rounded-full bg-gradient-to-r from-amber to-teal"
-                    />
+                  <div className="mt-10 rounded-3xl border border-white/10 bg-white/[0.02] p-6 sm:p-8">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <span className="text-sm font-bold text-cream-soft">{t.burns.demoTitle}</span>
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-amber/40 bg-amber/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-amber">
+                        {t.burns.demoBadge}
+                      </span>
+                    </div>
+                    <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                      <Stat label={t.burns.supply} value={TOKEN.supply.toLocaleString(loc)} unit={TOKEN.symbol} />
+                      <Stat label={t.burns.burned} value={<CountUp to={burned} locale={loc} />} unit={`🔥 ${TOKEN.symbol}`} accent />
+                      <Stat label={t.burns.left} value={remaining.toLocaleString(loc)} unit={TOKEN.symbol} />
+                      <Stat label={t.burns.cups} value={<CountUp to={cupsSold} locale={loc} />} unit="☕" />
+                    </div>
+                    <div className="mt-8 h-3 overflow-hidden rounded-full bg-white/10">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        whileInView={{ width: `${burned > 0 ? Math.max(burnedPct, 1.5) : 0}%` }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1.4, ease: "easeOut" }}
+                        className="h-full rounded-full bg-gradient-to-r from-amber to-teal"
+                      />
+                    </div>
+                    <p className="mt-4 text-center text-xs text-cream/50">{isLive ? t.burns.liveNote : t.burns.note}</p>
+                    <div className="mt-3 text-center">
+                      <a
+                        href={solscanToken()}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal transition hover:text-gold"
+                      >
+                        {t.burns.verify} ↗
+                      </a>
+                    </div>
                   </div>
-                  <p className="mt-4 text-center text-xs text-cream/50">{isLive ? t.burns.liveNote : t.burns.note}</p>
-                  <div className="mt-3 text-center">
-                    <a
-                      href={solscanToken()}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal transition hover:text-gold"
-                    >
-                      {t.burns.verify} ↗
-                    </a>
+                </Reveal>
+
+                {/* Настоящий токен (mainnet) — нетронут, ждёт запуска, отдельно */}
+                <Reveal delay={0.1}>
+                  <div className="mt-6 rounded-3xl border border-gold/25 bg-gradient-to-b from-gold/[0.06] to-transparent p-6 sm:p-8">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <span className="text-sm font-bold text-cream-soft">{t.burns.realTitle}</span>
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-gold/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-gold">
+                        {t.burns.realBadge}
+                      </span>
+                    </div>
+                    <div className="mt-6 grid gap-5 sm:grid-cols-3">
+                      <Stat label={t.burns.supply} value={REAL.initialSupply.toLocaleString(loc)} unit={TOKEN.symbol} />
+                      <Stat label={t.burns.burned} value={realBurned.toLocaleString(loc)} unit={`🔥 ${TOKEN.symbol}`} />
+                      <Stat label={t.burns.left} value={realCirculating.toLocaleString(loc)} unit={TOKEN.symbol} />
+                    </div>
+                    <div className="mt-6 flex items-center justify-center gap-2 rounded-xl border border-gold/20 bg-black/20 px-4 py-3">
+                      <span className="h-2 w-2 rounded-full bg-gold/80" />
+                      <span className="text-sm font-semibold text-gold">{t.burns.realStatus}</span>
+                    </div>
+                    <p className="mt-4 text-center text-xs text-cream/50">{realMinted ? t.burns.realNote : t.burns.realPending}</p>
+                    <div className="mt-3 text-center">
+                      {realMinted ? (
+                        <a
+                          href={solscanTokenOf(REAL)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-gold transition hover:text-amber"
+                        >
+                          {t.burns.verify} ↗
+                        </a>
+                      ) : REAL.wallet ? (
+                        <a
+                          href={solscanWalletOf(REAL)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-gold/80 transition hover:text-amber"
+                        >
+                          {`${REAL.wallet.slice(0, 4)}…${REAL.wallet.slice(-4)}`} ↗
+                        </a>
+                      ) : null}
+                    </div>
                   </div>
                 </Reveal>
               </Section>
@@ -723,7 +790,7 @@ export default function Home() {
                   <Reveal>
                     <VerifyCard
                       label={t.verify.mintLabel}
-                      value={CHAIN.mint}
+                      value={CHAIN.mint ?? ""}
                       href={solscanToken()}
                       cta={t.verify.viewToken}
                       copiedLabel={t.ui.copied}

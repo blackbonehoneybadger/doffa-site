@@ -2,44 +2,100 @@
 // читаем данные токена через публичный JSON-RPC и подключаем Phantom через
 // встроенный в браузер провайдер.
 //
-// Сеть и адрес токена настраиваются переменными окружения Vercel
-// (NEXT_PUBLIC_*). По умолчанию — devnet тест-токен, тот же, что сжигает бот,
-// чтобы сайт показывал реальные сжигания. Для mainnet задать на Vercel:
-//   NEXT_PUBLIC_SOLANA_CLUSTER = mainnet-beta
-//   NEXT_PUBLIC_SOLANA_RPC     = <платный RPC, напр. Helius>
-//   NEXT_PUBLIC_DOFFA_MINT     = <адрес mainnet-токена>
+// На сайте живут ДВА токена одновременно:
+//   1) DEMO  — тест-токен на devnet. Его сжигает бот, сжигания видны вживую.
+//              Бесплатно, для всех, доказывает что система работает.
+//   2) REAL  — боевой токен на mainnet. Эмиссия 100 000 000, нетронут, ждёт
+//              запуска. Сжигаться начнёт, когда закончим тесты на devnet.
+//
+// Переменные окружения Vercel (NEXT_PUBLIC_*):
+//   DEMO (devnet, есть дефолты — менять не нужно):
+//     NEXT_PUBLIC_SOLANA_CLUSTER = devnet
+//     NEXT_PUBLIC_SOLANA_RPC     = https://api.devnet.solana.com
+//     NEXT_PUBLIC_DOFFA_MINT     = FVERje4sz25gD1w4hTYV5VevSLPPDFhoNDHax1gvMVKU
+//   REAL (mainnet, задать когда создадим боевой токен):
+//     NEXT_PUBLIC_REAL_MINT      = <адрес боевого mainnet-токена>
+//     NEXT_PUBLIC_REAL_RPC       = <RPC mainnet, по умолчанию публичный>
 
-const CLUSTER = (process.env.NEXT_PUBLIC_SOLANA_CLUSTER as "devnet" | "mainnet-beta") || "devnet";
+export type Cluster = "devnet" | "mainnet-beta";
 
-export const CHAIN = {
-  cluster: CLUSTER,
+export type TokenInfo = {
+  /** demo — тест на devnet; real — боевой на mainnet. */
+  kind: "demo" | "real";
+  cluster: Cluster;
+  rpc: string;
+  /** Адрес mint. null — токен ещё не создан (REAL до запуска). */
+  mint: string | null;
+  /** Кошелёк-держатель токена (treasury). Для REAL — Phantom-адрес проекта. */
+  wallet: string | null;
+  /** Полная эмиссия — для расчёта «сожжено = выпуск − текущий объём». */
+  initialSupply: number;
+};
+
+const DEMO_CLUSTER = (process.env.NEXT_PUBLIC_SOLANA_CLUSTER as Cluster) || "devnet";
+
+/** DEMO-токен (devnet): живые сжигания, тот же mint, что сжигает бот. */
+export const DEMO: TokenInfo = {
+  kind: "demo",
+  cluster: DEMO_CLUSTER,
   rpc:
     process.env.NEXT_PUBLIC_SOLANA_RPC ||
-    (CLUSTER === "devnet" ? "https://api.devnet.solana.com" : "https://api.mainnet-beta.solana.com"),
-  // Адрес минта $DOFFA. По умолчанию — devnet тест-токен (совпадает с ботом).
+    (DEMO_CLUSTER === "devnet" ? "https://api.devnet.solana.com" : "https://api.mainnet-beta.solana.com"),
   mint: process.env.NEXT_PUBLIC_DOFFA_MINT || "FVERje4sz25gD1w4hTYV5VevSLPPDFhoNDHax1gvMVKU",
-  // Сколько всего было выпущено (для расчёта «сожжено = выпуск − текущий объём»).
+  wallet: null,
   initialSupply: 100_000_000,
 };
 
+/** REAL-токен (mainnet): боевой, нетронут. mint=null пока токен не выпущен. */
+export const REAL: TokenInfo = {
+  kind: "real",
+  cluster: "mainnet-beta",
+  rpc: process.env.NEXT_PUBLIC_REAL_RPC || "https://api.mainnet-beta.solana.com",
+  mint: process.env.NEXT_PUBLIC_REAL_MINT?.trim() || null,
+  // Phantom-кошелёк проекта на mainnet — здесь будет лежать нетронутые 100 млн.
+  // Это адрес КОШЕЛЬКА (держателя), не mint. Mint появится при выпуске токена.
+  wallet: process.env.NEXT_PUBLIC_REAL_WALLET?.trim() || "6cAtKTM8ZPUgRgmzsgkRfZsq4jZTXymA7cLqjz9qYMFS",
+  initialSupply: 100_000_000,
+};
+
+/** Совместимость со старым кодом: CHAIN = DEMO (живой дашборд сжиганий). */
+export const CHAIN = DEMO;
+
+function clusterSuffix(cluster: Cluster): string {
+  return cluster === "devnet" ? "?cluster=devnet" : "";
+}
+
+export function solscanTokenOf(token: TokenInfo): string {
+  if (!token.mint) return "https://solscan.io/";
+  return `https://solscan.io/token/${token.mint}${clusterSuffix(token.cluster)}`;
+}
+
+export function solscanHoldersOf(token: TokenInfo): string {
+  if (!token.mint) return "https://solscan.io/";
+  return `https://solscan.io/token/${token.mint}${clusterSuffix(token.cluster)}#holders`;
+}
+
+/** Ссылка на кошелёк-держатель (account) в нужной сети. */
+export function solscanWalletOf(token: TokenInfo): string {
+  if (!token.wallet) return "https://solscan.io/";
+  return `https://solscan.io/account/${token.wallet}${clusterSuffix(token.cluster)}`;
+}
+
 export function solscanToken(): string {
-  const suffix = CHAIN.cluster === "devnet" ? "?cluster=devnet" : "";
-  return `https://solscan.io/token/${CHAIN.mint}${suffix}`;
+  return solscanTokenOf(DEMO);
 }
 
 export function solscanTx(sig: string): string {
-  const suffix = CHAIN.cluster === "devnet" ? "?cluster=devnet" : "";
-  return `https://solscan.io/tx/${sig}${suffix}`;
+  return `https://solscan.io/tx/${sig}${clusterSuffix(DEMO.cluster)}`;
 }
 
-/** Ссылка на держателей токена — там виден кошелёк Burn Reserve и все сжигания. */
+/** Ссылка на держателей DEMO-токена — там виден кошелёк Burn Reserve и сжигания. */
 export function solscanHolders(): string {
-  const suffix = CHAIN.cluster === "devnet" ? "?cluster=devnet" : "";
-  return `https://solscan.io/token/${CHAIN.mint}${suffix}#holders`;
+  return solscanHoldersOf(DEMO);
 }
 
-async function rpc<T>(method: string, params: unknown[]): Promise<T> {
-  const res = await fetch(CHAIN.rpc, {
+async function rpc<T>(method: string, params: unknown[], endpoint: string = DEMO.rpc): Promise<T> {
+  const res = await fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
@@ -50,16 +106,24 @@ async function rpc<T>(method: string, params: unknown[]): Promise<T> {
 }
 
 /** Текущий объём токена в обороте (uiAmount), напрямую из блокчейна. */
-export async function fetchSupply(): Promise<number> {
-  const r = await rpc<{ value: { uiAmount: number | null } }>("getTokenSupply", [CHAIN.mint]);
+export async function fetchSupplyOf(token: TokenInfo): Promise<number> {
+  if (!token.mint) throw new Error("mint не задан");
+  const r = await rpc<{ value: { uiAmount: number | null } }>("getTokenSupply", [token.mint], token.rpc);
   return r.value.uiAmount ?? 0;
 }
 
-/** Баланс $DOFFA у конкретного адреса (суммарно по его токен-аккаунтам). */
+/** Текущий объём DEMO-токена в обороте (uiAmount). */
+export async function fetchSupply(): Promise<number> {
+  return fetchSupplyOf(DEMO);
+}
+
+/** Баланс DEMO-токена $DOFFA у адреса (суммарно по его токен-аккаунтам). */
 export async function fetchBalance(owner: string): Promise<number> {
+  if (!DEMO.mint) return 0;
   const r = await rpc<{ value: { account: { data: { parsed: { info: { tokenAmount: { uiAmount: number | null } } } } } }[] }>(
     "getTokenAccountsByOwner",
-    [owner, { mint: CHAIN.mint }, { encoding: "jsonParsed" }],
+    [owner, { mint: DEMO.mint }, { encoding: "jsonParsed" }],
+    DEMO.rpc,
   );
   let total = 0;
   for (const acc of r.value ?? []) {
@@ -128,8 +192,8 @@ function burnedFromTx(tx: SolTx): number {
   if (!tx?.meta) return 0;
   const pre = tx.meta.preTokenBalances ?? [];
   const post = tx.meta.postTokenBalances ?? [];
-  const preSum = pre.filter((b) => b.mint === CHAIN.mint).reduce((s, b) => s + (b.uiTokenAmount.uiAmount ?? 0), 0);
-  const postSum = post.filter((b) => b.mint === CHAIN.mint).reduce((s, b) => s + (b.uiTokenAmount.uiAmount ?? 0), 0);
+  const preSum = pre.filter((b) => b.mint === DEMO.mint).reduce((s, b) => s + (b.uiTokenAmount.uiAmount ?? 0), 0);
+  const postSum = post.filter((b) => b.mint === DEMO.mint).reduce((s, b) => s + (b.uiTokenAmount.uiAmount ?? 0), 0);
   return Math.max(preSum - postSum, 0);
 }
 
@@ -138,8 +202,9 @@ function burnedFromTx(tx: SolTx): number {
  * Читает напрямую из блокчейна — данные невозможно подделать на уровне сайта.
  */
 export async function fetchBurnHistory(limit = 15): Promise<BurnRecord[]> {
+  if (!DEMO.mint) return [];
   type SigInfo = { signature: string; slot: number; blockTime: number | null };
-  const sigs = await rpc<SigInfo[]>("getSignaturesForAddress", [CHAIN.mint, { limit: 50 }]);
+  const sigs = await rpc<SigInfo[]>("getSignaturesForAddress", [DEMO.mint, { limit: 50 }], DEMO.rpc);
 
   // Параллельно загружаем транзакции, чтобы не ждать по одной
   const txResults = await Promise.allSettled(

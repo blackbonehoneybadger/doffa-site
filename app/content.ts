@@ -86,7 +86,7 @@ type Dict = {
   story: { tag: string; title: string; body: string[] };
   how: { tag: string; title: string; sub: string; steps: { t: string; d: string }[] };
   token: { tag: string; title: string; sub: string; rows: { k: string; v: string }[]; alloc: { name: string; pct: number }[] };
-  burns: { tag: string; title: string; supply: string; burned: string; left: string; cups: string; note: string; live: string; verify: string; liveNote: string; demoBadge: string; demoNote: string };
+  burns: { tag: string; title: string; supply: string; burned: string; left: string; cups: string; note: string; live: string; verify: string; liveNote: string; demoBadge: string; demoNote: string; demoTitle: string; realTitle: string; realBadge: string; realStatus: string; realNote: string; realPending: string };
   proof: {
     tag: string;
     title: string;
@@ -211,6 +211,12 @@ export const dict: Record<Lang, Dict> = {
       liveNote: "Цифры читаются напрямую из блокчейна Solana (тест-токен на devnet). Их никто не вписывает вручную — любой может перепроверить в Solscan.",
       demoBadge: "DEVNET DEMO · НЕ РЕАЛЬНЫЕ ДЕНЬГИ",
       demoNote: "Это демонстрация на тестовой сети Solana (devnet). Токены здесь не имеют ценности, реальные деньги не задействованы.",
+      demoTitle: "Демо-токен · devnet",
+      realTitle: "Настоящий токен · mainnet",
+      realBadge: "MAINNET · БОЕВОЙ ТОКЕН",
+      realStatus: "Нетронут · ждёт запуска",
+      realNote: "Боевой $DOFFA на mainnet. Вся эмиссия 100 000 000 выпущена и не тронута — ни одного сжигания. Сжигать начнём, когда закончим тесты на devnet.",
+      realPending: "Готовится к запуску. Адрес появится здесь, как только создадим боевой токен на mainnet.",
     },
     proof: {
       tag: "Публичный аудит",
@@ -446,6 +452,12 @@ export const dict: Record<Lang, Dict> = {
       liveNote: "These numbers are read straight from the Solana blockchain (devnet test token). Nobody types them in by hand — anyone can re-check them on Solscan.",
       demoBadge: "DEVNET DEMO · NO REAL MONEY",
       demoNote: "This is a demo on Solana's test network (devnet). Tokens here have no value and no real money is involved.",
+      demoTitle: "Demo token · devnet",
+      realTitle: "Real token · mainnet",
+      realBadge: "MAINNET · LIVE TOKEN",
+      realStatus: "Untouched · awaiting launch",
+      realNote: "The real $DOFFA on mainnet. The full 100,000,000 supply is minted and untouched — zero burns. Burning starts once devnet testing is done.",
+      realPending: "Preparing for launch. The address will appear here as soon as the real token is created on mainnet.",
     },
     proof: {
       tag: "Public audit",
@@ -682,6 +694,12 @@ export const dict: Record<Lang, Dict> = {
       liveNote: "تُقرأ هذه الأرقام مباشرة من بلوكشين Solana (عملة اختبار على devnet). لا أحد يكتبها يدوياً — يمكن للجميع التحقق منها عبر Solscan.",
       demoBadge: "عرض DEVNET · لا أموال حقيقية",
       demoNote: "هذا عرض على شبكة Solana الاختبارية (devnet). العملات هنا بلا قيمة ولا تُستخدم أموال حقيقية.",
+      demoTitle: "عملة تجريبية · devnet",
+      realTitle: "العملة الحقيقية · mainnet",
+      realBadge: "MAINNET · عملة حقيقية",
+      realStatus: "غير ممسوسة · بانتظار الإطلاق",
+      realNote: "عملة $DOFFA الحقيقية على mainnet. تم سكّ كامل الإصدار 100,000,000 دون أي مساس — صفر عمليات حرق. يبدأ الحرق بعد انتهاء اختبارات devnet.",
+      realPending: "قيد التحضير للإطلاق. سيظهر العنوان هنا فور إنشاء العملة الحقيقية على mainnet.",
     },
     proof: {
       tag: "تدقيق عام",
@@ -917,6 +935,12 @@ export const dict: Record<Lang, Dict> = {
       liveNote: "Bu sayılar doğrudan Solana blok zincirinden okunur (devnet test token). Kimse elle girmez — herkes Solscan'de yeniden kontrol edebilir.",
       demoBadge: "DEVNET DEMO · GERÇEK PARA YOK",
       demoNote: "Bu, Solana'nın test ağındaki (devnet) bir demodur. Buradaki tokenların değeri yoktur ve gerçek para kullanılmaz.",
+      demoTitle: "Demo token · devnet",
+      realTitle: "Gerçek token · mainnet",
+      realBadge: "MAINNET · GERÇEK TOKEN",
+      realStatus: "Dokunulmamış · lansman bekliyor",
+      realNote: "Mainnet'teki gerçek $DOFFA. 100.000.000'luk tüm arz basıldı ve hiç dokunulmadı — sıfır yakım. Yakım, devnet testleri bitince başlar.",
+      realPending: "Lansmana hazırlanıyor. Gerçek token mainnet'te oluşturulur oluşturulmaz adres burada görünecek.",
     },
     proof: {
       tag: "Kamuya açık denetim",
@@ -1152,6 +1176,12 @@ export const dict: Record<Lang, Dict> = {
       liveNote: "Estas cifras se leen directamente de la blockchain de Solana (token de prueba en devnet). Nadie las escribe a mano: cualquiera puede comprobarlas en Solscan.",
       demoBadge: "DEMO DEVNET · SIN DINERO REAL",
       demoNote: "Esto es una demo en la red de prueba de Solana (devnet). Los tokens aquí no tienen valor y no se usa dinero real.",
+      demoTitle: "Token demo · devnet",
+      realTitle: "Token real · mainnet",
+      realBadge: "MAINNET · TOKEN REAL",
+      realStatus: "Intacto · esperando lanzamiento",
+      realNote: "El $DOFFA real en mainnet. Todo el suministro de 100.000.000 está acuñado e intacto: cero quemas. La quema empieza cuando terminen las pruebas en devnet.",
+      realPending: "Preparándose para el lanzamiento. La dirección aparecerá aquí en cuanto se cree el token real en mainnet.",
     },
     proof: {
       tag: "Auditoría pública",
@@ -1387,6 +1417,12 @@ export const dict: Record<Lang, Dict> = {
       liveNote: "Ces chiffres sont lus directement sur la blockchain Solana (jeton de test sur devnet). Personne ne les saisit à la main — chacun peut les revérifier sur Solscan.",
       demoBadge: "DÉMO DEVNET · PAS D'ARGENT RÉEL",
       demoNote: "Ceci est une démo sur le réseau de test de Solana (devnet). Les jetons ici n'ont aucune valeur et aucun argent réel n'est en jeu.",
+      demoTitle: "Jeton démo · devnet",
+      realTitle: "Jeton réel · mainnet",
+      realBadge: "MAINNET · JETON RÉEL",
+      realStatus: "Intact · en attente de lancement",
+      realNote: "Le vrai $DOFFA sur mainnet. La totalité de l'offre de 100 000 000 est émise et intacte — zéro burn. Le burn commence une fois les tests devnet terminés.",
+      realPending: "En préparation. L'adresse apparaîtra ici dès que le jeton réel sera créé sur mainnet.",
     },
     proof: {
       tag: "Audit public",
@@ -1622,6 +1658,12 @@ export const dict: Record<Lang, Dict> = {
       liveNote: "Diese Zahlen werden direkt aus der Solana-Blockchain gelesen (devnet-Test-Token). Niemand tippt sie von Hand – jeder kann sie auf Solscan nachprüfen.",
       demoBadge: "DEVNET-DEMO · KEIN ECHTES GELD",
       demoNote: "Dies ist eine Demo im Solana-Testnetz (devnet). Die Tokens hier haben keinen Wert und es ist kein echtes Geld im Spiel.",
+      demoTitle: "Demo-Token · devnet",
+      realTitle: "Echter Token · mainnet",
+      realBadge: "MAINNET · ECHTER TOKEN",
+      realStatus: "Unberührt · wartet auf Start",
+      realNote: "Der echte $DOFFA auf mainnet. Die gesamte Menge von 100.000.000 ist geprägt und unberührt — null Burns. Das Verbrennen startet, sobald die devnet-Tests fertig sind.",
+      realPending: "Wird für den Start vorbereitet. Die Adresse erscheint hier, sobald der echte Token auf mainnet erstellt ist.",
     },
     proof: {
       tag: "Öffentliches Audit",
@@ -1857,6 +1899,12 @@ export const dict: Record<Lang, Dict> = {
       liveNote: "这些数字直接从 Solana 区块链读取（devnet 测试代币）。没有人手动填写——任何人都可在 Solscan 复核。",
       demoBadge: "DEVNET 演示 · 非真实资金",
       demoNote: "这是 Solana 测试网（devnet）上的演示。此处的代币没有价值，也不涉及真实资金。",
+      demoTitle: "演示代币 · devnet",
+      realTitle: "真实代币 · mainnet",
+      realBadge: "MAINNET · 真实代币",
+      realStatus: "未触碰 · 等待上线",
+      realNote: "mainnet 上的真实 $DOFFA。全部 100,000,000 供应量已铸造且未触碰——零销毁。devnet 测试结束后开始销毁。",
+      realPending: "正在准备上线。真实代币在 mainnet 创建后，地址将显示在此处。",
     },
     proof: {
       tag: "公开审计",
@@ -2092,6 +2140,12 @@ export const dict: Record<Lang, Dict> = {
       liveNote: "ये आंकड़े सीधे Solana ब्लॉकचेन से पढ़े जाते हैं (devnet परीक्षण टोकन)। कोई इन्हें हाथ से नहीं भरता — कोई भी Solscan पर दोबारा जाँच सकता है।",
       demoBadge: "DEVNET डेमो · असली पैसा नहीं",
       demoNote: "यह Solana के परीक्षण नेटवर्क (devnet) पर एक डेमो है। यहाँ के टोकन का कोई मूल्य नहीं है और कोई असली पैसा शामिल नहीं है।",
+      demoTitle: "डेमो टोकन · devnet",
+      realTitle: "असली टोकन · mainnet",
+      realBadge: "MAINNET · असली टोकन",
+      realStatus: "अछूता · लॉन्च की प्रतीक्षा",
+      realNote: "mainnet पर असली $DOFFA। पूरी 100,000,000 आपूर्ति मिंट है और अछूती — शून्य बर्न। devnet परीक्षण पूरा होने पर बर्निंग शुरू होगी।",
+      realPending: "लॉन्च की तैयारी हो रही है। mainnet पर असली टोकन बनते ही पता यहाँ दिखेगा।",
     },
     proof: {
       tag: "सार्वजनिक ऑडिट",
@@ -2327,6 +2381,12 @@ export const dict: Record<Lang, Dict> = {
       liveNote: "Estes números são lidos direto da blockchain Solana (token de teste na devnet). Ninguém os digita à mão — qualquer um pode reconferir no Solscan.",
       demoBadge: "DEMO DEVNET · SEM DINHEIRO REAL",
       demoNote: "Isto é uma demo na rede de teste da Solana (devnet). Os tokens aqui não têm valor e nenhum dinheiro real está envolvido.",
+      demoTitle: "Token demo · devnet",
+      realTitle: "Token real · mainnet",
+      realBadge: "MAINNET · TOKEN REAL",
+      realStatus: "Intocado · aguardando lançamento",
+      realNote: "O $DOFFA real na mainnet. Todo o fornecimento de 100.000.000 está cunhado e intocado — zero queimas. A queima começa quando os testes na devnet terminarem.",
+      realPending: "Preparando para o lançamento. O endereço aparecerá aqui assim que o token real for criado na mainnet.",
     },
     proof: {
       tag: "Auditoria pública",
@@ -2562,6 +2622,12 @@ export const dict: Record<Lang, Dict> = {
       liveNote: "Questi numeri sono letti direttamente dalla blockchain Solana (token di test su devnet). Nessuno li digita a mano — chiunque può ricontrollarli su Solscan.",
       demoBadge: "DEMO DEVNET · NESSUN DENARO REALE",
       demoNote: "Questa è una demo sulla rete di test di Solana (devnet). I token qui non hanno valore e non è coinvolto denaro reale.",
+      demoTitle: "Token demo · devnet",
+      realTitle: "Token reale · mainnet",
+      realBadge: "MAINNET · TOKEN REALE",
+      realStatus: "Intatto · in attesa del lancio",
+      realNote: "Il vero $DOFFA su mainnet. L'intera offerta di 100.000.000 è coniata e intatta — zero burn. Il burn inizia al termine dei test su devnet.",
+      realPending: "In preparazione per il lancio. L'indirizzo apparirà qui non appena il token reale sarà creato su mainnet.",
     },
     proof: {
       tag: "Audit pubblico",
@@ -2797,6 +2863,12 @@ export const dict: Record<Lang, Dict> = {
       liveNote: "これらの数字は Solana ブロックチェーンから直接読み取られます（devnet テストトークン）。手入力する人はいません——誰でも Solscan で再確認できます。",
       demoBadge: "DEVNET デモ · 実際の資金ではありません",
       demoNote: "これは Solana のテストネット（devnet）上のデモです。ここでのトークンに価値はなく、実際の資金は関与しません。",
+      demoTitle: "デモトークン · devnet",
+      realTitle: "本物のトークン · mainnet",
+      realBadge: "MAINNET · 本番トークン",
+      realStatus: "未使用 · ローンチ待ち",
+      realNote: "mainnet 上の本物の $DOFFA。総供給量 100,000,000 はすべて発行済みで未使用——バーンはゼロ。devnet のテストが終わり次第バーンを開始します。",
+      realPending: "ローンチ準備中。本物のトークンを mainnet で作成し次第、アドレスがここに表示されます。",
     },
     proof: {
       tag: "公開監査",
