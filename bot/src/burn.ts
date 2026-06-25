@@ -42,6 +42,7 @@ export async function burnCoffee(args: {
   receiptHash: string;
 }): Promise<BurnResult> {
   const rpc = process.env.SOLANA_RPC?.trim() || "https://api.mainnet-beta.solana.com";
+  const isDevnet = rpc.includes("devnet");
   const conn = new Connection(rpc, "confirmed");
   const keypair = loadKeypair();
   const mint = new PublicKey(CONFIG.mint);
@@ -79,9 +80,10 @@ export async function burnCoffee(args: {
     commitment: "confirmed",
   });
 
+  const clusterParam = isDevnet ? "?cluster=devnet" : "";
   return {
     sig,
-    solscan: `https://solscan.io/tx/${sig}`,
+    solscan: `https://solscan.io/tx/${sig}${clusterParam}`,
   };
 }
 
