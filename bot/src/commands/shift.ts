@@ -16,18 +16,18 @@ export async function handleShift(ctx: Context, arg: string): Promise<void> {
   // /shift open
   if (action === "open" || action === "открыть") {
     if (open) {
-      await ctx.reply(`⚠️ Смена уже открыта (с ${formatTime(open.opened_at)}). Закрой её: /shift close`);
+      await ctx.reply(`⚠️ Смена уже открыта (с ${formatTime(open.opened_at)}). Закрой её: /off`);
       return;
     }
     const shift = openShift(userId);
-    await ctx.reply(`✅ Смена #${shift.id} открыта в ${formatTime(shift.opened_at)}.\nПробивай продажи: /sale 150 Капучино`);
+    await ctx.reply(`✅ Смена #${shift.id} открыта в ${formatTime(shift.opened_at)}.\nПробивай продажи: /menu`);
     return;
   }
 
   // /shift close
   if (action === "close" || action === "закрыть") {
     if (!open) {
-      await ctx.reply("⚠️ Нет открытой смены. Открой: /shift open");
+      await ctx.reply("⚠️ Нет открытой смены. Открой: /go");
       return;
     }
     const sum = shiftSummary(open.id);
@@ -43,7 +43,7 @@ export async function handleShift(ctx: Context, arg: string): Promise<void> {
 
   // /shift  (без аргумента) — статус
   if (!open) {
-    await ctx.reply("Смена закрыта. Открой новую: /shift open");
+    await ctx.reply("Смена закрыта. Открой новую: /go");
   } else {
     const sum = shiftSummary(open.id);
     await ctx.reply(

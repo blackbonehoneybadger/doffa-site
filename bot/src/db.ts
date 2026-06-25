@@ -30,10 +30,17 @@ db.exec(`
     note         TEXT,
     receipt_hash TEXT NOT NULL,
     burned       INTEGER NOT NULL DEFAULT 0,
+    tx_hash      TEXT,
     created_at   INTEGER NOT NULL,
     FOREIGN KEY (shift_id) REFERENCES shifts(id)
   );
 `);
+
+// Миграция: добавить tx_hash для старых БД без этой колонки
+const cols = (db.prepare("PRAGMA table_info(sales)").all() as { name: string }[]).map(c => c.name);
+if (!cols.includes("tx_hash")) {
+  db.exec("ALTER TABLE sales ADD COLUMN tx_hash TEXT");
+}
 
 export type Shift = {
   id: number;
@@ -51,6 +58,7 @@ export type Sale = {
   note: string | null;
   receipt_hash: string;
   burned: number;
+  tx_hash: string | null;
   created_at: number;
 };
 
@@ -109,6 +117,10 @@ export function getLastSale(shiftId: number): Sale | undefined {
 
 export function deleteSale(saleId: number): void {
   db.prepare("DELETE FROM sales WHERE id = ?").run(saleId);
+}
+
+export function markAsBurned(saleId: number, txHash: string): void {
+  db.prepare("UPDATE sales SET burned = 1, tx_hash = ? WHERE id = ?").run(txHash, saleId);
 }
 
 // Сводка по смене: сколько чеков, чашек, денег.

@@ -73,5 +73,5 @@ console.log("");
 console.log("Следующие шаги:");
 console.log("  1. git add app/solana.ts && git commit -m 'chore: switch to mainnet token'");
 console.log("  2. git push → Vercel автоматически задеплоит");
-console.log("  3. Добавь в Vercel env: CLOUDSHOP_API_KEY, CLOUDSHOP_ACCOUNT_ID, RECEIPT_HASH_SALT");
-console.log("  4. Настрой вебхук CloudShop → https://doffa.coffee/api/webhook/pos");
+console.log("  3. В Railway (бот) обнови DOFFA_MINT и SOLANA_RPC на mainnet");
+console.log("  4. Проверь дашборд на сайте → https://doffa.coffee");
