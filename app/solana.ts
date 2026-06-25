@@ -233,7 +233,7 @@ export async function fetchBurnHistory(limit = 15): Promise<BurnRecord[]> {
       sig,
       blockTime: blockTime ?? tx.blockTime,
       amount,
-      saleId: parts[1] ?? "",
+      saleId: (parts[1] ?? "").replace(/^sale#/, ""),
       receiptHash: parts[2] ?? "",
       rawMemo: memo,
     });

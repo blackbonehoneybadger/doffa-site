@@ -196,7 +196,7 @@ export default function Home() {
                         <p className="mb-1 text-[10px] uppercase tracking-wider text-cream/40">{WALLET_OPTS.find((w) => w.id === walletId)?.name}</p>
                         <p className="mb-3 font-mono text-[11px] text-cream/50 break-all">{wallet.slice(0, 8)}…{wallet.slice(-8)}</p>
                         {walletBal !== null && (
-                          <p className="mb-3 text-xs font-semibold text-gold">{walletBal.toLocaleString()} $DOFFA</p>
+                          <p className="mb-3 text-xs font-semibold text-gold">{walletBal.toLocaleString(loc)} $DOFFA</p>
                         )}
                         <button onClick={disconnectWallet} className="w-full rounded-lg bg-white/5 px-3 py-2 text-xs text-cream/70 hover:bg-white/10">
                           {t.buy.disconnect}

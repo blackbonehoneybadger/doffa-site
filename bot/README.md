@@ -3,7 +3,14 @@
 Касса в Telegram: бариста открывает смену, пробивает продажи кофе, а бот считает,
 сколько токенов $DOFFA нужно сжечь. Это **Фаза 0–1** проекта.
 
-Главный адрес токена (менять нельзя): `6cAtKTM8ZPUgRgmzsgkRfZsq4jZTXymA7cLqjz9qYMFS`
+Токены проекта:
+
+- **DEMO (devnet, сейчас активен):** `FVERje4sz25gD1w4hTYV5VevSLPPDFhoNDHax1gvMVKU` — тест-токен,
+  который бот сжигает по умолчанию. Бесплатно, для тестов. Меняется переменной `DOFFA_MINT`.
+- **REAL (mainnet, ещё не выпущен):** боевой $DOFFA, эмиссия 100 000 000, появится позже.
+  Кошелёк проекта (Phantom, держатель будущих токенов): `6cAtKTM8ZPUgRgmzsgkRfZsq4jZTXymA7cLqjz9qYMFS`
+  — это адрес **кошелька**, а не mint-адрес токена. На mainnet бот переведём, задав `SOLANA_CLUSTER=mainnet`,
+  `SOLANA_RPC` и `DOFFA_MINT` (адрес боевого mint после выпуска).
 
 ---
 

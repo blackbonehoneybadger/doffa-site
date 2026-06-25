@@ -30,7 +30,8 @@ export const CONFIG = {
   dbPath: process.env.DB_PATH?.trim() || "./data/doffa.db",
   // По умолчанию — devnet тест-токен (бесплатно). На mainnet зададим DOFFA_MINT.
   mint: process.env.DOFFA_MINT?.trim() || "FVERje4sz25gD1w4hTYV5VevSLPPDFhoNDHax1gvMVKU",
-  burnPerCup: Number(process.env.BURN_PER_CUP ?? "1") || 1,
+  // Целое ≥1: дробное значение сломало бы BigInt() при расчёте суммы сжигания.
+  burnPerCup: Math.max(1, Math.round(Number(process.env.BURN_PER_CUP ?? "1") || 1)),
 };
 
 export function isAdmin(userId: number | undefined): boolean {
