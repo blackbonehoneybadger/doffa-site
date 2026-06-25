@@ -7,6 +7,7 @@ import { handleShift } from "./commands/shift.js";
 import { handleSale } from "./commands/sale.js";
 import { handleStats } from "./commands/stats.js";
 import { handleMenuCommand, handleMenuCallback } from "./commands/menuCmd.js";
+import { preflight } from "./burn.js";
 
 const bot = new Telegraf(CONFIG.botToken);
 
@@ -108,12 +109,41 @@ async function cancelLastSale(ctx: Context): Promise<void> {
 bot.command("cancel", (ctx) => cancelLastSale(ctx));
 
 // --- Запуск ---
+// Уникальный ID запуска: если в логах видно ДВА разных BOOT — значит работает
+// несколько копий бота (старый деплой не остановлен). Это и есть причина
+// «открой смену после каждого заказа»: Telegram раздаёт сообщения между копиями,
+// у каждой своя база. Решение: оставить ОДНУ активную копию на Railway.
+const BOOT = `${process.pid}-${process.uptime().toFixed(0)}`;
+
 // Видно в логах Railway сразу при старте контейнера — даже до подключения к Telegram.
 console.log(
-  `🚀 DOFFA POS стартует… Node ${process.version}. ` +
+  `🚀 DOFFA POS стартует… BOOT=${BOOT} · Node ${process.version}. ` +
     `Админов: ${CONFIG.adminIds.length}. База: ${CONFIG.dbPath}. ` +
     `Mint: ${CONFIG.mint.slice(0, 6)}…`,
 );
+
+// Самопроверка кошелька в текущей сети — сразу видно, почему burn не пройдёт.
+preflight()
+  .then((p) => {
+    console.log(
+      `🔎 Самопроверка burn: сеть=${p.cluster} · mint=${p.mint.slice(0, 6)}… · ` +
+        (p.pubkey ? `кошелёк=${p.pubkey.slice(0, 6)}… · SOL=${p.sol} · $DOFFA=${p.tokenBalance}` : "OWNER_KEYPAIR не задан"),
+    );
+    if (!p.ok) {
+      console.warn(
+        `⚠️ Burn НЕ заработает: ${p.error ?? `на кошельке нет SOL или $DOFFA в сети ${p.cluster}`}. ` +
+          `Проверь, что SOLANA_RPC и DOFFA_MINT указывают на одну сеть (сейчас RPC=${p.rpc}).`,
+      );
+    } else {
+      console.log("✅ Кошелёк готов к сжиганию: SOL и $DOFFA на месте.");
+    }
+  })
+  .catch((e) => console.error("preflight error:", e));
+
+// Любая необработанная ошибка в обработчике — в лог, бот продолжает жить.
+bot.catch((err, ctx) => {
+  console.error(`bot.catch [${ctx.updateType}]:`, err instanceof Error ? err.message : err);
+});
 
 bot
   .launch(async () => {
@@ -130,11 +160,19 @@ bot
     } catch (err) {
       console.error("setMyCommands error:", err);
     }
-    console.log(`✅ DOFFA POS бот запущен и слушает Telegram. Админов: ${CONFIG.adminIds.length}.`);
+    console.log(`✅ DOFFA POS бот запущен (BOOT=${BOOT}) и слушает Telegram. Админов: ${CONFIG.adminIds.length}.`);
   })
   .catch((err) => {
     // Если Telegram отверг токен или сеть недоступна — видно в логах, контейнер перезапустится.
-    console.error("⛔ Не удалось запустить бота:", err instanceof Error ? err.message : err);
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg.includes("409") || msg.toLowerCase().includes("conflict")) {
+      console.error(
+        "⛔ Конфликт 409: бот уже запущен в другом месте. Оставь ОДНУ активную копию " +
+          "(удали старые деплои на Railway / не запускай локально одновременно).",
+      );
+    } else {
+      console.error("⛔ Не удалось запустить бота:", msg);
+    }
     process.exit(1);
   });
 
