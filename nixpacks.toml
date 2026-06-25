@@ -1,0 +1,5 @@
+[phases.install]
+cmds = ["npm install --prefix bot"]
+
+[start]
+cmd = "npm start --prefix bot"
