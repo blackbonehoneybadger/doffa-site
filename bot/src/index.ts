@@ -90,6 +90,17 @@ async function cancelLastSale(ctx: Context): Promise<void> {
     await ctx.reply("В этой смене ещё нет продаж.");
     return;
   }
+  // Если токены уже сожжены в блокчейне — отмена запрещена.
+  // Burn необратим, а удаление чека сломало бы сверку смены с Solana.
+  if (last.burned) {
+    await ctx.reply(
+      `⛔ Продажу #${last.id} нельзя отменить — $DOFFA уже сожжены в блокчейне.\n` +
+        `Сжигание необратимо, удаление чека сломало бы сверку смены.\n` +
+        (last.tx_hash ? `TX: https://solscan.io/tx/${last.tx_hash}\n` : "") +
+        `Если это ошибка — оформи возврат отдельной продажей.`,
+    );
+    return;
+  }
   deleteSale(last.id);
   await ctx.reply(`↩️ Продажа #${last.id} отменена.`);
 }

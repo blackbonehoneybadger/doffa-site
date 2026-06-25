@@ -11,7 +11,10 @@ export async function GET() {
     const burns = await fetchBurnHistory(50);
 
     const totalBurns = burns.reduce((s, b) => s + b.amount, 0);
-    const totalSales = burns.length; // каждый burn = 1 продажа
+    const totalSales = burns.length; // число burn-транзакций (продаж)
+    // Чашки считаем по сожжённому объёму, а не по числу транзакций:
+    // продажа "x2" — одна транзакция, но 2 чашки = 2 сожжённых $DOFFA.
+    const totalCups = totalBurns;
 
     const status =
       totalBurns === 0
@@ -26,7 +29,7 @@ export async function GET() {
     return Response.json({
       pos_sales: totalSales,
       solana_burns: totalBurns,
-      pos_cups: totalSales,
+      pos_cups: totalCups,
       mismatch: 0,
       mismatch_percent: 0,
       status,
