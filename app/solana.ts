@@ -1,12 +1,23 @@
 // Лёгкая интеграция с Solana без тяжёлых библиотек:
 // читаем данные токена через публичный JSON-RPC и подключаем Phantom через
-// встроенный в браузер провайдер. Токен на mainnet-beta.
+// встроенный в браузер провайдер.
+//
+// Сеть и адрес токена настраиваются переменными окружения Vercel
+// (NEXT_PUBLIC_*). По умолчанию — devnet тест-токен, тот же, что сжигает бот,
+// чтобы сайт показывал реальные сжигания. Для mainnet задать на Vercel:
+//   NEXT_PUBLIC_SOLANA_CLUSTER = mainnet-beta
+//   NEXT_PUBLIC_SOLANA_RPC     = <платный RPC, напр. Helius>
+//   NEXT_PUBLIC_DOFFA_MINT     = <адрес mainnet-токена>
+
+const CLUSTER = (process.env.NEXT_PUBLIC_SOLANA_CLUSTER as "devnet" | "mainnet-beta") || "devnet";
 
 export const CHAIN = {
-  cluster: "mainnet-beta" as "devnet" | "mainnet-beta",
-  rpc: "https://api.mainnet-beta.solana.com",
-  // Боевой адрес минта $DOFFA на mainnet.
-  mint: "6cAtKTM8ZPUgRgmzsgkRfZsq4jZTXymA7cLqjz9qYMFS",
+  cluster: CLUSTER,
+  rpc:
+    process.env.NEXT_PUBLIC_SOLANA_RPC ||
+    (CLUSTER === "devnet" ? "https://api.devnet.solana.com" : "https://api.mainnet-beta.solana.com"),
+  // Адрес минта $DOFFA. По умолчанию — devnet тест-токен (совпадает с ботом).
+  mint: process.env.NEXT_PUBLIC_DOFFA_MINT || "FVERje4sz25gD1w4hTYV5VevSLPPDFhoNDHax1gvMVKU",
   // Сколько всего было выпущено (для расчёта «сожжено = выпуск − текущий объём»).
   initialSupply: 100_000_000,
 };
