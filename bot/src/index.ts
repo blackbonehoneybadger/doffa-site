@@ -3,6 +3,8 @@
 import { Telegraf, Markup, type Context } from "telegraf";
 import { CONFIG, isAdmin } from "./config.js";
 import { getOpenShift, getLastSale, deleteSale } from "./db.js";
+import { isBurning } from "./burnState.js";
+import { isAbsolute } from "node:path";
 import { handleShift } from "./commands/shift.js";
 import { handleSale } from "./commands/sale.js";
 import { handleStats } from "./commands/stats.js";
@@ -91,6 +93,14 @@ async function cancelLastSale(ctx: Context): Promise<void> {
     await ctx.reply("В этой смене ещё нет продаж.");
     return;
   }
+  // Если продажа прямо сейчас сжигается — нельзя отменять (иначе токены сгорят,
+  // а чек исчезнет: получится осиротевший burn и расхождение сверки).
+  if (isBurning(last.id)) {
+    await ctx.reply(
+      `⏳ Продажа #${last.id} сейчас сжигается в блокчейне. Подожди пару секунд и проверь /stats — отменять во время сжигания нельзя.`,
+    );
+    return;
+  }
   // Если токены уже сожжены в блокчейне — отмена запрещена.
   // Burn необратим, а удаление чека сломало бы сверку смены с Solana.
   if (last.burned) {
@@ -121,6 +131,17 @@ console.log(
     `Админов: ${CONFIG.adminIds.length}. База: ${CONFIG.dbPath}. ` +
     `Mint: ${CONFIG.mint.slice(0, 6)}…`,
 );
+
+// Эфемерный диск Railway — вторая причина «открой смену после каждого заказа»:
+// относительный путь к БД теряется при каждом рестарте/деплое вместе со сменами.
+// Решение: смонтировать Volume и задать DB_PATH=/data/doffa.db (абсолютный путь).
+if (!isAbsolute(CONFIG.dbPath)) {
+  console.warn(
+    `⚠️ База лежит по ОТНОСИТЕЛЬНОМУ пути ${CONFIG.dbPath} — на Railway это эфемерный диск: ` +
+      `при каждом рестарте смены и продажи ТЕРЯЮТСЯ (отсюда «открой смену» после заказа). ` +
+      `Смонтируй Volume и задай DB_PATH=/data/doffa.db.`,
+  );
+}
 
 // Самопроверка кошелька в текущей сети — сразу видно, почему burn не пройдёт.
 preflight()

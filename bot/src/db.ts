@@ -115,12 +115,25 @@ export function getLastSale(shiftId: number): Sale | undefined {
     .get(shiftId) as Sale | undefined;
 }
 
+export function getSaleById(saleId: number): Sale | undefined {
+  return db.prepare("SELECT * FROM sales WHERE id = ?").get(saleId) as Sale | undefined;
+}
+
 export function deleteSale(saleId: number): void {
   db.prepare("DELETE FROM sales WHERE id = ?").run(saleId);
 }
 
-export function markAsBurned(saleId: number, txHash: string): void {
-  db.prepare("UPDATE sales SET burned = 1, tx_hash = ? WHERE id = ?").run(txHash, saleId);
+/**
+ * Идемпотентная пометка о сжигании: помечает ТОЛЬКО если продажа ещё не сожжена
+ * (WHERE burned = 0). Возвращает число изменённых строк:
+ *   1 — пометили; 0 — продажа уже сожжена ИЛИ удалена (двойной burn / гонка).
+ * Вызывающий обязан проверить результат и не считать 0 успехом.
+ */
+export function markAsBurned(saleId: number, txHash: string): number {
+  const info = db
+    .prepare("UPDATE sales SET burned = 1, tx_hash = ? WHERE id = ? AND burned = 0")
+    .run(txHash, saleId);
+  return info.changes;
 }
 
 // Сводка по смене: сколько чеков, чашек, денег.

@@ -3,8 +3,9 @@
 //   /sale 150 Капучино   — то же, с заметкой
 //   /sale 300 x2 Латте   — 300 ₽, 2 чашки, заметка "Латте"
 import type { Context } from "telegraf";
-import { getOpenShift, addSale, markAsBurned } from "../db.js";
+import { getOpenShift, addSale, markAsBurned, getSaleById } from "../db.js";
 import { burnCoffee, isBurnConfigured } from "../burn.js";
+import { beginBurn, endBurn } from "../burnState.js";
 import { CONFIG } from "../config.js";
 import { formatRub } from "../format.js";
 
@@ -68,14 +69,29 @@ export async function handleSale(ctx: Context, arg: string): Promise<void> {
     return;
   }
 
+  // Защита от двойного сжигания: захватываем продажу под burn.
+  if (!beginBurn(sale.id)) return;
   try {
+    // Не жжём повторно, если продажа уже отмечена сожжённой.
+    const fresh = getSaleById(sale.id);
+    if (!fresh || fresh.burned) return;
+
     const result = await burnCoffee({
       qty: toBurn,
       saleId: sale.id,
       receiptHash: sale.receipt_hash,
     });
 
-    markAsBurned(sale.id, result.sig);
+    const changed = markAsBurned(sale.id, result.sig);
+    if (changed === 0) {
+      // Продажа была удалена/отменена во время сжигания — токены уже сожжены.
+      console.warn(`⚠️ Осиротевший burn: sale#${sale.id} сожжён, но строки в БД нет. TX ${result.sig}`);
+      await ctx.reply(
+        `⚠️ ${toBurn} $DOFFA сожжено, но продажа #${sale.id} была отменена во время сжигания.\n` +
+          `TX: ${result.solscan}`,
+      );
+      return;
+    }
 
     await ctx.reply(
       `✅ ${toBurn} $DOFFA сожжено!\n` +
@@ -90,5 +106,7 @@ export async function handleSale(ctx: Context, arg: string): Promise<void> {
         `Чек: sale#${sale.id} | ${sale.receipt_hash}\n` +
         `Можно сжечь вручную позже.`,
     );
+  } finally {
+    endBurn(sale.id);
   }
 }

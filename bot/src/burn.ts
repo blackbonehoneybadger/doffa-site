@@ -27,12 +27,17 @@ export function getRpc(): string {
   return process.env.SOLANA_RPC?.trim() || "https://api.devnet.solana.com";
 }
 
-export function isDevnet(): boolean {
-  return getRpc().includes("devnet");
+// Сеть определяем ЯВНО через SOLANA_CLUSTER (devnet|mainnet). Если не задано —
+// откатываемся на эвристику по URL. Явная переменная надёжнее: многие mainnet
+// RPC (Helius/QuickNode/свои домены) не содержат слов «mainnet»/«devnet».
+export function clusterName(): "devnet" | "mainnet" {
+  const explicit = process.env.SOLANA_CLUSTER?.trim().toLowerCase();
+  if (explicit === "devnet" || explicit === "mainnet") return explicit;
+  return getRpc().includes("devnet") ? "devnet" : "mainnet";
 }
 
-export function clusterName(): "devnet" | "mainnet" {
-  return isDevnet() ? "devnet" : "mainnet";
+export function isDevnet(): boolean {
+  return clusterName() === "devnet";
 }
 
 function clusterParam(): string {

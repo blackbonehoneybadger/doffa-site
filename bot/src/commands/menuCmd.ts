@@ -1,8 +1,9 @@
 import { Markup, type Context } from "telegraf";
 import type { CallbackQuery } from "telegraf/types";
 import { MENU } from "../menu.js";
-import { getOpenShift, addSale, markAsBurned } from "../db.js";
+import { getOpenShift, addSale, markAsBurned, getSaleById } from "../db.js";
 import { burnCoffee, isBurnConfigured } from "../burn.js";
+import { beginBurn, endBurn } from "../burnState.js";
 import { CONFIG } from "../config.js";
 
 export function categoryKeyboard() {
@@ -88,13 +89,25 @@ export async function handleMenuCallback(ctx: Context): Promise<void> {
       return;
     }
 
+    // Защита от двойного сжигания: захватываем продажу под burn.
+    if (!beginBurn(sale.id)) return;
     try {
+      const fresh = getSaleById(sale.id);
+      if (!fresh || fresh.burned) return;
+
       const result = await burnCoffee({ qty: toBurn, saleId: sale.id, receiptHash: sale.receipt_hash });
-      markAsBurned(sale.id, result.sig);
+      const changed = markAsBurned(sale.id, result.sig);
+      if (changed === 0) {
+        console.warn(`⚠️ Осиротевший burn: sale#${sale.id} сожжён, но строки в БД нет. TX ${result.sig}`);
+        await ctx.reply(`⚠️ ${toBurn} $DOFFA сожжено, но продажа #${sale.id} была отменена во время сжигания.\nTX: ${result.solscan}`);
+        return;
+      }
       await ctx.reply(`✅ ${toBurn} $DOFFA сожжено!\nTX: ${result.solscan}\n\nОшиблись? /cancel`);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       await ctx.reply(`⚠️ Продажа записана, но burn не прошёл:\n${msg}`);
+    } finally {
+      endBurn(sale.id);
     }
     return;
   }
