@@ -1,10 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
-import { motion, useInView, useMotionValue, animate, AnimatePresence } from "framer-motion";
-import { dict, LANGS, TOKEN, MOCK, CONTACT, GALLERY, VIDEOS, type Lang } from "./content";
-import { CHAIN, REAL, solscanToken, solscanTokenOf, solscanWalletOf, solscanTx, solscanHolders, fetchSupply, fetchSupplyOf, fetchBalance, fetchBurnHistory, connectWalletById, disconnectWalletById, type BurnRecord } from "./solana";
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { dict, LANGS, TOKEN, CONTACT, GALLERY, VIDEOS, type Lang } from "./content";
+import { CHAIN, REAL, solscanToken, solscanTokenOf, solscanWalletOf, solscanTx, solscanHolders, fetchSupplyOf, fetchBalance, fetchBurnHistory, connectWalletById, disconnectWalletById, type BurnRecord } from "./solana";
 
 // Главный ролик в hero — без вшитых субтитров. Лежит в public/brand/hero.mp4.
 const HERO_VIDEO: string | null = "/brand/hero.mp4";
@@ -32,23 +32,6 @@ function Tag({ children }: { children: React.ReactNode }) {
   );
 }
 
-function CountUp({ to, locale = "ru-RU" }: { to: number; locale?: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true });
-  const mv = useMotionValue(0);
-  const [val, setVal] = useState(0);
-  useEffect(() => {
-    if (!inView) return;
-    const controls = animate(mv, to, { duration: 1.6, ease: "easeOut" });
-    const unsub = mv.on("change", (v) => setVal(Math.round(v)));
-    return () => {
-      controls.stop();
-      unsub();
-    };
-  }, [inView, to, mv]);
-  return <span ref={ref}>{val.toLocaleString(locale)}</span>;
-}
-
 /* ---------- page ---------- */
 
 export default function Home() {
@@ -56,14 +39,6 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"story" | "token" | "cafe" | "community" | "buy" | "contact">("story");
   const t = dict[lang];
-
-  // Живые данные из блокчейна (devnet). null — ещё не загружено / недоступно.
-  const [liveSupply, setLiveSupply] = useState<number | null>(null);
-  useEffect(() => {
-    fetchSupply()
-      .then(setLiveSupply)
-      .catch(() => setLiveSupply(null));
-  }, []);
 
   // Объём НАСТОЯЩЕГО токена (mainnet). null — mint ещё не задан (токен не выпущен).
   const [realSupply, setRealSupply] = useState<number | null>(null);
@@ -92,7 +67,6 @@ export default function Home() {
       .catch(() => setCompare(null));
   }, []);
 
-  const IS_DEVNET = CHAIN.cluster === "devnet";
   const loc = t.locale;
 
   // Направление письма и атрибут языка — для арабского (rtl) и доступности.
@@ -100,12 +74,6 @@ export default function Home() {
     document.documentElement.lang = lang;
     document.documentElement.dir = t.dir ?? "ltr";
   }, [lang, t.dir]);
-
-  const isLive = liveSupply !== null;
-  const burned = isLive ? Math.max(CHAIN.initialSupply - liveSupply!, 0) : MOCK.burned;
-  const remaining = isLive ? liveSupply! : TOKEN.supply - MOCK.burned;
-  const cupsSold = isLive ? burned : MOCK.cupsSold;
-  const burnedPct = (burned / TOKEN.supply) * 100;
 
   // Настоящий токен (mainnet). Выпущен ли уже mint?
   const realMinted = REAL.mint !== null;
@@ -352,11 +320,6 @@ export default function Home() {
               <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1.5">
                 🕖 07:00–22:00
               </span>
-              {IS_DEVNET && (
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-amber/40 bg-amber/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-amber">
-                  {t.burns.demoBadge}
-                </span>
-              )}
             </div>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <span className="inline-flex cursor-not-allowed items-center gap-2 rounded-full bg-gold px-7 py-3 font-bold text-ink opacity-90">
@@ -397,19 +360,6 @@ export default function Home() {
           ))}
         </div>
       </div>
-
-      {/* ---------- DEVNET DEMO BANNER (только на devnet) ---------- */}
-      {IS_DEVNET && (
-        <div className="border-b border-amber/20 bg-amber/[0.08] px-5 py-2">
-          <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-amber/40 bg-amber/15 px-3 py-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-amber">
-              <span className="h-1.5 w-1.5 rounded-full bg-amber" />
-              {t.burns.demoBadge}
-            </span>
-            <span className="text-[11px] text-amber/70">{t.burns.demoNote}</span>
-          </div>
-        </div>
-      )}
 
       {/* ---------- TAB CONTENT ---------- */}
       <div className="relative">
@@ -548,55 +498,12 @@ export default function Home() {
                   <div className="text-center">
                     <Tag>{t.burns.tag}</Tag>
                     <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.burns.title}</h2>
-                    {isLive && (
-                      <span className="mt-4 inline-flex items-center gap-2 rounded-full border border-teal/40 bg-teal/10 px-3 py-1 text-xs font-semibold text-teal">
-                        <span className="h-2 w-2 animate-pulse rounded-full bg-teal" />
-                        {t.burns.live}
-                      </span>
-                    )}
-                  </div>
-                </Reveal>
-                {/* Демо-токен (devnet) — живые сжигания, всё работает сейчас */}
-                <Reveal>
-                  <div className="mt-10 rounded-3xl border border-white/10 bg-white/[0.02] p-6 sm:p-8">
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                      <span className="text-sm font-bold text-cream-soft">{t.burns.demoTitle}</span>
-                      <span className="inline-flex items-center gap-1.5 rounded-full border border-amber/40 bg-amber/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-amber">
-                        {t.burns.demoBadge}
-                      </span>
-                    </div>
-                    <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                      <Stat label={t.burns.supply} value={TOKEN.supply.toLocaleString(loc)} unit={TOKEN.symbol} />
-                      <Stat label={t.burns.burned} value={<CountUp to={burned} locale={loc} />} unit={`🔥 ${TOKEN.symbol}`} accent />
-                      <Stat label={t.burns.left} value={remaining.toLocaleString(loc)} unit={TOKEN.symbol} />
-                      <Stat label={t.burns.cups} value={<CountUp to={cupsSold} locale={loc} />} unit="☕" />
-                    </div>
-                    <div className="mt-8 h-3 overflow-hidden rounded-full bg-white/10">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        whileInView={{ width: `${burned > 0 ? Math.max(burnedPct, 1.5) : 0}%` }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 1.4, ease: "easeOut" }}
-                        className="h-full rounded-full bg-gradient-to-r from-amber to-teal"
-                      />
-                    </div>
-                    <p className="mt-4 text-center text-xs text-cream/50">{isLive ? t.burns.liveNote : t.burns.note}</p>
-                    <div className="mt-3 text-center">
-                      <a
-                        href={solscanToken()}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal transition hover:text-gold"
-                      >
-                        {t.burns.verify} ↗
-                      </a>
-                    </div>
                   </div>
                 </Reveal>
 
-                {/* Настоящий токен (mainnet) — нетронут, ждёт запуска, отдельно */}
-                <Reveal delay={0.1}>
-                  <div className="mt-6 rounded-3xl border border-gold/25 bg-gradient-to-b from-gold/[0.06] to-transparent p-6 sm:p-8">
+                {/* Настоящий токен (mainnet) */}
+                <Reveal>
+                  <div className="mt-10 rounded-3xl border border-gold/25 bg-gradient-to-b from-gold/[0.06] to-transparent p-6 sm:p-8">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <span className="text-sm font-bold text-cream-soft">{t.burns.realTitle}</span>
                       <span className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-gold/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-gold">
