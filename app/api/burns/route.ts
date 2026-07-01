@@ -8,7 +8,9 @@ import { fetchBurnHistory } from "../../solana";
 export async function GET() {
   try {
     const burns = await fetchBurnHistory(20);
-    return Response.json({ ok: true, burns });
+    return Response.json({ ok: true, burns }, {
+      headers: { "Cache-Control": "public, max-age=30, stale-while-revalidate=60" },
+    });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "RPC error";
     return Response.json({ ok: false, error: msg }, { status: 502 });

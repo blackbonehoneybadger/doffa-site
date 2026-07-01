@@ -6,6 +6,16 @@ import { burnCoffee, isBurnConfigured } from "../burn.js";
 import { beginBurn, endBurn } from "../burnState.js";
 import { CONFIG } from "../config.js";
 
+// Dedup Telegram callbacks: двойной клик на кнопку даёт два одинаковых callback_id.
+// Храним обработанные ID 10 сек — достаточно, чтобы блокировать ретрансмиссию.
+const seenCallbacks = new Set<string>();
+function claimCallback(id: string): boolean {
+  if (seenCallbacks.has(id)) return false;
+  seenCallbacks.add(id);
+  setTimeout(() => seenCallbacks.delete(id), 10_000);
+  return true;
+}
+
 export function categoryKeyboard() {
   return Markup.inlineKeyboard(
     MENU.map((cat) => Markup.button.callback(`${cat.emoji} ${cat.title}`, `m:cat:${cat.id}`)),
@@ -37,6 +47,12 @@ export async function handleMenuCommand(ctx: Context): Promise<void> {
 export async function handleMenuCallback(ctx: Context): Promise<void> {
   const cb = ctx.callbackQuery as CallbackQuery.DataQuery;
   const data = cb?.data ?? "";
+
+  // Блокируем повторную обработку того же callback (двойной клик / ретрансмиссия).
+  if (!claimCallback(cb.id)) {
+    await ctx.answerCbQuery();
+    return;
+  }
 
   if (data === "m:back") {
     await ctx.editMessageText("Выбери категорию:", categoryKeyboard());
