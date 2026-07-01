@@ -6,7 +6,7 @@ import {
   mintV1,
   TokenStandard,
 } from "@metaplex-foundation/mpl-token-metadata";
-import { generateSigner, percentAmount, some } from "@metaplex-foundation/umi";
+import { generateSigner, percentAmount, publicKey, some } from "@metaplex-foundation/umi";
 import { CFG, makeUmi, MINT_FILE, explorerUrl } from "./config.js";
 
 if (!CFG.metadataUri) {
@@ -14,8 +14,16 @@ if (!CFG.metadataUri) {
   process.exit(1);
 }
 
+// На mainnet вся эмиссия должна уходить сразу в treasury-кошелёк, а не оставаться
+// у служебного ключа owner.json — иначе им придётся владеть токенами навсегда.
+if (CFG.cluster === "mainnet-beta" && !CFG.recipient) {
+  console.error("⛔ RECIPIENT_ADDRESS пуст. На mainnet укажи адрес treasury-кошелька в .env.");
+  process.exit(1);
+}
+
 const umi = makeUmi();
 const mint = generateSigner(umi);
+const recipient = CFG.recipient ? publicKey(CFG.recipient) : umi.identity.publicKey;
 
 console.log(`Сеть: ${CFG.cluster}`);
 console.log(`Создаю токен ${CFG.name} (${CFG.symbol}), decimals=${CFG.decimals} ...`);
@@ -36,15 +44,15 @@ console.log("✅ Минт создан:", mintAddress);
 // Сохраняем адрес сразу — на случай, если минтинг придётся повторить отдельно.
 writeFileSync(MINT_FILE, JSON.stringify({ mint: mintAddress, cluster: CFG.cluster }, null, 2));
 
-// Минтим весь объём в базовых единицах (supply * 10^decimals) владельцу.
+// Минтим весь объём в базовых единицах (supply * 10^decimals) в treasury-кошелёк.
 const amount = CFG.supply * 10n ** BigInt(CFG.decimals);
-console.log(`Минчу ${CFG.supply.toString()} ${CFG.symbol} владельцу ...`);
+console.log(`Минчу ${CFG.supply.toString()} ${CFG.symbol} на адрес ${recipient.toString()} ...`);
 
 await mintV1(umi, {
   mint: mint.publicKey,
   authority: umi.identity,
   amount,
-  tokenOwner: umi.identity.publicKey,
+  tokenOwner: recipient,
   tokenStandard: TokenStandard.Fungible,
 }).sendAndConfirm(umi, { confirm: { commitment: "finalized" } });
 

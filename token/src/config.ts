@@ -22,6 +22,10 @@ export const CFG = {
   supply: BigInt(process.env.TOKEN_SUPPLY ?? "100000000"),
   metadataUri: process.env.METADATA_URI ?? "",
   mintAddress: process.env.MINT_ADDRESS?.trim() || "",
+  // Кому уходит вся эмиссия при создании. Если пусто — минтится владельцу ключа
+  // (owner.json), что оставляет служебный ключ держателем токенов — небезопасно
+  // для mainnet. На mainnet всегда указывай реальный кошелёк-treasury.
+  recipient: process.env.RECIPIENT_ADDRESS?.trim() || "",
 };
 
 export const MINT_FILE = ".doffa-mint.json";
