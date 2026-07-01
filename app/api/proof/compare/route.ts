@@ -40,6 +40,8 @@ export async function GET() {
         quantity: b.amount,
         timestamp: (b.blockTime ?? 0) * 1000,
       })),
+    }, {
+      headers: { "Cache-Control": "public, max-age=2, stale-while-revalidate=8" },
     });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Unknown error";

@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { dict, LANGS, TOKEN, CONTACT, GALLERY, VIDEOS, type Lang } from "./content";
-import { CHAIN, REAL, solscanToken, solscanTokenOf, solscanWalletOf, solscanTx, solscanHolders, fetchSupplyOf, fetchBalance, fetchBurnHistory, connectWalletById, disconnectWalletById, type BurnRecord } from "./solana";
+import { REAL, solscanToken, solscanTokenOf, solscanWalletOf, solscanTx, solscanHolders, fetchSupplyOf, fetchBalance, fetchBurnHistory, connectWalletById, disconnectWalletById, type BurnRecord } from "./solana";
 
 // Главный ролик в hero — без вшитых субтитров. Лежит в public/brand/hero.mp4.
 const HERO_VIDEO: string | null = "/brand/hero.mp4";
@@ -40,31 +40,51 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<"story" | "token" | "cafe" | "community" | "buy" | "contact">("story");
   const t = dict[lang];
 
-  // Объём НАСТОЯЩЕГО токена (mainnet). null — mint ещё не задан (токен не выпущен).
+  // Объём НАСТОЯЩЕГО токена (mainnet) — опрашивается каждую секунду, живой счётчик.
   const [realSupply, setRealSupply] = useState<number | null>(null);
   useEffect(() => {
     if (!REAL.mint) return;
-    fetchSupplyOf(REAL)
-      .then(setRealSupply)
-      .catch(() => setRealSupply(null));
+    let cancelled = false;
+    const tick = () => {
+      fetchSupplyOf(REAL)
+        .then((v) => { if (!cancelled) setRealSupply(v); })
+        .catch(() => { if (!cancelled) setRealSupply(null); });
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => { cancelled = true; clearInterval(id); };
   }, []);
 
   // История сжиганий — читается напрямую из Solana (мемо "DOFFA coffee burn | ...").
+  // Опрашивается каждую секунду, чтобы новое сжигание появлялось в ленте сразу.
   const [burns, setBurns] = useState<BurnRecord[] | null>(null);
   useEffect(() => {
-    fetchBurnHistory(15)
-      .then(setBurns)
-      .catch(() => setBurns([]));
+    let cancelled = false;
+    const tick = () => {
+      fetchBurnHistory(15)
+        .then((v) => { if (!cancelled) setBurns(v); })
+        .catch(() => { if (!cancelled) setBurns([]); });
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => { cancelled = true; clearInterval(id); };
   }, []);
 
   // Сверка POS-продаж ↔ Solana burns. Данные из блокчейна через /api/proof/compare.
+  // Опрашивается каждую секунду — цифры на сайте не отстают от бота.
   type Compare = { pos_cups: number; solana_burns: number; mismatch: number; status: string; message: string };
   const [compare, setCompare] = useState<Compare | null>(null);
   useEffect(() => {
-    fetch("/api/proof/compare")
-      .then((r) => r.json())
-      .then((d) => setCompare(d as Compare))
-      .catch(() => setCompare(null));
+    let cancelled = false;
+    const tick = () => {
+      fetch("/api/proof/compare")
+        .then((r) => r.json())
+        .then((d) => { if (!cancelled) setCompare(d as Compare); })
+        .catch(() => { if (!cancelled) setCompare(null); });
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => { cancelled = true; clearInterval(id); };
   }, []);
 
   const loc = t.locale;
@@ -697,7 +717,7 @@ export default function Home() {
                   <Reveal>
                     <VerifyCard
                       label={t.verify.mintLabel}
-                      value={CHAIN.mint ?? ""}
+                      value={REAL.mint ?? ""}
                       href={solscanToken()}
                       cta={t.verify.viewToken}
                       copiedLabel={t.ui.copied}
