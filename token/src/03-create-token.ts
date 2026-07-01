@@ -29,6 +29,8 @@ console.log(`Сеть: ${CFG.cluster}`);
 console.log(`Создаю токен ${CFG.name} (${CFG.symbol}), decimals=${CFG.decimals} ...`);
 
 // Финализируем создание минта, чтобы все узлы RPC увидели аккаунт (devnet — балансировщик).
+// updateAuthority (право менять имя/лого метаданных) сразу уходит в treasury —
+// иначе служебный ключ owner.json навсегда мог бы редактировать метаданные токена.
 await createFungible(umi, {
   mint,
   name: CFG.name,
@@ -36,6 +38,7 @@ await createFungible(umi, {
   uri: CFG.metadataUri,
   sellerFeeBasisPoints: percentAmount(0),
   decimals: some(CFG.decimals),
+  updateAuthority: recipient,
 }).sendAndConfirm(umi, { confirm: { commitment: "finalized" } });
 
 const mintAddress = mint.publicKey.toString();
