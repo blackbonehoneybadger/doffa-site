@@ -9,7 +9,7 @@ export async function GET() {
   try {
     const burns = await fetchBurnHistory(20);
     return Response.json({ ok: true, burns }, {
-      headers: { "Cache-Control": "public, max-age=30, stale-while-revalidate=60" },
+      headers: { "Cache-Control": "public, max-age=2, stale-while-revalidate=8" },
     });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "RPC error";

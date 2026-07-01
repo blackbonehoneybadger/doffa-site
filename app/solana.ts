@@ -82,16 +82,17 @@ export function solscanWalletOf(token: TokenInfo): string {
 }
 
 export function solscanToken(): string {
-  return solscanTokenOf(DEMO);
+  return solscanTokenOf(REAL);
 }
 
-export function solscanTx(sig: string): string {
-  return `https://solscan.io/tx/${sig}${clusterSuffix(DEMO.cluster)}`;
+/** По умолчанию ссылка на mainnet (REAL) — тот же токен, что жжёт бот в проде. */
+export function solscanTx(sig: string, cluster: Cluster = REAL.cluster): string {
+  return `https://solscan.io/tx/${sig}${clusterSuffix(cluster)}`;
 }
 
-/** Ссылка на держателей DEMO-токена — там виден кошелёк Burn Reserve и сжигания. */
+/** Ссылка на держателей REAL-токена. */
 export function solscanHolders(): string {
-  return solscanHoldersOf(DEMO);
+  return solscanHoldersOf(REAL);
 }
 
 async function rpc<T>(method: string, params: unknown[], endpoint: string = DEMO.rpc): Promise<T> {
@@ -112,24 +113,28 @@ export async function fetchSupplyOf(token: TokenInfo): Promise<number> {
   return r.value.uiAmount ?? 0;
 }
 
-/** Текущий объём DEMO-токена в обороте (uiAmount). */
+/** Текущий объём REAL-токена в обороте (uiAmount). */
 export async function fetchSupply(): Promise<number> {
-  return fetchSupplyOf(DEMO);
+  return fetchSupplyOf(REAL);
 }
 
-/** Баланс DEMO-токена $DOFFA у адреса (суммарно по его токен-аккаунтам). */
-export async function fetchBalance(owner: string): Promise<number> {
-  if (!DEMO.mint) return 0;
+/** Баланс токена $DOFFA у адреса (суммарно по его токен-аккаунтам). По умолчанию REAL. */
+export async function fetchBalanceOf(owner: string, token: TokenInfo): Promise<number> {
+  if (!token.mint) return 0;
   const r = await rpc<{ value: { account: { data: { parsed: { info: { tokenAmount: { uiAmount: number | null } } } } } }[] }>(
     "getTokenAccountsByOwner",
-    [owner, { mint: DEMO.mint }, { encoding: "jsonParsed" }],
-    DEMO.rpc,
+    [owner, { mint: token.mint }, { encoding: "jsonParsed" }],
+    token.rpc,
   );
   let total = 0;
   for (const acc of r.value ?? []) {
     total += acc.account.data.parsed.info.tokenAmount.uiAmount ?? 0;
   }
   return total;
+}
+
+export async function fetchBalance(owner: string): Promise<number> {
+  return fetchBalanceOf(owner, REAL);
 }
 
 /* ---------- Burn history from on-chain memos ---------- */
@@ -188,23 +193,25 @@ function extractMemo(tx: SolTx): string {
   return "";
 }
 
-function burnedFromTx(tx: SolTx): number {
+function burnedFromTx(tx: SolTx, mint: string): number {
   if (!tx?.meta) return 0;
   const pre = tx.meta.preTokenBalances ?? [];
   const post = tx.meta.postTokenBalances ?? [];
-  const preSum = pre.filter((b) => b.mint === DEMO.mint).reduce((s, b) => s + (b.uiTokenAmount.uiAmount ?? 0), 0);
-  const postSum = post.filter((b) => b.mint === DEMO.mint).reduce((s, b) => s + (b.uiTokenAmount.uiAmount ?? 0), 0);
+  const preSum = pre.filter((b) => b.mint === mint).reduce((s, b) => s + (b.uiTokenAmount.uiAmount ?? 0), 0);
+  const postSum = post.filter((b) => b.mint === mint).reduce((s, b) => s + (b.uiTokenAmount.uiAmount ?? 0), 0);
   return Math.max(preSum - postSum, 0);
 }
 
 /**
  * Последние сожжения с on-chain мемо "DOFFA coffee burn | sale_id | receipt_hash".
  * Читает напрямую из блокчейна — данные невозможно подделать на уровне сайта.
+ * По умолчанию читает REAL (боевой mainnet-токен, тот же, что жжёт бот).
  */
-export async function fetchBurnHistory(limit = 15): Promise<BurnRecord[]> {
-  if (!DEMO.mint) return [];
+export async function fetchBurnHistoryOf(token: TokenInfo, limit = 15): Promise<BurnRecord[]> {
+  if (!token.mint) return [];
+  const mint = token.mint;
   type SigInfo = { signature: string; slot: number; blockTime: number | null };
-  const sigs = await rpc<SigInfo[]>("getSignaturesForAddress", [DEMO.mint, { limit: 50 }], DEMO.rpc);
+  const sigs = await rpc<SigInfo[]>("getSignaturesForAddress", [mint, { limit: 50 }], token.rpc);
 
   // Параллельно загружаем транзакции, чтобы не ждать по одной
   const txResults = await Promise.allSettled(
@@ -212,7 +219,7 @@ export async function fetchBurnHistory(limit = 15): Promise<BurnRecord[]> {
       rpc<SolTx>("getTransaction", [
         s.signature,
         { encoding: "jsonParsed", maxSupportedTransactionVersion: 0 },
-      ]).then((tx) => ({ sig: s.signature, blockTime: s.blockTime, tx })),
+      ], token.rpc).then((tx) => ({ sig: s.signature, blockTime: s.blockTime, tx })),
     ),
   );
 
@@ -227,7 +234,7 @@ export async function fetchBurnHistory(limit = 15): Promise<BurnRecord[]> {
     if (!memo.startsWith(BURN_MEMO_PREFIX)) continue;
 
     const parts = memo.split("|").map((p) => p.trim());
-    const amount = burnedFromTx(tx);
+    const amount = burnedFromTx(tx, mint);
 
     records.push({
       sig,
@@ -242,6 +249,11 @@ export async function fetchBurnHistory(limit = 15): Promise<BurnRecord[]> {
   }
 
   return records;
+}
+
+/** История сжиганий REAL-токена (mainnet) — тот же токен, что жжёт бот в проде. */
+export async function fetchBurnHistory(limit = 15): Promise<BurnRecord[]> {
+  return fetchBurnHistoryOf(REAL, limit);
 }
 
 /* ---------- Wallet providers ---------- */
