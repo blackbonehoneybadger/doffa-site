@@ -7,8 +7,8 @@ import { dict, LANGS, TOKEN, CONTACT, GALLERY, VIDEOS, type Lang } from "./conte
 import { REAL, solscanToken, solscanTokenOf, solscanWalletOf, solscanTx, solscanHolders, fetchSupplyOf, fetchBalance, fetchBurnHistory, connectWalletById, disconnectWalletById, type BurnRecord } from "./solana";
 import { SmoothScroll, CursorGlow, MouseParallax, TiltCard } from "./cinematic";
 
-// Главный ролик в hero — без вшитых субтитров. Лежит в public/brand/hero.mp4.
-const HERO_VIDEO: string | null = "/brand/hero.mp4";
+// Дефолтный ролик в hero, пока владелец кофейни не загрузил свои через /admin.
+const DEFAULT_HERO_VIDEO = "/brand/hero.mp4";
 
 /* ---------- helpers ---------- */
 
@@ -40,6 +40,18 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"story" | "token" | "cafe" | "community" | "buy" | "contact">("story");
   const t = dict[lang];
+
+  // Hero-видео "на сегодня": владелец кофейни загружает через /admin, сайт
+  // ротирует по кругу раз в день. Пока ничего не загружено — дефолтное видео.
+  const [heroVideo, setHeroVideo] = useState<string>(DEFAULT_HERO_VIDEO);
+  useEffect(() => {
+    fetch("/api/hero-video")
+      .then((r) => r.json())
+      .then((d: { ok: boolean; url: string | null }) => {
+        if (d.ok && d.url) setHeroVideo(d.url);
+      })
+      .catch(() => {});
+  }, []);
 
   // Объём НАСТОЯЩЕГО токена (mainnet) — опрашивается каждую секунду, живой счётчик.
   const [realSupply, setRealSupply] = useState<number | null>(null);
@@ -297,34 +309,24 @@ export default function Home() {
 
       {/* ---------- HERO ---------- */}
       <section id="top" className="relative flex min-h-screen items-end overflow-hidden sm:items-center">
-        {HERO_VIDEO ? (
-          <motion.video
-            src={HERO_VIDEO}
-            autoPlay
-            muted
-            loop
-            playsInline
-            poster="/brand/cafe-night-2.jpeg"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1.4, ease: "easeOut" }}
-            // Видео 720p растянуто на весь экран через object-cover — при апскейле
-            // центр кадра (низкоконтрастные окна/стены) выглядит мягче, чем края
-            // с высококонтрастной вывеской. Лёгкая коррекция контраста/резкости
-            // компенсирует этот эффект без обрезки или замены самого файла.
-            style={{ filter: "contrast(1.08) saturate(1.12) brightness(1.02)" }}
-            className="absolute inset-0 h-full w-full object-cover object-center [image-rendering:-webkit-optimize-contrast]"
-          />
-        ) : (
-          <Image
-            src="/brand/cafe-night-2.jpeg"
-            alt="COFFEE DOFFA"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-center"
-          />
-        )}
+        <motion.video
+          key={heroVideo}
+          src={heroVideo}
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster="/brand/cafe-night-2.jpeg"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.4, ease: "easeOut" }}
+          // Видео 720p растянуто на весь экран через object-cover — при апскейле
+          // центр кадра (низкоконтрастные окна/стены) выглядит мягче, чем края
+          // с высококонтрастной вывеской. Лёгкая коррекция контраста/резкости
+          // компенсирует этот эффект без обрезки или замены самого файла.
+          style={{ filter: "contrast(1.08) saturate(1.12) brightness(1.02)" }}
+          className="absolute inset-0 h-full w-full object-cover object-center [image-rendering:-webkit-optimize-contrast]"
+        />
         {/* затемнение для читаемости текста */}
         <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/55 to-ink/30" />
         <div className="absolute inset-0 bg-ink/20" />
