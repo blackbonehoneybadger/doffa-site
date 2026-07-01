@@ -4,6 +4,7 @@ import { writeFileSync } from "node:fs";
 import {
   createFungible,
   mintV1,
+  updateV1,
   TokenStandard,
 } from "@metaplex-foundation/mpl-token-metadata";
 import { generateSigner, percentAmount, publicKey, some } from "@metaplex-foundation/umi";
@@ -29,8 +30,9 @@ console.log(`Сеть: ${CFG.cluster}`);
 console.log(`Создаю токен ${CFG.name} (${CFG.symbol}), decimals=${CFG.decimals} ...`);
 
 // Финализируем создание минта, чтобы все узлы RPC увидели аккаунт (devnet — балансировщик).
-// updateAuthority (право менять имя/лого метаданных) сразу уходит в treasury —
-// иначе служебный ключ owner.json навсегда мог бы редактировать метаданные токена.
+// updateAuthority на этом шаге НЕ передаём — по умолчанию она = identity (служебный
+// ключ), иначе Metaplex требует подпись recipient для верификации creator (0x36).
+// Передаём её в treasury отдельной транзакцией (updateV1) сразу после минтинга.
 await createFungible(umi, {
   mint,
   name: CFG.name,
@@ -38,7 +40,6 @@ await createFungible(umi, {
   uri: CFG.metadataUri,
   sellerFeeBasisPoints: percentAmount(0),
   decimals: some(CFG.decimals),
-  updateAuthority: recipient,
 }).sendAndConfirm(umi, { confirm: { commitment: "finalized" } });
 
 const mintAddress = mint.publicKey.toString();
@@ -60,6 +61,19 @@ await mintV1(umi, {
 }).sendAndConfirm(umi, { confirm: { commitment: "finalized" } });
 
 console.log("✅ Выпуск завершён.");
+
+// Передаём право менять метаданные (имя/лого/описание) в treasury — иначе
+// служебный ключ owner.json навсегда мог бы редактировать метаданные токена.
+if (CFG.recipient) {
+  console.log(`Передаю updateAuthority метаданных на ${recipient.toString()} ...`);
+  await updateV1(umi, {
+    mint: mint.publicKey,
+    authority: umi.identity,
+    newUpdateAuthority: recipient,
+  }).sendAndConfirm(umi, { confirm: { commitment: "finalized" } });
+  console.log("✅ updateAuthority передана в treasury.");
+}
+
 console.log("   Сохранил адрес в", MINT_FILE);
 console.log("   Solscan:", explorerUrl(mintAddress));
 console.log("\nСледующие шаги: проверка (npm run verify), затем — отзыв прав (npm run revoke).");
