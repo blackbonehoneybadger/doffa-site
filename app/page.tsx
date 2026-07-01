@@ -918,7 +918,7 @@ export default function Home() {
                           {t.buy.connect}
                         </button>
                       )}
-                      <p className="mt-3 max-w-md text-xs text-cream/50">{t.buy.demoNote}</p>
+                      <p className="mt-3 max-w-md text-xs text-cream/50">{t.buy.walletNote}</p>
                     </div>
                   </Reveal>
                   <Reveal delay={0.15}>

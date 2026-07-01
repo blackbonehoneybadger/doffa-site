@@ -2,64 +2,36 @@
 // читаем данные токена через публичный JSON-RPC и подключаем Phantom через
 // встроенный в браузер провайдер.
 //
-// На сайте живут ДВА токена одновременно:
-//   1) DEMO  — тест-токен на devnet. Его сжигает бот, сжигания видны вживую.
-//              Бесплатно, для всех, доказывает что система работает.
-//   2) REAL  — боевой токен на mainnet. Эмиссия 100 000 000, нетронут, ждёт
-//              запуска. Сжигаться начнёт, когда закончим тесты на devnet.
+// $DOFFA выпущен на mainnet: эмиссия 100 000 000, mint/freeze authority
+// отозваны навсегда. Бот сжигает этот же токен за каждую проданную чашку.
 //
 // Переменные окружения Vercel (NEXT_PUBLIC_*):
-//   DEMO (devnet, есть дефолты — менять не нужно):
-//     NEXT_PUBLIC_SOLANA_CLUSTER = devnet
-//     NEXT_PUBLIC_SOLANA_RPC     = https://api.devnet.solana.com
-//     NEXT_PUBLIC_DOFFA_MINT     = FVERje4sz25gD1w4hTYV5VevSLPPDFhoNDHax1gvMVKU
-//   REAL (mainnet, задать когда создадим боевой токен):
-//     NEXT_PUBLIC_REAL_MINT      = <адрес боевого mainnet-токена>
-//     NEXT_PUBLIC_REAL_RPC       = <RPC mainnet, по умолчанию публичный>
+//   NEXT_PUBLIC_REAL_MINT   = адрес mint (обязательна)
+//   NEXT_PUBLIC_REAL_RPC    = RPC mainnet (по умолчанию публичный)
+//   NEXT_PUBLIC_REAL_WALLET = кошелёк-держатель (для отображения до выпуска)
 
 export type Cluster = "devnet" | "mainnet-beta";
 
 export type TokenInfo = {
-  /** demo — тест на devnet; real — боевой на mainnet. */
-  kind: "demo" | "real";
   cluster: Cluster;
   rpc: string;
-  /** Адрес mint. null — токен ещё не создан (REAL до запуска). */
+  /** Адрес mint. null — токен ещё не создан. */
   mint: string | null;
-  /** Кошелёк-держатель токена (treasury). Для REAL — Phantom-адрес проекта. */
+  /** Кошелёк-держатель токена (treasury). */
   wallet: string | null;
   /** Полная эмиссия — для расчёта «сожжено = выпуск − текущий объём». */
   initialSupply: number;
 };
 
-const DEMO_CLUSTER = (process.env.NEXT_PUBLIC_SOLANA_CLUSTER as Cluster) || "devnet";
-
-/** DEMO-токен (devnet): живые сжигания, тот же mint, что сжигает бот. */
-export const DEMO: TokenInfo = {
-  kind: "demo",
-  cluster: DEMO_CLUSTER,
-  rpc:
-    process.env.NEXT_PUBLIC_SOLANA_RPC ||
-    (DEMO_CLUSTER === "devnet" ? "https://api.devnet.solana.com" : "https://api.mainnet-beta.solana.com"),
-  mint: process.env.NEXT_PUBLIC_DOFFA_MINT || "FVERje4sz25gD1w4hTYV5VevSLPPDFhoNDHax1gvMVKU",
-  wallet: null,
-  initialSupply: 100_000_000,
-};
-
-/** REAL-токен (mainnet): боевой, нетронут. mint=null пока токен не выпущен. */
+/** $DOFFA на mainnet — боевой токен, тот же, что жжёт бот. */
 export const REAL: TokenInfo = {
-  kind: "real",
   cluster: "mainnet-beta",
   rpc: process.env.NEXT_PUBLIC_REAL_RPC || "https://api.mainnet-beta.solana.com",
   mint: process.env.NEXT_PUBLIC_REAL_MINT?.trim() || null,
-  // Phantom-кошелёк проекта на mainnet — здесь будет лежать нетронутые 100 млн.
-  // Это адрес КОШЕЛЬКА (держателя), не mint. Mint появится при выпуске токена.
+  // Phantom-кошелёк проекта — держатель эмиссии до/во время сжиганий.
   wallet: process.env.NEXT_PUBLIC_REAL_WALLET?.trim() || "6cAtKTM8ZPUgRgmzsgkRfZsq4jZTXymA7cLqjz9qYMFS",
   initialSupply: 100_000_000,
 };
-
-/** Совместимость со старым кодом: CHAIN = DEMO (живой дашборд сжиганий). */
-export const CHAIN = DEMO;
 
 function clusterSuffix(cluster: Cluster): string {
   return cluster === "devnet" ? "?cluster=devnet" : "";
@@ -95,7 +67,7 @@ export function solscanHolders(): string {
   return solscanHoldersOf(REAL);
 }
 
-async function rpc<T>(method: string, params: unknown[], endpoint: string = DEMO.rpc): Promise<T> {
+async function rpc<T>(method: string, params: unknown[], endpoint: string = REAL.rpc): Promise<T> {
   const res = await fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
