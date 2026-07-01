@@ -305,10 +305,15 @@ export default function Home() {
             loop
             playsInline
             poster="/brand/cafe-night-2.jpeg"
-            initial={{ scale: 1.12, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 2.2, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute inset-0 h-full w-full object-cover object-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1.4, ease: "easeOut" }}
+            // Видео 720p растянуто на весь экран через object-cover — при апскейле
+            // центр кадра (низкоконтрастные окна/стены) выглядит мягче, чем края
+            // с высококонтрастной вывеской. Лёгкая коррекция контраста/резкости
+            // компенсирует этот эффект без обрезки или замены самого файла.
+            style={{ filter: "contrast(1.08) saturate(1.12) brightness(1.02)" }}
+            className="absolute inset-0 h-full w-full object-cover object-center [image-rendering:-webkit-optimize-contrast]"
           />
         ) : (
           <Image
