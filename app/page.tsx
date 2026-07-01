@@ -5,19 +5,20 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { dict, LANGS, TOKEN, CONTACT, GALLERY, VIDEOS, type Lang } from "./content";
 import { REAL, solscanToken, solscanTokenOf, solscanWalletOf, solscanTx, solscanHolders, fetchSupplyOf, fetchBalance, fetchBurnHistory, connectWalletById, disconnectWalletById, type BurnRecord } from "./solana";
+import { SmoothScroll, CursorGlow, MouseParallax, TiltCard } from "./cinematic";
 
 // Главный ролик в hero — без вшитых субтитров. Лежит в public/brand/hero.mp4.
 const HERO_VIDEO: string | null = "/brand/hero.mp4";
 
 /* ---------- helpers ---------- */
 
-function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+function Reveal({ children, delay = 0, blur = true }: { children: React.ReactNode; delay?: number; blur?: boolean }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 28 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 32, scale: 0.98, filter: blur ? "blur(6px)" : "blur(0px)" }}
+      whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
       viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.85, delay, ease: [0.16, 1, 0.3, 1] }}
     >
       {children}
     </motion.div>
@@ -143,6 +144,8 @@ export default function Home() {
 
   return (
     <main className="relative z-0">
+      <SmoothScroll />
+      <CursorGlow />
       {/* ---------- NAV ---------- */}
       <header className="fixed inset-x-0 top-0 z-50 border-b border-white/5 bg-ink/70 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-5 sm:py-3">
@@ -295,13 +298,16 @@ export default function Home() {
       {/* ---------- HERO ---------- */}
       <section id="top" className="relative flex min-h-screen items-end overflow-hidden sm:items-center">
         {HERO_VIDEO ? (
-          <video
+          <motion.video
             src={HERO_VIDEO}
             autoPlay
             muted
             loop
             playsInline
             poster="/brand/cafe-night-2.jpeg"
+            initial={{ scale: 1.12, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 2.2, ease: [0.16, 1, 0.3, 1] }}
             className="absolute inset-0 h-full w-full object-cover object-center"
           />
         ) : (
@@ -317,14 +323,19 @@ export default function Home() {
         {/* затемнение для читаемости текста */}
         <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/55 to-ink/30" />
         <div className="absolute inset-0 bg-ink/20" />
-        <div className="absolute -left-40 top-1/3 h-96 w-96 rounded-full bg-amber/20 blur-[120px]" />
+        <MouseParallax strength={-14} className="pointer-events-none absolute -left-40 top-1/3 h-96 w-96">
+          <div className="glow-pulse h-96 w-96 rounded-full bg-amber/20 blur-[120px]" />
+        </MouseParallax>
+        <MouseParallax strength={-10} className="pointer-events-none absolute -right-32 bottom-0 h-80 w-80">
+          <div className="glow-pulse h-80 w-80 rounded-full bg-teal/15 blur-[110px]" style={{ animationDelay: "2s" }} />
+        </MouseParallax>
         {/* эффект пара */}
         <div className="steam" />
         <div className="steam s2" />
         <div className="steam s3" />
         <div className="steam s4" />
 
-        <div className="relative mx-auto w-full max-w-6xl px-5 pb-20 pt-28">
+        <MouseParallax strength={10} className="relative mx-auto w-full max-w-6xl px-5 pb-20 pt-28">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             <p className="mb-5 text-xs font-semibold uppercase tracking-[0.35em] text-amber text-glow">{t.hero.kicker}</p>
             <h1 className="display max-w-3xl text-5xl font-extrabold leading-[1.02] text-cream-soft sm:text-7xl">
@@ -351,7 +362,7 @@ export default function Home() {
               </button>
             </div>
           </motion.div>
-        </div>
+        </MouseParallax>
 
         {/* подсказка прокрутки */}
         <div className="absolute inset-x-0 bottom-5 flex justify-center">
@@ -523,7 +534,7 @@ export default function Home() {
 
                 {/* Настоящий токен (mainnet) */}
                 <Reveal>
-                  <div className="mt-10 rounded-3xl border border-gold/25 bg-gradient-to-b from-gold/[0.06] to-transparent p-6 sm:p-8">
+                  <TiltCard max={2.5} className="mt-10 rounded-3xl border border-gold/25 bg-gradient-to-b from-gold/[0.06] to-transparent p-6 sm:p-8">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <span className="text-sm font-bold text-cream-soft">{t.burns.realTitle}</span>
                       <span className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-gold/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-gold">
@@ -561,7 +572,7 @@ export default function Home() {
                         </a>
                       ) : null}
                     </div>
-                  </div>
+                  </TiltCard>
                 </Reveal>
               </Section>
 
@@ -797,7 +808,7 @@ export default function Home() {
                 <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
                   {GALLERY.map((g, i) => (
                     <Reveal key={g.src} delay={(i % 3) * 0.08}>
-                      <div className="group relative aspect-[4/5] overflow-hidden rounded-2xl ring-1 ring-white/10">
+                      <TiltCard max={4} className="group relative aspect-[4/5] overflow-hidden rounded-2xl ring-1 ring-white/10">
                         <Image
                           src={g.src}
                           alt={g.alt}
@@ -806,7 +817,7 @@ export default function Home() {
                           className="object-cover transition duration-700 group-hover:scale-105"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-ink/40 to-transparent opacity-0 transition group-hover:opacity-100" />
-                      </div>
+                      </TiltCard>
                     </Reveal>
                   ))}
                 </div>
@@ -839,7 +850,7 @@ export default function Home() {
                             )}
                           </div>
                           {/* card */}
-                          <div className={`flex-1 rounded-2xl border p-5 ${p.done ? "border-teal/40 bg-teal/[0.06]" : "border-white/10 bg-white/[0.02]"}`}>
+                          <TiltCard max={3} className={`flex-1 rounded-2xl border p-5 ${p.done ? "border-teal/40 bg-teal/[0.06]" : "border-white/10 bg-white/[0.02]"}`}>
                             <div className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-gold/70">{p.n}</div>
                             <h3 className="display text-base font-bold text-cream-soft">{p.t}</h3>
                             <p className="mt-2 text-sm leading-relaxed text-cream/65">{p.d}</p>
@@ -848,7 +859,7 @@ export default function Home() {
                                 ✓ Done
                               </span>
                             )}
-                          </div>
+                          </TiltCard>
                         </div>
                       </Reveal>
                     ))}
