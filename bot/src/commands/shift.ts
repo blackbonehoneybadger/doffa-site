@@ -3,7 +3,7 @@
 //   /shift close  — закрыть смену и показать итог
 //   /shift        — показать статус текущей смены
 import type { Context } from "telegraf";
-import { getOpenShift, openShift, closeShift, shiftSummary } from "../db.js";
+import { getOpenShift, openShift, closeShift, shiftSummary, pendingBurns } from "../db.js";
 import { formatRub, formatTime } from "../format.js";
 
 export async function handleShift(ctx: Context, arg: string): Promise<void> {
@@ -31,12 +31,17 @@ export async function handleShift(ctx: Context, arg: string): Promise<void> {
       return;
     }
     const sum = shiftSummary(open.id);
+    const pending = pendingBurns(open.id);
     closeShift(open.id);
+    const pendingLine = pending > 0
+      ? `\n\n⚠️ ${pending} продаж не сожжено в блокчейне (burn упал). Проверь SOLANA_RPC и баланс кошелька.`
+      : "";
     await ctx.reply(
       `🔒 Смена #${open.id} закрыта.\n\n` +
         `Чеков: ${sum.count}\n` +
         `Чашек: ${sum.cups}\n` +
-        `Выручка: ${formatRub(sum.cents)}`
+        `Выручка: ${formatRub(sum.cents)}` +
+        pendingLine
     );
     return;
   }

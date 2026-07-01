@@ -10,7 +10,8 @@ import { CONFIG } from "./config.js";
 mkdirSync(dirname(CONFIG.dbPath), { recursive: true });
 
 const db = new Database(CONFIG.dbPath);
-db.pragma("journal_mode = WAL"); // безопаснее при сбоях
+db.pragma("journal_mode = WAL");
+db.pragma("foreign_keys = ON");
 
 // Таблица смен: одна открытая смена за раз.
 db.exec(`
@@ -34,6 +35,9 @@ db.exec(`
     created_at   INTEGER NOT NULL,
     FOREIGN KEY (shift_id) REFERENCES shifts(id)
   );
+
+  CREATE INDEX IF NOT EXISTS idx_sales_shift  ON sales(shift_id);
+  CREATE INDEX IF NOT EXISTS idx_sales_pending ON sales(shift_id, burned);
 `);
 
 // Миграция: добавить tx_hash для старых БД без этой колонки
@@ -134,6 +138,14 @@ export function markAsBurned(saleId: number, txHash: string): number {
     .prepare("UPDATE sales SET burned = 1, tx_hash = ? WHERE id = ? AND burned = 0")
     .run(txHash, saleId);
   return info.changes;
+}
+
+// Число продаж с неуспешным burn (burned=0) в смене.
+export function pendingBurns(shiftId: number): number {
+  const row = db
+    .prepare("SELECT COUNT(*) AS cnt FROM sales WHERE shift_id = ? AND burned = 0")
+    .get(shiftId) as { cnt: number };
+  return row.cnt;
 }
 
 // Сводка по смене: сколько чеков, чашек, денег.
