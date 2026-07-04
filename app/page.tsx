@@ -1,11 +1,16 @@
 "use client";
 
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { dict, LANGS, TOKEN, CONTACT, GALLERY, VIDEOS, type Lang } from "./content";
 import { REAL, solscanToken, solscanTokenOf, solscanWalletOf, solscanTx, solscanHolders, fetchSupplyOf, fetchBalance, fetchBurnHistory, connectWalletById, disconnectWalletById, type BurnRecord } from "./solana";
 import { SmoothScroll, CursorGlow, MouseParallax, TiltCard } from "./cinematic";
+
+// three.js + gsap — тяжёлые библиотеки, грузим отдельным чанком только в
+// браузере и только когда компонент реально понадобится (см. hero3d.tsx).
+const Hero3D = dynamic(() => import("./hero3d").then((m) => m.Hero3D), { ssr: false });
 
 // Дефолтный ролик в hero, пока владелец кофейни не загрузил свои через /admin.
 const DEFAULT_HERO_VIDEO = "/brand/hero.mp4";
@@ -336,6 +341,7 @@ export default function Home() {
         <MouseParallax strength={-10} className="pointer-events-none absolute -right-32 bottom-0 h-80 w-80">
           <div className="glow-pulse h-80 w-80 rounded-full bg-teal/15 blur-[110px]" style={{ animationDelay: "2s" }} />
         </MouseParallax>
+        <Hero3D className="absolute right-6 top-24 hidden h-40 w-40 sm:block sm:h-52 sm:w-52" />
         {/* эффект пара */}
         <div className="steam" />
         <div className="steam s2" />
