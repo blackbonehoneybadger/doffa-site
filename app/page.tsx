@@ -432,13 +432,12 @@ export default function Home() {
             </div>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Magnetic>
-                <span className="inline-flex cursor-not-allowed items-center gap-2 rounded-full bg-gradient-to-r from-gold to-copper px-7 py-3 font-bold text-ink opacity-90 shadow-lg shadow-gold/10">
+                <button onClick={() => setActiveTab("token")} className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold to-copper px-7 py-3 font-bold text-ink shadow-lg shadow-gold/10 transition hover:brightness-110">
                   {t.hero.ctaBuy}
-                  <span className="rounded-full bg-ink/20 px-2 py-0.5 text-[10px] uppercase">{t.hero.soon}</span>
-                </span>
+                </button>
               </Magnetic>
               <Magnetic>
-                <button onClick={() => setActiveTab("cafe")} className="rounded-full border border-cream/30 px-7 py-3 font-semibold text-cream transition hover:border-gold hover:text-gold">
+                <button onClick={() => setActiveTab("merch")} className="rounded-full border border-cream/30 px-7 py-3 font-semibold text-cream transition hover:border-gold hover:text-gold">
                   {t.hero.ctaMenu}
                 </button>
               </Magnetic>
