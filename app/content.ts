@@ -72,7 +72,7 @@ export type Dict = {
   locale: string;
   dir?: "rtl";
   tabs: { story: string; token: string; cafe: string; merch: string; community: string; buy: string; contact: string };
-  hero: { kicker: string; title1: string; title2: string; sub: string; ctaBuy: string; ctaMenu: string; soon: string };
+  hero: { kicker: string; title1: string; title2: string; sub: string; ctaBuy: string; ctaMenu: string };
   story: { tag: string; title: string; body: string[] };
   how: { tag: string; title: string; sub: string; steps: { t: string; d: string }[] };
   token: { tag: string; title: string; sub: string; rows: { k: string; v: string }[]; alloc: { name: string; pct: number }[] };
@@ -143,12 +143,11 @@ export const dict: Record<Lang, Dict> = {
     tabs: { story: "Начало", token: "Токен", cafe: "Кофейня", merch: "Мерч", community: "Сообщество", buy: "Купить", contact: "Контакты" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
-      title1: "Каждая чашка",
-      title2: "сжигает токен",
-      sub: "Кофейня из аула в Карачаево-Черкесии, сделанная своими руками. Один проданный кофе — один сожжённый $DOFFA. Чем больше людей пьют — тем реже становится токен.",
-      ctaBuy: "Купить $DOFFA",
-      ctaMenu: "Смотреть меню",
-      soon: "Скоро",
+      title1: "Горная кофейня.",
+      title2: "Своя экономика.",
+      sub: "Кофе из аула в горах Карачаево-Черкесии. Каждая чашка — часть токеномики $DOFFA.",
+      ctaBuy: "Узнать про $DOFFA",
+      ctaMenu: "Смотреть мерч",
     },
     story: {
       tag: "История",
@@ -390,12 +389,11 @@ export const dict: Record<Lang, Dict> = {
     tabs: { story: "Start", token: "Token", cafe: "Café", merch: "Merch", community: "Community", buy: "Buy", contact: "Contact" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
-      title1: "Every cup",
-      title2: "burns a token",
-      sub: "A hand-built coffee bar in the mountains of Karachay-Cherkessia. One coffee sold — one $DOFFA burned. The more people drink, the rarer the token becomes.",
-      ctaBuy: "Buy $DOFFA",
-      ctaMenu: "View menu",
-      soon: "Soon",
+      title1: "Mountain coffee bar.",
+      title2: "Its own economy.",
+      sub: "Coffee from a mountain village in Karachay-Cherkessia. Every cup feeds the $DOFFA tokenomics.",
+      ctaBuy: "Learn about $DOFFA",
+      ctaMenu: "View the merch",
     },
     story: {
       tag: "Story",
@@ -638,12 +636,11 @@ export const dict: Record<Lang, Dict> = {
     tabs: { story: "البداية", token: "العملة", cafe: "المقهى", merch: "منتجات", community: "المجتمع", buy: "شراء", contact: "تواصل" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
-      title1: "كل فنجان",
-      title2: "يحرق عملة",
-      sub: "مقهى بُني باليد في جبال قره تشاي تشيركيسيا. كل قهوة تُباع تحرق عملة $DOFFA واحدة. كلما شرب الناس أكثر، أصبحت العملة أندر.",
-      ctaBuy: "شراء $DOFFA",
-      ctaMenu: "عرض القائمة",
-      soon: "قريباً",
+      title1: "مقهى في الجبال.",
+      title2: "اقتصاده الخاص.",
+      sub: "قهوة من قرية جبلية في قره تشاي تشيركيسيا. كل كوب جزء من اقتصاد عملة $DOFFA.",
+      ctaBuy: "تعرّف على $DOFFA",
+      ctaMenu: "شاهد المنتجات",
     },
     story: {
       tag: "القصة",
@@ -885,12 +882,11 @@ export const dict: Record<Lang, Dict> = {
     tabs: { story: "Başlangıç", token: "Token", cafe: "Kafe", merch: "Mağaza", community: "Topluluk", buy: "Satın Al", contact: "İletişim" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
-      title1: "Her fincan",
-      title2: "bir token yakar",
-      sub: "Karaçay-Çerkesya dağlarında elle inşa edilmiş bir kahve barı. Satılan her kahve bir $DOFFA yakar. İnsanlar ne kadar çok içerse token o kadar nadir olur.",
-      ctaBuy: "$DOFFA Satın Al",
-      ctaMenu: "Menüyü gör",
-      soon: "Yakında",
+      title1: "Dağ kahvesi.",
+      title2: "Kendi ekonomisi.",
+      sub: "Karaçay-Çerkesya dağlarındaki bir köyden kahve. Her fincan $DOFFA tokenomisinin bir parçası.",
+      ctaBuy: "$DOFFA hakkında bilgi al",
+      ctaMenu: "Mağazaya göz at",
     },
     story: {
       tag: "Hikâye",
@@ -1132,12 +1128,11 @@ export const dict: Record<Lang, Dict> = {
     tabs: { story: "Inicio", token: "Token", cafe: "Cafetería", merch: "Merch", community: "Comunidad", buy: "Comprar", contact: "Contacto" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
-      title1: "Cada taza",
-      title2: "quema un token",
-      sub: "Una cafetería hecha a mano en las montañas de Karacháevo-Cherkesia. Un café vendido, un $DOFFA quemado. Cuanta más gente bebe, más raro se vuelve el token.",
-      ctaBuy: "Comprar $DOFFA",
-      ctaMenu: "Ver el menú",
-      soon: "Pronto",
+      title1: "Cafetería de montaña.",
+      title2: "Su propia economía.",
+      sub: "Café de un pueblo de montaña en Karacháevo-Cherkesia. Cada taza forma parte de la tokenómica de $DOFFA.",
+      ctaBuy: "Conoce $DOFFA",
+      ctaMenu: "Ver la línea de merch",
     },
     story: {
       tag: "Historia",
@@ -1379,12 +1374,11 @@ export const dict: Record<Lang, Dict> = {
     tabs: { story: "Début", token: "Jeton", cafe: "Café", merch: "Boutique", community: "Communauté", buy: "Acheter", contact: "Contact" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
-      title1: "Chaque tasse",
-      title2: "brûle un jeton",
-      sub: "Un bar à café construit à la main dans les montagnes de Karatchaïévo-Tcherkessie. Un café vendu, un $DOFFA brûlé. Plus les gens boivent, plus le jeton devient rare.",
-      ctaBuy: "Acheter $DOFFA",
-      ctaMenu: "Voir le menu",
-      soon: "Bientôt",
+      title1: "Café de montagne.",
+      title2: "Sa propre économie.",
+      sub: "Un café venu d'un village de montagne en Karatchaïévo-Tcherkessie. Chaque tasse fait partie de la tokenomics $DOFFA.",
+      ctaBuy: "Découvrir $DOFFA",
+      ctaMenu: "Voir la boutique",
     },
     story: {
       tag: "Histoire",
@@ -1626,12 +1620,11 @@ export const dict: Record<Lang, Dict> = {
     tabs: { story: "Start", token: "Token", cafe: "Café", merch: "Merch", community: "Community", buy: "Kaufen", contact: "Kontakt" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
-      title1: "Jede Tasse",
-      title2: "verbrennt einen Token",
-      sub: "Eine handgebaute Kaffeebar in den Bergen von Karatschai-Tscherkessien. Ein verkaufter Kaffee – ein verbrannter $DOFFA. Je mehr Menschen trinken, desto seltener wird der Token.",
-      ctaBuy: "$DOFFA kaufen",
-      ctaMenu: "Menü ansehen",
-      soon: "Bald",
+      title1: "Bergkaffee.",
+      title2: "Eigene Ökonomie.",
+      sub: "Kaffee aus einem Bergdorf in Karatschai-Tscherkessien. Jede Tasse ist Teil der $DOFFA-Tokenomics.",
+      ctaBuy: "Mehr über $DOFFA",
+      ctaMenu: "Merch ansehen",
     },
     story: {
       tag: "Geschichte",
@@ -1873,12 +1866,11 @@ export const dict: Record<Lang, Dict> = {
     tabs: { story: "起点", token: "代币", cafe: "咖啡馆", merch: "周边", community: "社区", buy: "购买", contact: "联系" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
-      title1: "每一杯",
-      title2: "燃烧一枚代币",
-      sub: "一家位于卡拉恰伊-切尔克斯山区、纯手工打造的咖啡馆。每卖出一杯咖啡，就销毁一枚 $DOFFA。喝的人越多，代币就越稀有。",
-      ctaBuy: "购买 $DOFFA",
-      ctaMenu: "查看菜单",
-      soon: "即将推出",
+      title1: "山地咖啡馆。",
+      title2: "自成经济体系。",
+      sub: "咖啡来自卡拉恰伊-切尔克斯山区的小村庄。每一杯都是 $DOFFA 代币经济的一部分。",
+      ctaBuy: "了解 $DOFFA",
+      ctaMenu: "查看周边",
     },
     story: {
       tag: "故事",
@@ -2120,12 +2112,11 @@ export const dict: Record<Lang, Dict> = {
     tabs: { story: "शुरुआत", token: "टोकन", cafe: "कैफ़े", merch: "मर्च", community: "समुदाय", buy: "खरीदें", contact: "संपर्क" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
-      title1: "हर कप",
-      title2: "एक टोकन जलाता है",
-      sub: "कराचाय-चर्केसिया के पहाड़ों में हाथ से बनाया गया एक कॉफ़ी बार। एक कॉफ़ी बिकी — एक $DOFFA जला। जितने ज़्यादा लोग पिएंगे, टोकन उतना ही दुर्लभ होता जाएगा।",
-      ctaBuy: "$DOFFA खरीदें",
-      ctaMenu: "मेन्यू देखें",
-      soon: "जल्द ही",
+      title1: "पहाड़ों का कैफ़े।",
+      title2: "अपनी खुद की अर्थव्यवस्था।",
+      sub: "कराचाय-चर्केसिया के पहाड़ी गाँव से आई कॉफ़ी। हर कप $DOFFA टोकनॉमिक्स का हिस्सा है।",
+      ctaBuy: "$DOFFA के बारे में जानें",
+      ctaMenu: "मर्च देखें",
     },
     story: {
       tag: "कहानी",
@@ -2367,12 +2358,11 @@ export const dict: Record<Lang, Dict> = {
     tabs: { story: "Início", token: "Token", cafe: "Cafeteria", merch: "Loja", community: "Comunidade", buy: "Comprar", contact: "Contato" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
-      title1: "Cada xícara",
-      title2: "queima um token",
-      sub: "Uma cafeteria feita à mão nas montanhas da Karatchai-Tcherkéssia. Um café vendido — um $DOFFA queimado. Quanto mais gente bebe, mais raro o token fica.",
-      ctaBuy: "Comprar $DOFFA",
-      ctaMenu: "Ver cardápio",
-      soon: "Em breve",
+      title1: "Cafeteria de montanha.",
+      title2: "Sua própria economia.",
+      sub: "Café de uma vila nas montanhas de Karatchai-Tcherkéssia. Cada xícara faz parte da tokenomics do $DOFFA.",
+      ctaBuy: "Conheça o $DOFFA",
+      ctaMenu: "Ver a loja",
     },
     story: {
       tag: "História",
@@ -2614,12 +2604,11 @@ export const dict: Record<Lang, Dict> = {
     tabs: { story: "Inizio", token: "Token", cafe: "Caffetteria", merch: "Merch", community: "Community", buy: "Acquista", contact: "Contatti" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
-      title1: "Ogni tazza",
-      title2: "brucia un token",
-      sub: "Una caffetteria costruita a mano tra le montagne della Karačaj-Circassia. Un caffè venduto, un $DOFFA bruciato. Più persone bevono, più il token diventa raro.",
-      ctaBuy: "Acquista $DOFFA",
-      ctaMenu: "Vedi il menu",
-      soon: "Presto",
+      title1: "Caffetteria di montagna.",
+      title2: "La sua economia.",
+      sub: "Caffè da un villaggio di montagna nella Karačaj-Circassia. Ogni tazza fa parte della tokenomics di $DOFFA.",
+      ctaBuy: "Scopri $DOFFA",
+      ctaMenu: "Guarda il merch",
     },
     story: {
       tag: "Storia",
@@ -2861,12 +2850,11 @@ export const dict: Record<Lang, Dict> = {
     tabs: { story: "はじまり", token: "トークン", cafe: "カフェ", merch: "マーチ", community: "コミュニティ", buy: "購入", contact: "お問い合わせ" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
-      title1: "一杯ごとに",
-      title2: "トークンを燃やす",
-      sub: "カラチャイ・チェルケス山中の、手づくりのコーヒーバー。コーヒーが一杯売れるたびに $DOFFA が一枚バーンされます。飲む人が増えるほど、トークンは希少になります。",
-      ctaBuy: "$DOFFA を購入",
-      ctaMenu: "メニューを見る",
-      soon: "近日公開",
+      title1: "山のコーヒーバー。",
+      title2: "独自の経済圏。",
+      sub: "カラチャイ・チェルケスの山あいの村から届くコーヒー。一杯ごとに $DOFFA のトークノミクスへ。",
+      ctaBuy: "$DOFFA について知る",
+      ctaMenu: "マーチを見る",
     },
     story: {
       tag: "ストーリー",
