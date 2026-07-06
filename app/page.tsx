@@ -6,7 +6,9 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { dict, LANGS, TOKEN, CONTACT, GALLERY, VIDEOS, type Lang } from "./content";
 import { REAL, solscanToken, solscanTokenOf, solscanWalletOf, solscanTx, solscanHolders, fetchSupplyOf, fetchBalance, fetchBurnHistory, connectWalletById, disconnectWalletById, type BurnRecord } from "./solana";
-import { SmoothScroll, CursorGlow, MouseParallax, TiltCard } from "./cinematic";
+import { SmoothScroll, CursorGlow, MouseParallax, TiltCard, Magnetic, ScrollProgressBar } from "./cinematic";
+import { ThemeToggle } from "./theme-toggle";
+import { Assistant } from "./assistant";
 
 // three.js + gsap — тяжёлые библиотеки, грузим отдельным чанком только в
 // браузере и только когда компонент реально понадобится (см. hero3d.tsx).
@@ -17,9 +19,20 @@ const DEFAULT_HERO_VIDEO = "/brand/hero.mp4";
 
 /* ---------- helpers ---------- */
 
-function Reveal({ children, delay = 0, blur = true }: { children: React.ReactNode; delay?: number; blur?: boolean }) {
+function Reveal({
+  children,
+  delay = 0,
+  blur = true,
+  className,
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  blur?: boolean;
+  className?: string;
+}) {
   return (
     <motion.div
+      className={className}
       initial={{ opacity: 0, y: 32, scale: 0.98, filter: blur ? "blur(6px)" : "blur(0px)" }}
       whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
       viewport={{ once: true, margin: "-80px" }}
@@ -29,6 +42,21 @@ function Reveal({ children, delay = 0, blur = true }: { children: React.ReactNod
     </motion.div>
   );
 }
+
+// Раскладка "bento" для галереи: часть плиток крупнее/шире остальных.
+// Индекс берётся по модулю длины массива — раскладка не сломается,
+// если фото в GALLERY когда-нибудь станет больше или меньше девяти.
+const BENTO_SPANS = [
+  "col-span-2 row-span-2",
+  "col-span-2",
+  "",
+  "",
+  "row-span-2",
+  "",
+  "",
+  "col-span-2",
+  "",
+];
 
 function Tag({ children }: { children: React.ReactNode }) {
   return (
@@ -163,8 +191,9 @@ export default function Home() {
     <main className="relative z-0">
       <SmoothScroll />
       <CursorGlow />
+      <ScrollProgressBar />
       {/* ---------- NAV ---------- */}
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-white/5 bg-ink/70 backdrop-blur-md">
+      <header className="theme-pin-dark fixed inset-x-0 top-0 z-50 border-b border-white/5 bg-ink/70 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-5 sm:py-3">
           <a href="#top" className="flex items-center gap-2.5 sm:gap-3">
             <Image src="/brand/doffa-logo.jpeg" alt="DOFFA" width={36} height={36} className="rounded-full ring-1 ring-gold/40 sm:w-[40px] sm:h-[40px]" />
@@ -268,6 +297,7 @@ export default function Home() {
                 <path d="M6 9l6 6 6-6" />
               </svg>
             </label>
+            <ThemeToggle />
             <button
               onClick={() => setMenuOpen((v) => !v)}
               aria-label="Menu"
@@ -313,7 +343,7 @@ export default function Home() {
       </header>
 
       {/* ---------- HERO ---------- */}
-      <section id="top" className="relative flex min-h-screen items-end overflow-hidden sm:items-center">
+      <section id="top" className="theme-pin-dark relative flex min-h-screen items-end overflow-hidden sm:items-center">
         <motion.video
           key={heroVideo}
           src={heroVideo}
@@ -366,13 +396,17 @@ export default function Home() {
               </span>
             </div>
             <div className="mt-8 flex flex-wrap items-center gap-4">
-              <span className="inline-flex cursor-not-allowed items-center gap-2 rounded-full bg-gold px-7 py-3 font-bold text-ink opacity-90">
-                {t.hero.ctaBuy}
-                <span className="rounded-full bg-ink/20 px-2 py-0.5 text-[10px] uppercase">{t.hero.soon}</span>
-              </span>
-              <button onClick={() => setActiveTab("cafe")} className="rounded-full border border-cream/30 px-7 py-3 font-semibold text-cream transition hover:border-gold hover:text-gold">
-                {t.hero.ctaMenu}
-              </button>
+              <Magnetic>
+                <span className="inline-flex cursor-not-allowed items-center gap-2 rounded-full bg-gold px-7 py-3 font-bold text-ink opacity-90">
+                  {t.hero.ctaBuy}
+                  <span className="rounded-full bg-ink/20 px-2 py-0.5 text-[10px] uppercase">{t.hero.soon}</span>
+                </span>
+              </Magnetic>
+              <Magnetic>
+                <button onClick={() => setActiveTab("cafe")} className="rounded-full border border-cream/30 px-7 py-3 font-semibold text-cream transition hover:border-gold hover:text-gold">
+                  {t.hero.ctaMenu}
+                </button>
+              </Magnetic>
             </div>
           </motion.div>
         </MouseParallax>
@@ -818,10 +852,10 @@ export default function Home() {
                     <p className="mx-auto mt-4 max-w-2xl text-cream/70">{t.gallery.sub}</p>
                   </div>
                 </Reveal>
-                <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
+                <div className="mt-10 grid auto-rows-[130px] grid-cols-2 gap-3 sm:auto-rows-[160px] sm:gap-4 md:grid-flow-dense md:auto-rows-[190px] md:grid-cols-4">
                   {GALLERY.map((g, i) => (
-                    <Reveal key={g.src} delay={(i % 3) * 0.08}>
-                      <TiltCard max={4} className="group relative aspect-[4/5] overflow-hidden rounded-2xl ring-1 ring-white/10">
+                    <Reveal key={g.src} delay={(i % 3) * 0.08} className={BENTO_SPANS[i % BENTO_SPANS.length]}>
+                      <TiltCard max={4} className="group relative h-full overflow-hidden rounded-2xl ring-1 ring-white/10">
                         <Image
                           src={g.src}
                           alt={g.alt}
@@ -1017,6 +1051,8 @@ export default function Home() {
           <p className="mt-6 text-center text-[11px] text-cream/30">© {new Date().getFullYear()} DOFFA. {TOKEN.symbol} · {TOKEN.network}.</p>
         </div>
       </footer>
+
+      <Assistant t={t} onNavigate={setActiveTab} />
     </main>
   );
 }

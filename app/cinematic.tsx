@@ -5,7 +5,7 @@
 // и Lenis, чтобы сайт кофейни оставался быстрым на мобильном интернете.
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
 import Lenis from "lenis";
 
 /** Инерционный плавный скролл на весь сайт. Монтируется один раз в корне. */
@@ -100,6 +100,62 @@ export function MouseParallax({
 
   return (
     <motion.div ref={ref} style={{ x: sx, y: sy }} className={className}>
+      {children}
+    </motion.div>
+  );
+}
+
+/** Тонкая полоса прогресса скролла у самого верха страницы. */
+export function ScrollProgressBar() {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { damping: 25, stiffness: 200, mass: 0.2 });
+
+  return (
+    <motion.div
+      aria-hidden
+      className="fixed inset-x-0 top-0 z-[60] h-[2px] origin-left bg-gradient-to-r from-amber via-gold to-teal"
+      style={{ scaleX }}
+    />
+  );
+}
+
+/** Обёртка, притягивающая содержимое (обычно кнопку) к курсору — эффект "магнита". */
+export function Magnetic({
+  children,
+  className = "",
+  strength = 0.35,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  strength?: number;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const sx = useSpring(x, { damping: 14, stiffness: 150, mass: 0.4 });
+  const sy = useSpring(y, { damping: 14, stiffness: 150, mass: 0.4 });
+
+  function onMove(e: React.MouseEvent<HTMLDivElement>) {
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    x.set((e.clientX - rect.left - rect.width / 2) * strength);
+    y.set((e.clientY - rect.top - rect.height / 2) * strength);
+  }
+
+  function onLeave() {
+    x.set(0);
+    y.set(0);
+  }
+
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      style={{ x: sx, y: sy }}
+      className={`inline-block ${className}`}
+    >
       {children}
     </motion.div>
   );

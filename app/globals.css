@@ -20,6 +20,37 @@
   color-scheme: dark;
 }
 
+/*
+ * Светлая тема: тот же тёплый кофейный набор цветов, просто фон/текст
+ * меняются ролями (было ink-фон + cream-текст → стало cream-фон +
+ * ink-текст) — контраст гарантированно тот же, новых оттенков не нужно.
+ * --color-white переопределён на тёмный, чтобы полупрозрачные bg-white/N
+ * и border-white/N (используются как деликатные подложки на карточках)
+ * стали тёмными подложками на светлом фоне, а не белыми пятнами.
+ */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --color-ink: #faf6ee;
+  --color-ink-soft: #f3ead9;
+  --color-cream: #1d1714;
+  --color-cream-soft: #14100e;
+  --color-white: #14100e;
+}
+
+/*
+ * Шапка и hero-секция всегда остаются "кинематографично" тёмными
+ * независимо от выбранной темы сайта — на них лежит видео с тёмным
+ * градиентом ради читаемости текста, светлая тема их сломала бы.
+ * Класс переобъявляет переменные локально, перекрывая :root[data-theme].
+ */
+.theme-pin-dark {
+  --color-ink: #14100e;
+  --color-ink-soft: #1d1714;
+  --color-cream: #f3ead9;
+  --color-cream-soft: #faf6ee;
+  --color-white: #ffffff;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -30,6 +61,7 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  transition: background-color 0.35s ease, color 0.35s ease;
 }
 
 .display {
@@ -42,9 +74,14 @@ body {
 }
 
 .card {
-  background: linear-gradient(180deg, rgba(45, 36, 32, 0.7), rgba(20, 16, 14, 0.7));
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-ink-soft) 70%, transparent),
+    color-mix(in oklab, var(--color-ink) 70%, transparent)
+  );
   border: 1px solid rgba(201, 162, 39, 0.18);
   backdrop-filter: blur(6px);
+  transition: background 0.35s ease, border-color 0.35s ease;
 }
 
 .gold-line {
@@ -63,7 +100,7 @@ body {
 
 ::selection {
   background: var(--color-teal);
-  color: var(--color-ink);
+  color: #14100e;
 }
 
 ::-webkit-scrollbar { width: 10px; }
