@@ -11,7 +11,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Dict } from "./content";
 
-type TabId = "story" | "token" | "cafe" | "community" | "buy" | "contact";
+type TabId = "story" | "token" | "cafe" | "merch" | "community" | "buy" | "contact";
 
 export function Assistant({ t, onNavigate }: { t: Dict; onNavigate: (tab: TabId) => void }) {
   const [open, setOpen] = useState(false);
