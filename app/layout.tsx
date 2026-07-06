@@ -38,8 +38,16 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#14100e",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#faf6ee" },
+    { media: "(prefers-color-scheme: dark)", color: "#14100e" },
+  ],
 };
+
+// Ставим data-theme ДО гидратации React, синхронным инлайн-скриптом —
+// иначе при заходе со светлой системной темой страница на долю секунды
+// мигнёт тёмной вёрсткой, а потом перекрасится в светлую.
+const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem("doffa-theme");if(t!=="light"&&t!=="dark"){t=matchMedia("(prefers-color-scheme: light)").matches?"light":"dark";}document.documentElement.setAttribute("data-theme",t);}catch(e){}})();`;
 
 export default function RootLayout({
   children,
@@ -50,8 +58,12 @@ export default function RootLayout({
     <html
       lang="ru"
       className={`${display.variable} ${sans.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="grain min-h-full flex flex-col">{children}</body>
+      <body className="grain min-h-full flex flex-col">
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        {children}
+      </body>
     </html>
   );
 }

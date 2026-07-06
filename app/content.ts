@@ -67,7 +67,7 @@ export const GALLERY: { src: string; alt: string }[] = [
   { src: "/brand/logo-sign.jpg", alt: "Вывеска DOFFA Espresso Bar" },
 ];
 
-type Dict = {
+export type Dict = {
   // locale — для форматирования чисел и дат (Intl). dir — направление письма (rtl для арабского).
   locale: string;
   dir?: "rtl";
