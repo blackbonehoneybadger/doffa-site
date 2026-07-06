@@ -5,12 +5,13 @@
   --color-espresso-deep: #4a3325;
   --color-cream: #f3ead9;
   --color-cream-soft: #faf6ee;
-  --color-gold: #c9a227;
-  --color-amber: #e8a23d;
+  --color-gold: #c5a46e;
+  --color-copper: #b8976a;
+  --color-amber: #d9954a;
   --color-teal: #3fb6a8;
   --color-teal-deep: #2c8076;
-  --color-ink: #14100e;
-  --color-ink-soft: #1d1714;
+  --color-ink: #1c140f;
+  --color-ink-soft: #211a14;
 
   --font-display: var(--font-display-src), system-ui, sans-serif;
   --font-sans: var(--font-sans-src), system-ui, sans-serif;
@@ -32,9 +33,9 @@
   color-scheme: light;
   --color-ink: #faf6ee;
   --color-ink-soft: #f3ead9;
-  --color-cream: #1d1714;
-  --color-cream-soft: #14100e;
-  --color-white: #14100e;
+  --color-cream: #211a14;
+  --color-cream-soft: #1c140f;
+  --color-white: #1c140f;
 }
 
 /*
@@ -44,8 +45,8 @@
  * Класс переобъявляет переменные локально, перекрывая :root[data-theme].
  */
 .theme-pin-dark {
-  --color-ink: #14100e;
-  --color-ink-soft: #1d1714;
+  --color-ink: #1c140f;
+  --color-ink-soft: #211a14;
   --color-cream: #f3ead9;
   --color-cream-soft: #faf6ee;
   --color-white: #ffffff;
@@ -81,7 +82,16 @@ body {
   );
   border: 1px solid rgba(201, 162, 39, 0.18);
   backdrop-filter: blur(6px);
-  transition: background 0.35s ease, border-color 0.35s ease;
+  transition: background 0.35s ease, border-color 0.35s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.4s ease;
+}
+
+/* Приподнимаем карточку и добавляем тёплую тень при наведении — эффект
+   не проявится на карточках внутри TiltCard (у них transform уже занят
+   инлайн-наклоном от Framer Motion), там премиальность даёт сам наклон. */
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 24px 60px -24px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(197, 164, 110, 0.15);
 }
 
 .gold-line {
@@ -100,7 +110,7 @@ body {
 
 ::selection {
   background: var(--color-teal);
-  color: #14100e;
+  color: #1c140f;
 }
 
 ::-webkit-scrollbar { width: 10px; }

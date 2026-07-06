@@ -86,7 +86,7 @@ export function Hero3D({ className = "" }: { className?: string }) {
 
       geometry = new THREE.IcosahedronGeometry(1.1, 0);
       material = new THREE.MeshBasicMaterial({
-        color: 0xe8a23d,
+        color: 0xc5a46e,
         wireframe: true,
         transparent: true,
         opacity: 0.5,

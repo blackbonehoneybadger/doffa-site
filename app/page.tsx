@@ -66,12 +66,43 @@ function Tag({ children }: { children: React.ReactNode }) {
   );
 }
 
+// Иконки для карточек мерча: чехол для кружки, фартук, сумка для зёрен —
+// в том же порядке, что и t.merch.items. Простые линейные иконки вместо
+// фото товаров, которых пока не существует.
+function MerchIcon({ index }: { index: number }) {
+  const common = { width: 24, height: 24, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.6, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+  if (index === 0) {
+    return (
+      <svg {...common}>
+        <path d="M6 8h10v9a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3V8z" />
+        <path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16" />
+        <path d="M9 5.5c0-.9.7-1.5 1.5-1.5S12 4.6 12 5.5" />
+      </svg>
+    );
+  }
+  if (index === 1) {
+    return (
+      <svg {...common}>
+        <path d="M7 4h10v4a5 5 0 0 1-5 5 5 5 0 0 1-5-5V4z" />
+        <path d="M9 13v3a3 3 0 0 0 3 3 3 3 0 0 0 3-3v-3" />
+        <path d="M10.5 4V2.5h3V4" />
+      </svg>
+    );
+  }
+  return (
+    <svg {...common}>
+      <rect x="4" y="8" width="16" height="12" rx="2" />
+      <path d="M8 8V6a4 4 0 0 1 8 0v2" />
+    </svg>
+  );
+}
+
 /* ---------- page ---------- */
 
 export default function Home() {
   const [lang, setLang] = useState<Lang>("ru");
   const [menuOpen, setMenuOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<"story" | "token" | "cafe" | "community" | "buy" | "contact">("story");
+  const [activeTab, setActiveTab] = useState<"story" | "token" | "cafe" | "merch" | "community" | "buy" | "contact">("story");
   const t = dict[lang];
 
   // Hero-видео "на сегодня": владелец кофейни загружает через /admin, сайт
@@ -182,6 +213,7 @@ export default function Home() {
     { id: "story",     label: t.tabs.story },
     { id: "token",     label: t.tabs.token },
     { id: "cafe",      label: t.tabs.cafe },
+    { id: "merch",     label: t.tabs.merch },
     { id: "community", label: t.tabs.community },
     { id: "buy",       label: t.tabs.buy },
     { id: "contact",   label: t.tabs.contact },
@@ -380,13 +412,16 @@ export default function Home() {
 
         <MouseParallax strength={10} className="relative mx-auto w-full max-w-6xl px-5 pb-20 pt-28">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-            <p className="mb-5 text-xs font-semibold uppercase tracking-[0.35em] text-amber text-glow">{t.hero.kicker}</p>
-            <h1 className="display max-w-3xl text-5xl font-extrabold leading-[1.02] text-cream-soft sm:text-7xl">
+            <p className="mb-6 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.4em] text-amber text-glow">
+              <span aria-hidden className="h-px w-9 bg-gradient-to-r from-transparent to-amber" />
+              {t.hero.kicker}
+            </p>
+            <h1 className="display max-w-4xl text-6xl font-extrabold leading-[0.96] tracking-tight text-cream-soft sm:text-8xl">
               {t.hero.title1}
               <br />
-              <span className="text-amber text-glow">{t.hero.title2}</span>
+              <span className="bg-gradient-to-r from-gold via-amber to-copper bg-clip-text text-transparent text-glow">{t.hero.title2}</span>
             </h1>
-            <p className="mt-7 max-w-xl text-lg text-cream/80">{t.hero.sub}</p>
+            <p className="mt-8 max-w-xl text-lg leading-relaxed text-cream/80">{t.hero.sub}</p>
             <div className="mt-6 flex flex-wrap items-center gap-3 text-sm text-cream/75">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1.5">
                 📍 {t.ui.location}
@@ -397,7 +432,7 @@ export default function Home() {
             </div>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Magnetic>
-                <span className="inline-flex cursor-not-allowed items-center gap-2 rounded-full bg-gold px-7 py-3 font-bold text-ink opacity-90">
+                <span className="inline-flex cursor-not-allowed items-center gap-2 rounded-full bg-gradient-to-r from-gold to-copper px-7 py-3 font-bold text-ink opacity-90 shadow-lg shadow-gold/10">
                   {t.hero.ctaBuy}
                   <span className="rounded-full bg-ink/20 px-2 py-0.5 text-[10px] uppercase">{t.hero.soon}</span>
                 </span>
@@ -559,7 +594,7 @@ export default function Home() {
                                 whileInView={{ width: `${a.pct}%` }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 1, delay: i * 0.1, ease: "easeOut" }}
-                                className="h-full rounded-full bg-gradient-to-r from-amber to-gold"
+                                className="h-full rounded-full bg-gradient-to-r from-amber via-gold to-copper"
                               />
                             </div>
                           </div>
@@ -581,10 +616,11 @@ export default function Home() {
 
                 {/* Настоящий токен (mainnet) */}
                 <Reveal>
-                  <TiltCard max={2.5} className="mt-10 rounded-3xl border border-gold/25 bg-gradient-to-b from-gold/[0.06] to-transparent p-6 sm:p-8">
+                  <TiltCard max={2.5} className="relative mt-10 overflow-hidden rounded-3xl border border-gold/30 bg-gradient-to-b from-gold/[0.08] via-copper/[0.03] to-transparent p-6 shadow-2xl shadow-gold/10 sm:p-8">
+                    <div aria-hidden className="gold-line absolute inset-x-0 top-0 h-px" />
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <span className="text-sm font-bold text-cream-soft">{t.burns.realTitle}</span>
-                      <span className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-gold/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-gold">
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-gradient-to-r from-gold/20 to-copper/20 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-gold">
                         {t.burns.realBadge}
                       </span>
                     </div>
@@ -864,6 +900,40 @@ export default function Home() {
                           className="object-cover transition duration-700 group-hover:scale-105"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-ink/40 to-transparent opacity-0 transition group-hover:opacity-100" />
+                      </TiltCard>
+                    </Reveal>
+                  ))}
+                </div>
+              </Section>
+            </motion.div>
+          )}
+
+          {/* TAB: MERCH */}
+          {activeTab === "merch" && (
+            <motion.div key="merch" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}>
+              <Section id="merch">
+                <Reveal>
+                  <div className="text-center">
+                    <Tag>{t.merch.tag}</Tag>
+                    <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.merch.title}</h2>
+                    <p className="mx-auto mt-4 max-w-2xl text-cream/70">{t.merch.sub}</p>
+                  </div>
+                </Reveal>
+                <div className="mt-12 grid gap-6 md:grid-cols-3">
+                  {t.merch.items.map((item, i) => (
+                    <Reveal key={item.name} delay={i * 0.1}>
+                      <TiltCard max={5} className="card group relative flex h-full flex-col overflow-hidden rounded-2xl p-7">
+                        <div
+                          aria-hidden
+                          className="mb-6 flex h-14 w-14 items-center justify-center rounded-full border border-copper/30 bg-gradient-to-br from-copper/25 to-espresso-deep/40 text-copper transition group-hover:border-copper/60"
+                        >
+                          <MerchIcon index={i} />
+                        </div>
+                        <h3 className="display text-lg font-bold text-cream-soft">{item.name}</h3>
+                        <p className="mt-2 flex-1 text-sm leading-relaxed text-cream/65">{item.desc}</p>
+                        <span className="mt-6 inline-flex w-fit items-center gap-1.5 rounded-full border border-copper/30 bg-copper/10 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-copper">
+                          {t.merch.comingSoon}
+                        </span>
                       </TiltCard>
                     </Reveal>
                   ))}

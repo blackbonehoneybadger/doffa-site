@@ -71,7 +71,7 @@ export type Dict = {
   // locale — для форматирования чисел и дат (Intl). dir — направление письма (rtl для арабского).
   locale: string;
   dir?: "rtl";
-  tabs: { story: string; token: string; cafe: string; community: string; buy: string; contact: string };
+  tabs: { story: string; token: string; cafe: string; merch: string; community: string; buy: string; contact: string };
   hero: { kicker: string; title1: string; title2: string; sub: string; ctaBuy: string; ctaMenu: string; soon: string };
   story: { tag: string; title: string; body: string[] };
   how: { tag: string; title: string; sub: string; steps: { t: string; d: string }[] };
@@ -112,6 +112,7 @@ export type Dict = {
   menu: { tag: string; title: string; sub: string; note: string; groups: { title: string; items: { name: string; price: string }[] }[] };
   videos: { tag: string; title: string; sub: string };
   gallery: { tag: string; title: string; sub: string };
+  merch: { tag: string; title: string; sub: string; comingSoon: string; items: { name: string; desc: string }[] };
   buy: { tag: string; title: string; sub: string; connect: string; points: string[]; connected: string; balanceLabel: string; walletNote: string; disconnect: string };
   roadmap: { tag: string; title: string; phases: { n: string; t: string; d: string; done?: boolean }[] };
   faq: { tag: string; title: string; items: { q: string; a: string }[] };
@@ -139,7 +140,7 @@ export type Dict = {
 export const dict: Record<Lang, Dict> = {
   ru: {
     locale: "ru-RU",
-    tabs: { story: "Начало", token: "Токен", cafe: "Кофейня", community: "Сообщество", buy: "Купить", contact: "Контакты" },
+    tabs: { story: "Начало", token: "Токен", cafe: "Кофейня", merch: "Мерч", community: "Сообщество", buy: "Купить", contact: "Контакты" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "Каждая чашка",
@@ -307,6 +308,17 @@ export const dict: Record<Lang, Dict> = {
       title: "DOFFA вживую",
       sub: "Кадры из кофейни: кофе, латте-арт, зал и виды на горы Карачаево-Черкесии.",
     },
+    merch: {
+      tag: "Мерч",
+      title: "Кожаная линия DOFFA",
+      sub: "Три вещи ручной работы, с тем же характером, что и кофейня — скоро в шоуруме.",
+      comingSoon: "Скоро в продаже",
+      items: [
+        { name: "Кожаный чехол для кружки", desc: "Обхватывает термокружку и стареет вместе с ней." },
+        { name: "Фартук бариста", desc: "Плотная кожа, латунная фурнитура, шьётся под заказ." },
+        { name: "Сумка для зёрен", desc: "Компактная сумка через плечо для свежеобжаренного кофе." },
+      ],
+    },
     buy: {
       tag: "Купить и хранить",
       title: "Купить $DOFFA",
@@ -375,7 +387,7 @@ export const dict: Record<Lang, Dict> = {
   },
   en: {
     locale: "en-US",
-    tabs: { story: "Start", token: "Token", cafe: "Café", community: "Community", buy: "Buy", contact: "Contact" },
+    tabs: { story: "Start", token: "Token", cafe: "Café", merch: "Merch", community: "Community", buy: "Buy", contact: "Contact" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "Every cup",
@@ -543,6 +555,17 @@ export const dict: Record<Lang, Dict> = {
       title: "DOFFA in real life",
       sub: "Shots from the coffee bar: coffee, latte art, the room and views of the Karachay-Cherkessia mountains.",
     },
+    merch: {
+      tag: "Merch",
+      title: "The DOFFA Leather Line",
+      sub: "Three handmade pieces with the same character as the coffee bar — coming soon to the showroom.",
+      comingSoon: "Coming soon",
+      items: [
+        { name: "Leather Cup Sleeve", desc: "Wraps your thermo cup and ages right along with it." },
+        { name: "Barista Apron", desc: "Heavy leather, brass hardware, made to order." },
+        { name: "Bean Tote", desc: "A compact shoulder bag for freshly roasted coffee." },
+      ],
+    },
     buy: {
       tag: "Buy & hold",
       title: "Buy $DOFFA",
@@ -612,7 +635,7 @@ export const dict: Record<Lang, Dict> = {
   ar: {
     locale: "ar",
     dir: "rtl",
-    tabs: { story: "البداية", token: "العملة", cafe: "المقهى", community: "المجتمع", buy: "شراء", contact: "تواصل" },
+    tabs: { story: "البداية", token: "العملة", cafe: "المقهى", merch: "منتجات", community: "المجتمع", buy: "شراء", contact: "تواصل" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "كل فنجان",
@@ -780,6 +803,17 @@ export const dict: Record<Lang, Dict> = {
       title: "DOFFA على الطبيعة",
       sub: "لقطات من المقهى: القهوة، فنّ اللاتيه، القاعة، وإطلالات على جبال قره تشاي تشيركيسيا.",
     },
+    merch: {
+      tag: "منتجات",
+      title: "خط دوفا الجلدي",
+      sub: "ثلاث قطع يدوية بنفس روح المقهى — قريبًا في صالة العرض.",
+      comingSoon: "قريبًا",
+      items: [
+        { name: "غطاء كوب جلدي", desc: "يلتف حول كوبك الحراري ويشيخ معه بجمال." },
+        { name: "مريلة الباريستا", desc: "جلد سميك وتفاصيل نحاسية، تُصنع حسب الطلب." },
+        { name: "حقيبة حبوب البن", desc: "حقيبة كتف صغيرة للبن المحمّص طازجًا." },
+      ],
+    },
     buy: {
       tag: "اشترِ واحتفظ",
       title: "شراء $DOFFA",
@@ -848,7 +882,7 @@ export const dict: Record<Lang, Dict> = {
   },
   tr: {
     locale: "tr-TR",
-    tabs: { story: "Başlangıç", token: "Token", cafe: "Kafe", community: "Topluluk", buy: "Satın Al", contact: "İletişim" },
+    tabs: { story: "Başlangıç", token: "Token", cafe: "Kafe", merch: "Mağaza", community: "Topluluk", buy: "Satın Al", contact: "İletişim" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "Her fincan",
@@ -1016,6 +1050,17 @@ export const dict: Record<Lang, Dict> = {
       title: "Gerçek hayatta DOFFA",
       sub: "Kahve barından kareler: kahve, latte art, salon ve Karaçay-Çerkesya dağ manzaraları.",
     },
+    merch: {
+      tag: "Mağaza",
+      title: "DOFFA Deri Koleksiyonu",
+      sub: "Kafenin ruhunu taşıyan üç el yapımı parça — yakında vitrinde.",
+      comingSoon: "Yakında",
+      items: [
+        { name: "Deri Bardak Kılıfı", desc: "Termos bardağınızı sarar, onunla birlikte yıpranır." },
+        { name: "Barista Önlüğü", desc: "Kalın deri, pirinç detaylar, sipariş üzerine dikilir." },
+        { name: "Çekirdek Çantası", desc: "Taze kavrulmuş kahve için kompakt omuz çantası." },
+      ],
+    },
     buy: {
       tag: "Al & sakla",
       title: "$DOFFA Satın Al",
@@ -1084,7 +1129,7 @@ export const dict: Record<Lang, Dict> = {
   },
   es: {
     locale: "es-ES",
-    tabs: { story: "Inicio", token: "Token", cafe: "Cafetería", community: "Comunidad", buy: "Comprar", contact: "Contacto" },
+    tabs: { story: "Inicio", token: "Token", cafe: "Cafetería", merch: "Merch", community: "Comunidad", buy: "Comprar", contact: "Contacto" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "Cada taza",
@@ -1252,6 +1297,17 @@ export const dict: Record<Lang, Dict> = {
       title: "DOFFA en la vida real",
       sub: "Tomas de la cafetería: café, latte art, la sala y vistas a las montañas de Karacháevo-Cherkesia.",
     },
+    merch: {
+      tag: "Merch",
+      title: "La línea de cuero DOFFA",
+      sub: "Tres piezas hechas a mano con el mismo carácter que la cafetería — pronto en la sala de exposición.",
+      comingSoon: "Próximamente",
+      items: [
+        { name: "Funda de cuero para taza", desc: "Envuelve tu taza térmica y envejece junto a ella." },
+        { name: "Delantal de barista", desc: "Cuero grueso, herrajes de latón, hecho a medida." },
+        { name: "Bolsa para granos", desc: "Bolso compacto de hombro para café recién tostado." },
+      ],
+    },
     buy: {
       tag: "Compra y guarda",
       title: "Comprar $DOFFA",
@@ -1320,7 +1376,7 @@ export const dict: Record<Lang, Dict> = {
   },
   fr: {
     locale: "fr-FR",
-    tabs: { story: "Début", token: "Jeton", cafe: "Café", community: "Communauté", buy: "Acheter", contact: "Contact" },
+    tabs: { story: "Début", token: "Jeton", cafe: "Café", merch: "Boutique", community: "Communauté", buy: "Acheter", contact: "Contact" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "Chaque tasse",
@@ -1488,6 +1544,17 @@ export const dict: Record<Lang, Dict> = {
       title: "DOFFA en vrai",
       sub: "Plans du bar à café : café, latte art, la salle et les vues sur les montagnes de Karatchaïévo-Tcherkessie.",
     },
+    merch: {
+      tag: "Boutique",
+      title: "La ligne cuir DOFFA",
+      sub: "Trois pièces faites main, avec le même caractère que le café — bientôt en showroom.",
+      comingSoon: "Bientôt disponible",
+      items: [
+        { name: "Étui en cuir pour tasse", desc: "Enveloppe votre tasse thermique et vieillit avec elle." },
+        { name: "Tablier de barista", desc: "Cuir épais, quincaillerie laiton, fait sur commande." },
+        { name: "Sac à grains", desc: "Petit sac à bandoulière pour le café fraîchement torréfié." },
+      ],
+    },
     buy: {
       tag: "Acheter et garder",
       title: "Acheter $DOFFA",
@@ -1556,7 +1623,7 @@ export const dict: Record<Lang, Dict> = {
   },
   de: {
     locale: "de-DE",
-    tabs: { story: "Start", token: "Token", cafe: "Café", community: "Community", buy: "Kaufen", contact: "Kontakt" },
+    tabs: { story: "Start", token: "Token", cafe: "Café", merch: "Merch", community: "Community", buy: "Kaufen", contact: "Kontakt" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "Jede Tasse",
@@ -1724,6 +1791,17 @@ export const dict: Record<Lang, Dict> = {
       title: "DOFFA im echten Leben",
       sub: "Aufnahmen aus der Kaffeebar: Kaffee, Latte Art, der Raum und Blicke auf die Berge von Karatschai-Tscherkessien.",
     },
+    merch: {
+      tag: "Merch",
+      title: "Die DOFFA Lederlinie",
+      sub: "Drei handgefertigte Stücke mit dem Charakter des Cafés — bald im Showroom.",
+      comingSoon: "Demnächst",
+      items: [
+        { name: "Leder-Becherhülle", desc: "Umschließt deinen Thermobecher und altert mit ihm." },
+        { name: "Barista-Schürze", desc: "Schweres Leder, Messingbeschläge, auf Bestellung gefertigt." },
+        { name: "Bohnenbeutel", desc: "Kompakte Umhängetasche für frisch gerösteten Kaffee." },
+      ],
+    },
     buy: {
       tag: "Kaufen & halten",
       title: "$DOFFA kaufen",
@@ -1792,7 +1870,7 @@ export const dict: Record<Lang, Dict> = {
   },
   zh: {
     locale: "zh-CN",
-    tabs: { story: "起点", token: "代币", cafe: "咖啡馆", community: "社区", buy: "购买", contact: "联系" },
+    tabs: { story: "起点", token: "代币", cafe: "咖啡馆", merch: "周边", community: "社区", buy: "购买", contact: "联系" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "每一杯",
@@ -1960,6 +2038,17 @@ export const dict: Record<Lang, Dict> = {
       title: "真实的 DOFFA",
       sub: "咖啡馆的画面：咖啡、拉花、店内空间，以及卡拉恰伊-切尔克斯的群山景色。",
     },
+    merch: {
+      tag: "周边",
+      title: "DOFFA 皮革系列",
+      sub: "三件手工制作的单品，延续咖啡馆的气质——即将在展厅亮相。",
+      comingSoon: "即将上线",
+      items: [
+        { name: "皮革杯套", desc: "包裹你的保温杯，与它一起慢慢陈旧。" },
+        { name: "咖啡师围裙", desc: "厚实皮革，黄铜配件，定制打造。" },
+        { name: "咖啡豆手袋", desc: "小巧的单肩包，装下新鲜烘焙的咖啡豆。" },
+      ],
+    },
     buy: {
       tag: "购买与持有",
       title: "购买 $DOFFA",
@@ -2028,7 +2117,7 @@ export const dict: Record<Lang, Dict> = {
   },
   hi: {
     locale: "hi-IN",
-    tabs: { story: "शुरुआत", token: "टोकन", cafe: "कैफ़े", community: "समुदाय", buy: "खरीदें", contact: "संपर्क" },
+    tabs: { story: "शुरुआत", token: "टोकन", cafe: "कैफ़े", merch: "मर्च", community: "समुदाय", buy: "खरीदें", contact: "संपर्क" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "हर कप",
@@ -2196,6 +2285,17 @@ export const dict: Record<Lang, Dict> = {
       title: "असल ज़िंदगी में DOFFA",
       sub: "कॉफ़ी बार की झलकियाँ: कॉफ़ी, लाते आर्ट, हॉल और कराचाय-चर्केसिया के पहाड़ों के नज़ारे।",
     },
+    merch: {
+      tag: "मर्च",
+      title: "DOFFA लेदर लाइन",
+      sub: "कैफ़े जैसे ही अंदाज़ में बने तीन हाथ से तैयार सामान — जल्द ही शोरूम में।",
+      comingSoon: "जल्द आ रहा है",
+      items: [
+        { name: "लेदर कप स्लीव", desc: "आपके थर्मो कप को लपेटता है, साथ में पुराना होता है।" },
+        { name: "बरिस्ता एप्रन", desc: "मोटा चमड़ा, पीतल की फिटिंग, ऑर्डर पर बनता है।" },
+        { name: "बीन टोट बैग", desc: "ताज़े भुने कॉफ़ी बीन्स के लिए छोटा शोल्डर बैग।" },
+      ],
+    },
     buy: {
       tag: "खरीदें और रखें",
       title: "$DOFFA खरीदें",
@@ -2264,7 +2364,7 @@ export const dict: Record<Lang, Dict> = {
   },
   pt: {
     locale: "pt-BR",
-    tabs: { story: "Início", token: "Token", cafe: "Cafeteria", community: "Comunidade", buy: "Comprar", contact: "Contato" },
+    tabs: { story: "Início", token: "Token", cafe: "Cafeteria", merch: "Loja", community: "Comunidade", buy: "Comprar", contact: "Contato" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "Cada xícara",
@@ -2432,6 +2532,17 @@ export const dict: Record<Lang, Dict> = {
       title: "DOFFA na vida real",
       sub: "Cenas da cafeteria: café, latte art, o salão e vistas das montanhas da Karatchai-Tcherkéssia.",
     },
+    merch: {
+      tag: "Loja",
+      title: "A linha de couro DOFFA",
+      sub: "Três peças feitas à mão com o mesmo caráter da cafeteria — em breve no showroom.",
+      comingSoon: "Em breve",
+      items: [
+        { name: "Capa de couro para caneca", desc: "Envolve sua caneca térmica e envelhece junto com ela." },
+        { name: "Avental de barista", desc: "Couro grosso, ferragens de latão, feito sob encomenda." },
+        { name: "Bolsa para grãos", desc: "Bolsa de ombro compacta para café recém-torrado." },
+      ],
+    },
     buy: {
       tag: "Compre e guarde",
       title: "Comprar $DOFFA",
@@ -2500,7 +2611,7 @@ export const dict: Record<Lang, Dict> = {
   },
   it: {
     locale: "it-IT",
-    tabs: { story: "Inizio", token: "Token", cafe: "Caffetteria", community: "Community", buy: "Acquista", contact: "Contatti" },
+    tabs: { story: "Inizio", token: "Token", cafe: "Caffetteria", merch: "Merch", community: "Community", buy: "Acquista", contact: "Contatti" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "Ogni tazza",
@@ -2668,6 +2779,17 @@ export const dict: Record<Lang, Dict> = {
       title: "DOFFA dal vivo",
       sub: "Scatti dalla caffetteria: caffè, latte art, la sala e le viste sulle montagne della Karačaj-Circassia.",
     },
+    merch: {
+      tag: "Merch",
+      title: "La linea in pelle DOFFA",
+      sub: "Tre pezzi fatti a mano con lo stesso carattere del locale — presto in showroom.",
+      comingSoon: "Prossimamente",
+      items: [
+        { name: "Fodera in pelle per tazza", desc: "Avvolge la tua tazza termica e invecchia insieme a lei." },
+        { name: "Grembiule da barista", desc: "Pelle spessa, ferramenta in ottone, realizzato su ordinazione." },
+        { name: "Borsa per chicchi", desc: "Borsa a tracolla compatta per il caffè appena tostato." },
+      ],
+    },
     buy: {
       tag: "Compra e conserva",
       title: "Acquista $DOFFA",
@@ -2736,7 +2858,7 @@ export const dict: Record<Lang, Dict> = {
   },
   ja: {
     locale: "ja-JP",
-    tabs: { story: "はじまり", token: "トークン", cafe: "カフェ", community: "コミュニティ", buy: "購入", contact: "お問い合わせ" },
+    tabs: { story: "はじまり", token: "トークン", cafe: "カフェ", merch: "マーチ", community: "コミュニティ", buy: "購入", contact: "お問い合わせ" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "一杯ごとに",
@@ -2903,6 +3025,17 @@ export const dict: Record<Lang, Dict> = {
       tag: "雰囲気",
       title: "実際の DOFFA",
       sub: "コーヒーバーの風景：コーヒー、ラテアート、店内、そしてカラチャイ・チェルケスの山々の眺め。",
+    },
+    merch: {
+      tag: "マーチ",
+      title: "DOFFA レザーライン",
+      sub: "カフェと同じ気質を持つ、手作りの3つのアイテム — まもなくショールームに登場。",
+      comingSoon: "近日公開",
+      items: [
+        { name: "レザーカップスリーブ", desc: "保温カップを包み込み、一緒に経年変化していきます。" },
+        { name: "バリスタエプロン", desc: "厚手のレザーに真鍮金具、オーダーメイドで仕立てます。" },
+        { name: "コーヒー豆トートバッグ", desc: "焙煎したての豆を入れる、コンパクトなショルダーバッグ。" },
+      ],
     },
     buy: {
       tag: "買って保有",
