@@ -18,12 +18,12 @@ const sans = Manrope({
 export const metadata: Metadata = {
   title: "DOFFA — Espresso Bar × Web3 · Solana",
   description:
-    "COFFEE DOFFA — кофейня из Карачаево-Черкесии. Каждая проданная чашка сжигает один токен $DOFFA. Честный, прозрачный, халяльный проект.",
+    "COFFEE DOFFA — кофейня из Карачаево-Черкесии со своей игровой экономикой: Telegram Tap → Cups → DOFFA Crazy 8 → награда $DOFFA на Solana. Честный, прозрачный, халяльный проект.",
   metadataBase: new URL("https://doffa.coffee"),
   openGraph: {
     title: "DOFFA — Espresso Bar × Web3",
     description:
-      "Каждая проданная чашка сжигает один токен $DOFFA. Since 2021.",
+      "Играй, зарабатывай Cups и получай $DOFFA на Solana. Since 2021.",
     type: "website",
     locale: "ru_RU",
     siteName: "DOFFA",
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "DOFFA — Espresso Bar × Web3",
-    description: "Каждая проданная чашка сжигает один токен $DOFFA. Since 2021.",
+    description: "Играй, зарабатывай Cups и получай $DOFFA на Solana. Since 2021.",
     images: ["/og.jpg"],
   },
 };
