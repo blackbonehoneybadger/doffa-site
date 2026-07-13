@@ -1,11 +1,12 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { dict, LANGS, TOKEN, CONTACT, GALLERY, VIDEOS, type Lang } from "./content";
-import { REAL, solscanToken, solscanTokenOf, solscanWalletOf, solscanTx, solscanHolders, fetchSupplyOf, fetchBalance, fetchBurnHistory, connectWalletById, disconnectWalletById, type BurnRecord } from "./solana";
+import { REAL, solscanToken, solscanTokenOf, solscanHolders, fetchBalance, connectWalletById, disconnectWalletById } from "./solana";
 import { SmoothScroll, CursorGlow, MouseParallax, TiltCard, Magnetic, ScrollProgressBar } from "./cinematic";
 import { ThemeToggle } from "./theme-toggle";
 import { Assistant } from "./assistant";
@@ -16,6 +17,11 @@ const Hero3D = dynamic(() => import("./hero3d").then((m) => m.Hero3D), { ssr: fa
 
 // Дефолтный ролик в hero, пока владелец кофейни не загрузил свои через /admin.
 const DEFAULT_HERO_VIDEO = "/brand/hero.mp4";
+
+// Reward Vault — выделенный запас $DOFFA на игровые награды (1% эмиссии).
+const REWARD_VAULT = 1_000_000;
+// Игра DOFFA Crazy 8 (веб-версия).
+const GAME_URL = "https://zapisnoy-kozel.vercel.app";
 
 /* ---------- helpers ---------- */
 
@@ -117,52 +123,8 @@ export default function Home() {
       .catch(() => {});
   }, []);
 
-  // Объём НАСТОЯЩЕГО токена (mainnet) — опрашивается каждую секунду, живой счётчик.
-  const [realSupply, setRealSupply] = useState<number | null>(null);
-  useEffect(() => {
-    if (!REAL.mint) return;
-    let cancelled = false;
-    const tick = () => {
-      fetchSupplyOf(REAL)
-        .then((v) => { if (!cancelled) setRealSupply(v); })
-        .catch(() => { if (!cancelled) setRealSupply(null); });
-    };
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => { cancelled = true; clearInterval(id); };
-  }, []);
 
-  // История сжиганий — читается напрямую из Solana (мемо "DOFFA coffee burn | ...").
-  // Опрашивается каждую секунду, чтобы новое сжигание появлялось в ленте сразу.
-  const [burns, setBurns] = useState<BurnRecord[] | null>(null);
-  useEffect(() => {
-    let cancelled = false;
-    const tick = () => {
-      fetchBurnHistory(15)
-        .then((v) => { if (!cancelled) setBurns(v); })
-        .catch(() => { if (!cancelled) setBurns([]); });
-    };
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => { cancelled = true; clearInterval(id); };
-  }, []);
 
-  // Сверка POS-продаж ↔ Solana burns. Данные из блокчейна через /api/proof/compare.
-  // Опрашивается каждую секунду — цифры на сайте не отстают от бота.
-  type Compare = { pos_cups: number; solana_burns: number; mismatch: number; status: string; message: string };
-  const [compare, setCompare] = useState<Compare | null>(null);
-  useEffect(() => {
-    let cancelled = false;
-    const tick = () => {
-      fetch("/api/proof/compare")
-        .then((r) => r.json())
-        .then((d) => { if (!cancelled) setCompare(d as Compare); })
-        .catch(() => { if (!cancelled) setCompare(null); });
-    };
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => { cancelled = true; clearInterval(id); };
-  }, []);
 
   const loc = t.locale;
 
@@ -172,11 +134,6 @@ export default function Home() {
     document.documentElement.dir = t.dir ?? "ltr";
   }, [lang, t.dir]);
 
-  // Настоящий токен (mainnet). Выпущен ли уже mint?
-  const realMinted = REAL.mint !== null;
-  // Сколько в обороте: live из mainnet, иначе планируемая эмиссия (нетронуто).
-  const realCirculating = realSupply !== null ? realSupply : REAL.initialSupply;
-  const realBurned = Math.max(REAL.initialSupply - realCirculating, 0);
 
   // Кошелёк — Phantom, Solflare, Trust Wallet, Backpack (+ Ledger через Phantom/Solflare).
   const [wallet, setWallet] = useState<string | null>(null);
@@ -245,6 +202,12 @@ export default function Home() {
                 {t.label}
               </button>
             ))}
+            <Link
+              href="/download"
+              className="rounded-full border border-gold/40 bg-gold/10 px-3 py-1 text-xs font-semibold text-gold transition hover:bg-gold/20 xl:text-sm"
+            >
+              {t.tabs.download}
+            </Link>
           </nav>
           <div className="flex items-center gap-3 sm:gap-2">
             {/* Wallet connect button */}
@@ -369,6 +332,13 @@ export default function Home() {
                   {t.label}
                 </button>
               ))}
+              <Link
+                href="/download"
+                onClick={() => setMenuOpen(false)}
+                className="rounded-lg px-3 py-2 text-sm font-semibold text-gold hover:bg-gold/10"
+              >
+                {t.tabs.download} ↓
+              </Link>
             </div>
           </nav>
         )}
@@ -529,22 +499,25 @@ export default function Home() {
                 </div>
               </Section>
 
-              {/* HOW */}
-              <Section id="how">
+              {/* FLOW: Tap → Cups → Game → $DOFFA */}
+              <Section id="flow">
                 <Reveal>
                   <div className="text-center">
-                    <Tag>{t.how.tag}</Tag>
-                    <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.how.title}</h2>
-                    <p className="mx-auto mt-4 max-w-2xl text-cream/70">{t.how.sub}</p>
+                    <Tag>{t.flow.tag}</Tag>
+                    <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.flow.title}</h2>
+                    <p className="mx-auto mt-4 max-w-2xl text-cream/70">{t.flow.sub}</p>
                   </div>
                 </Reveal>
-                <div className="mt-12 grid gap-6 md:grid-cols-3">
-                  {t.how.steps.map((s, i) => (
-                    <Reveal key={i} delay={i * 0.12}>
-                      <div className="card h-full rounded-2xl p-7">
-                        <div className="display mb-4 text-3xl font-extrabold text-teal">0{i + 1}</div>
-                        <h3 className="display text-xl font-bold text-cream-soft">{s.t}</h3>
-                        <p className="mt-3 text-sm text-cream/70">{s.d}</p>
+                <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+                  {t.flow.steps.map((s, i) => (
+                    <Reveal key={i} delay={i * 0.1}>
+                      <div className="card h-full rounded-2xl p-6">
+                        <div className="mb-3 flex items-center gap-3">
+                          <span className="text-3xl">{s.icon}</span>
+                          <span className="display text-xl font-extrabold text-teal">0{i + 1}</span>
+                        </div>
+                        <h3 className="display text-lg font-bold text-cream-soft">{s.t}</h3>
+                        <p className="mt-2 text-sm text-cream/70">{s.d}</p>
                       </div>
                     </Reveal>
                   ))}
@@ -604,197 +577,70 @@ export default function Home() {
                 </div>
               </Section>
 
-              {/* BURNS */}
-              <Section id="burns">
+              {/* REWARD VAULT */}
+              <Section id="vault">
                 <Reveal>
                   <div className="text-center">
-                    <Tag>{t.burns.tag}</Tag>
-                    <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.burns.title}</h2>
+                    <Tag>{t.flow.vaultTag}</Tag>
+                    <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.flow.vaultTitle}</h2>
                   </div>
                 </Reveal>
 
-                {/* Настоящий токен (mainnet) */}
                 <Reveal>
                   <TiltCard max={2.5} className="relative mt-10 overflow-hidden rounded-3xl border border-gold/30 bg-gradient-to-b from-gold/[0.08] via-copper/[0.03] to-transparent p-6 shadow-2xl shadow-gold/10 sm:p-8">
                     <div aria-hidden className="gold-line absolute inset-x-0 top-0 h-px" />
                     <div className="flex flex-wrap items-center justify-between gap-3">
-                      <span className="text-sm font-bold text-cream-soft">{t.burns.realTitle}</span>
+                      <span className="text-sm font-bold text-cream-soft">{t.flow.vaultTag} · mainnet</span>
                       <span className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-gradient-to-r from-gold/20 to-copper/20 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-gold">
-                        {t.burns.realBadge}
+                        $DOFFA · SOLANA
                       </span>
                     </div>
                     <div className="mt-6 grid gap-5 sm:grid-cols-3">
-                      <Stat label={t.burns.supply} value={REAL.initialSupply.toLocaleString(loc)} unit={TOKEN.symbol} />
-                      <Stat label={t.burns.burned} value={realBurned.toLocaleString(loc)} unit={`🔥 ${TOKEN.symbol}`} />
-                      <Stat label={t.burns.left} value={realCirculating.toLocaleString(loc)} unit={TOKEN.symbol} />
+                      <Stat label={t.flow.vaultAmountLabel} value={REWARD_VAULT.toLocaleString(loc)} unit={TOKEN.symbol} accent />
+                      <Stat label={t.flow.vaultSupplyLabel} value={REAL.initialSupply.toLocaleString(loc)} unit={TOKEN.symbol} />
+                      <Stat label={t.flow.vaultShareLabel} value="1%" />
                     </div>
-                    <div className="mt-6 flex items-center justify-center gap-2 rounded-xl border border-gold/20 bg-black/20 px-4 py-3">
-                      <span className="h-2 w-2 rounded-full bg-gold/80" />
-                      <span className="text-sm font-semibold text-gold">{t.burns.realStatus}</span>
-                    </div>
-                    <p className="mt-4 text-center text-xs text-cream/50">{realMinted ? t.burns.realNote : t.burns.realPending}</p>
+                    <p className="mt-6 text-center text-xs leading-relaxed text-cream/50">{t.flow.vaultNote}</p>
                     <div className="mt-3 text-center">
-                      {realMinted ? (
-                        <a
-                          href={solscanTokenOf(REAL)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-gold transition hover:text-amber"
-                        >
-                          {t.burns.verify} ↗
-                        </a>
-                      ) : REAL.wallet ? (
-                        <a
-                          href={solscanWalletOf(REAL)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 font-mono text-xs font-semibold text-gold/80 transition hover:text-amber"
-                        >
-                          {`${REAL.wallet.slice(0, 4)}…${REAL.wallet.slice(-4)}`} ↗
-                        </a>
-                      ) : null}
+                      <a
+                        href={solscanTokenOf(REAL)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-gold transition hover:text-amber"
+                      >
+                        {t.verify.viewToken} ↗
+                      </a>
                     </div>
                   </TiltCard>
                 </Reveal>
-              </Section>
 
-              {/* PROOF */}
-              <Section id="proof">
+                {/* CLAIM */}
                 <Reveal>
-                  <div className="text-center">
-                    <Tag>{t.proof.tag}</Tag>
-                    <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.proof.title}</h2>
-                    <p className="mx-auto mt-4 max-w-2xl text-cream/70">{t.proof.sub}</p>
-                  </div>
-                </Reveal>
-
-                <Reveal>
-                  <div className="mt-10 overflow-hidden rounded-2xl border border-white/10 bg-black/20">
-                    {/* Заголовок потока */}
-                    <div className="flex items-center justify-between border-b border-white/10 bg-white/[0.03] px-4 py-3">
-                      <h3 className="text-sm font-semibold text-cream/70">{t.proof.title}</h3>
-                      <span className="flex items-center gap-1.5 text-xs text-cream/40">
-                        <span className="h-1.5 w-1.5 rounded-full bg-teal" />
-                        {t.burns.live}
-                      </span>
-                    </div>
-                    {/* Таблица */}
-                    <div className="overflow-x-auto">
-                      <table className="w-full border-collapse text-left text-xs">
-                        <thead>
-                          <tr className="border-b border-white/[0.06] bg-white/[0.02] text-[10px] uppercase tracking-wider text-cream/30">
-                            <th className="px-4 py-3 font-medium">{t.proof.colTime}</th>
-                            <th className="px-4 py-3 font-medium">{t.proof.colEvent}</th>
-                            <th className="px-4 py-3 font-medium">{t.proof.colSale}</th>
-                            <th className="px-4 py-3 text-right font-medium">{t.proof.colAmount}</th>
-                            <th className="px-4 py-3 text-center font-medium">{t.proof.colHash}</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-white/[0.04]">
-                          {burns === null ? (
-                            <tr>
-                              <td colSpan={5} className="px-4 py-12 text-center text-cream/40">
-                                <span className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-teal/40 border-t-teal align-middle" />
-                                {t.proof.loading}
-                              </td>
-                            </tr>
-                          ) : burns.length === 0 ? (
-                            <tr>
-                              <td colSpan={5} className="px-4 py-12 text-center text-cream/40">
-                                {t.proof.empty}
-                              </td>
-                            </tr>
-                          ) : (
-                            burns.map((b, i) => (
-                              <BurnRow key={b.sig} burn={b} even={i % 2 === 0} locale={loc} eventLabel={t.proof.colEvent} />
-                            ))
-                          )}
-                        </tbody>
-                      </table>
+                  <div className="card mt-8 rounded-3xl p-8 text-center sm:p-10">
+                    <h3 className="display text-2xl font-bold text-cream-soft sm:text-3xl">{t.flow.claimTitle}</h3>
+                    <p className="mx-auto mt-3 max-w-2xl text-sm text-cream/70">{t.flow.claimNote}</p>
+                    <div className="mt-7 flex flex-wrap items-center justify-center gap-4">
+                      <Magnetic>
+                        <a
+                          href={GAME_URL}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold to-copper px-7 py-3 font-bold text-ink shadow-lg shadow-gold/10 transition hover:brightness-110"
+                        >
+                          🃏 {t.flow.playCta}
+                        </a>
+                      </Magnetic>
+                      <Magnetic>
+                        <Link
+                          href="/download"
+                          className="rounded-full border border-cream/30 px-7 py-3 font-semibold text-cream transition hover:border-gold hover:text-gold"
+                        >
+                          {t.flow.downloadCta}
+                        </Link>
+                      </Magnetic>
                     </div>
                   </div>
                 </Reveal>
-
-                {compare && (compare.status === "warning" || compare.status === "error") && (
-                  <Reveal>
-                    <div className="mt-5 flex items-start gap-3 rounded-xl border border-amber/40 bg-amber/10 px-5 py-4 text-sm text-amber">
-                      <span className="mt-0.5 shrink-0">⚠</span>
-                      <div>
-                        <p className="font-semibold">{t.proof.mismatchWarn}</p>
-                        <p className="mt-1 text-xs text-amber/70">
-                          {`POS: ${compare.pos_cups.toLocaleString(loc)} ${t.ui.cupsWord} · Solana: ${compare.solana_burns.toLocaleString(loc)} ${t.ui.burnedWord} · ${t.ui.diffWord} ${compare.mismatch.toLocaleString(loc)}`}
-                        </p>
-                      </div>
-                    </div>
-                  </Reveal>
-                )}
-
-                {compare && compare.status === "perfect" && (
-                  <Reveal>
-                    <div className="mt-5 flex items-start gap-3 rounded-xl border border-teal/40 bg-teal/10 px-5 py-4 text-sm text-teal">
-                      <span className="mt-0.5 shrink-0">✓</span>
-                      <div>
-                        <p className="font-semibold">{t.ui.inSyncTitle}</p>
-                        <p className="mt-1 text-xs text-teal/70">
-                          {`${compare.pos_cups.toLocaleString(loc)} ${t.ui.cupsWord} → ${compare.solana_burns.toLocaleString(loc)} ${t.ui.burnedWord} $DOFFA`}
-                        </p>
-                      </div>
-                    </div>
-                  </Reveal>
-                )}
-
-                <div className="mt-20">
-                  <Reveal>
-                    <div className="text-center">
-                      <Tag>{t.proof.trustTag}</Tag>
-                      <h3 className="display mt-5 text-3xl font-bold text-cream-soft sm:text-4xl">{t.proof.trustTitle}</h3>
-                      <p className="mx-auto mt-4 max-w-2xl text-cream/70">{t.proof.trustSub}</p>
-                    </div>
-                  </Reveal>
-
-                  <div className="mt-10 grid gap-6 md:grid-cols-3">
-                    {t.proof.trustSteps.map((s, i) => (
-                      <Reveal key={i} delay={i * 0.1}>
-                        <div className="card h-full rounded-2xl p-7">
-                          <div className="mb-4 text-4xl">{s.icon}</div>
-                          <h4 className="display text-lg font-bold text-cream-soft">{s.t}</h4>
-                          <p className="mt-3 text-sm leading-relaxed text-cream/70">{s.d}</p>
-                        </div>
-                      </Reveal>
-                    ))}
-                  </div>
-
-                  <Reveal>
-                    <div className="mt-10 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] p-6">
-                      <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-cream/40">
-                        {t.ui.dataFlow}
-                      </p>
-                      <div className="flex flex-wrap items-center gap-2 text-sm">
-                        {[
-                          { icon: "☕", label: t.ui.flowPaid },
-                          { icon: "→", label: null },
-                          { icon: "🧾", label: t.ui.flowReceipt },
-                          { icon: "→", label: null },
-                          { icon: "🔐", label: "receipt_hash" },
-                          { icon: "→", label: null },
-                          { icon: "⛓", label: t.ui.flowMemo },
-                          { icon: "→", label: null },
-                          { icon: "📊", label: t.ui.flowDashboard },
-                        ].map((step, i) =>
-                          step.label === null ? (
-                            <span key={i} className="text-cream/30">{step.icon}</span>
-                          ) : (
-                            <span key={i} className="inline-flex flex-col items-center gap-1 rounded-xl border border-white/10 px-4 py-3 text-center">
-                              <span className="text-xl">{step.icon}</span>
-                              <span className="text-xs text-cream/60">{step.label}</span>
-                            </span>
-                          ),
-                        )}
-                      </div>
-                      <p className="mt-4 text-xs text-cream/40">{t.ui.dataFlowNote}</p>
-                    </div>
-                  </Reveal>
-                </div>
               </Section>
 
               {/* VERIFY */}
@@ -1148,35 +994,6 @@ function Stat({ label, value, unit, accent }: { label: string; value: React.Reac
   );
 }
 
-function BurnRow({ burn, even, locale = "ru-RU", eventLabel = "Burn" }: { burn: BurnRecord; even: boolean; locale?: string; eventLabel?: string }) {
-  const date = burn.blockTime
-    ? new Date(burn.blockTime * 1000).toLocaleString(locale, { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })
-    : "—";
-  const shortSig = burn.sig ? burn.sig.slice(0, 4) + "…" + burn.sig.slice(-4) : "—";
-  const saleLabel = burn.saleId ? `POS #${burn.saleId}` : "—";
-
-  return (
-    <tr className={`transition-colors hover:bg-white/[0.03] ${even ? "" : "bg-white/[0.015]"}`}>
-      <td className="px-4 py-3 text-cream/50 tabular-nums">{date}</td>
-      <td className="px-4 py-3 font-medium text-amber">🔥 {eventLabel}</td>
-      <td className="px-4 py-3 text-cream/60">{saleLabel}</td>
-      <td className="px-4 py-3 text-right font-bold tabular-nums text-cream/80">
-        −{burn.amount > 0 ? burn.amount.toLocaleString(locale) : "?"} $DOFFA
-      </td>
-      <td className="px-4 py-3 text-center">
-        <a
-          href={solscanTx(burn.sig)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-mono text-cream/50 underline transition hover:text-teal"
-          title={burn.sig}
-        >
-          {shortSig}
-        </a>
-      </td>
-    </tr>
-  );
-}
 
 function VerifyCard({
   label,
