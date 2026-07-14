@@ -24,6 +24,9 @@
 .DS_Store
 *.pem
 
+# локальное хранилище (fallback без Vercel Blob)
+/.data/
+
 # debug
 npm-debug.log*
 yarn-debug.log*

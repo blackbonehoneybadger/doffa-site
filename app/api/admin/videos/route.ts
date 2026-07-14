@@ -21,7 +21,11 @@ export async function POST(req: Request) {
   if (!(await isAuthed())) {
     return Response.json({ ok: false, error: "Не авторизован" }, { status: 401 });
   }
-  const body = await req.json().catch(() => null) as { url?: string; pathname?: string } | null;
+  const body = await req.json().catch(() => null) as {
+    url?: string;
+    pathname?: string;
+    durationSeconds?: number;
+  } | null;
   if (!body?.url || !body?.pathname) {
     return Response.json({ ok: false, error: "url/pathname не указаны" }, { status: 400 });
   }
@@ -31,10 +35,17 @@ export async function POST(req: Request) {
     return Response.json({ ok: false, error: "Недопустимый путь файла" }, { status: 400 });
   }
   try {
-    const videos = await registerVideo({ url: body.url, pathname: body.pathname });
+    const videos = await registerVideo({
+      url: body.url,
+      pathname: body.pathname,
+      durationSeconds: body.durationSeconds,
+    });
     return Response.json({ ok: true, videos });
   } catch (err) {
-    return Response.json({ ok: false, error: friendlyStorageError(err) }, { status: 400 });
+    return Response.json(
+      { ok: false, error: err instanceof Error ? err.message : friendlyStorageError(err) },
+      { status: 400 },
+    );
   }
 }
 

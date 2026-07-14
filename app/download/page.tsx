@@ -1,17 +1,20 @@
-import type { Metadata } from "next";
-import Link from "next/link";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Скачать · DOFFA Crazy 8",
-  description:
-    "Играй в DOFFA Crazy 8 в браузере, установи PWA или скачай APK. Зарабатывай Cups и получай $DOFFA на Solana-кошелёк.",
-};
+import Link from "next/link";
 
 const GAME_URL = "https://zapisnoy-kozel.vercel.app";
 const APK_URL = "https://github.com/blackbonehoneybadger/zapisnoy-kozel/releases";
 
-// Страница «Скачать»: игра DOFFA Crazy 8. Статическая, вне клиентского
-// словаря — RU-основной текст с EN-подстрочником, стиль сайта.
+function track(event: "game_open" | "game_download") {
+  fetch("/api/track", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ event }),
+  }).catch(() => {});
+}
+
+// Страница «Скачать»: игра DOFFA Crazy 8. Клиентская — чтобы считать
+// открытия/скачивания для админ-статистики.
 export default function DownloadPage() {
   return (
     <main className="mx-auto min-h-screen max-w-4xl px-5 pb-24 pt-28">
@@ -35,10 +38,8 @@ export default function DownloadPage() {
       </p>
 
       <div className="mt-12 grid gap-6 sm:grid-cols-2">
-        {/* Веб-версия / PWA */}
         <div className="card flex flex-col rounded-3xl p-8">
-          <span className="text-3xl">🃏</span>
-          <h2 className="display mt-4 text-2xl font-bold text-cream-soft">Играть в браузере</h2>
+          <h2 className="display mt-1 text-2xl font-bold text-cream-soft">Играть в браузере</h2>
           <p className="mt-2 flex-1 text-sm leading-relaxed text-cream/65">
             Открой игру на телефоне или компьютере — без установки. Добавь на
             экран «Домой», чтобы играть как в приложении (PWA, работает офлайн).
@@ -47,16 +48,18 @@ export default function DownloadPage() {
             href={GAME_URL}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => {
+              track("game_open");
+              track("game_download");
+            }}
             className="mt-6 inline-flex w-fit items-center gap-2 rounded-full bg-gradient-to-r from-gold to-copper px-7 py-3 font-bold text-ink shadow-lg shadow-gold/10 transition hover:brightness-110"
           >
             Играть сейчас ↗
           </a>
         </div>
 
-        {/* Android APK */}
         <div className="card flex flex-col rounded-3xl p-8">
-          <span className="text-3xl">🤖</span>
-          <h2 className="display mt-4 text-2xl font-bold text-cream-soft">Android APK</h2>
+          <h2 className="display mt-1 text-2xl font-bold text-cream-soft">Android APK</h2>
           <p className="mt-2 flex-1 text-sm leading-relaxed text-cream/65">
             Нативное приложение для Android. Скачай последний APK из релизов на
             GitHub — приложение обновляется само при каждом деплое.
@@ -65,6 +68,7 @@ export default function DownloadPage() {
             href={APK_URL}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => track("game_download")}
             className="mt-6 inline-flex w-fit items-center gap-2 rounded-full border border-cream/30 px-7 py-3 font-semibold text-cream transition hover:border-gold hover:text-gold"
           >
             Скачать APK ↗
@@ -72,9 +76,12 @@ export default function DownloadPage() {
         </div>
       </div>
 
-      <div className="mt-12 text-center">
-        <Link href="/" className="text-sm font-semibold text-gold transition hover:text-amber">
-          ← На главную doffa.coffee
+      <div className="mt-12 flex flex-wrap items-center justify-center gap-4 text-sm">
+        <Link href="/register" className="font-semibold text-gold transition hover:text-amber">
+          Регистрация и рефералы →
+        </Link>
+        <Link href="/" className="font-semibold text-cream/50 transition hover:text-gold">
+          ← На главную
         </Link>
       </div>
     </main>

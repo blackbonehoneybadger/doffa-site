@@ -4,6 +4,8 @@
 import { put, del, list } from "@vercel/blob";
 
 export const MAX_VIDEOS = 10;
+/** Лимит длины как у Shorts / Reels / TikTok — не длиннее минуты. */
+export const MAX_DURATION_SECONDS = 60;
 const MANIFEST_PATH = "hero-videos/manifest.json";
 
 export type HeroVideo = {
@@ -11,6 +13,8 @@ export type HeroVideo = {
   url: string;
   pathname: string;
   uploadedAt: number;
+  /** Длина ролика в секундах (если клиент передал). */
+  durationSeconds?: number;
 };
 
 /** Превращает сырые ошибки Vercel Blob SDK в понятное сообщение для владельца. */
@@ -46,14 +50,32 @@ export async function listVideos(): Promise<HeroVideo[]> {
 }
 
 /** Регистрирует уже загруженный в Blob файл в манифесте. Кидает, если мест нет. */
-export async function registerVideo(entry: { url: string; pathname: string }): Promise<HeroVideo[]> {
+export async function registerVideo(entry: {
+  url: string;
+  pathname: string;
+  durationSeconds?: number;
+}): Promise<HeroVideo[]> {
   const videos = await readManifest();
   if (videos.length >= MAX_VIDEOS) {
     throw new Error(`Уже загружено максимум (${MAX_VIDEOS}) видео. Сначала удали одно.`);
   }
+  if (
+    typeof entry.durationSeconds === "number" &&
+    entry.durationSeconds > MAX_DURATION_SECONDS
+  ) {
+    throw new Error(
+      `Видео длиннее ${MAX_DURATION_SECONDS} сек — загружай формат Shorts / Reels / TikTok.`,
+    );
+  }
   const next: HeroVideo[] = [
     ...videos,
-    { id: crypto.randomUUID(), url: entry.url, pathname: entry.pathname, uploadedAt: Date.now() },
+    {
+      id: crypto.randomUUID(),
+      url: entry.url,
+      pathname: entry.pathname,
+      uploadedAt: Date.now(),
+      durationSeconds: entry.durationSeconds,
+    },
   ];
   await writeManifest(next);
   return next;

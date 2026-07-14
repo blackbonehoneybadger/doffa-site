@@ -123,8 +123,29 @@ export default function Home() {
       .catch(() => {});
   }, []);
 
+  // Сессия сайта (логин/кабинет) + счётчик визита для админ-статистики.
+  const [authUser, setAuthUser] = useState<{ username: string; role: string } | null>(null);
+  useEffect(() => {
+    fetch("/api/auth/me")
+      .then((r) => r.json())
+      .then((d: { ok: boolean; user: { username: string; role: string } | null }) => {
+        if (d.ok && d.user) setAuthUser(d.user);
+      })
+      .catch(() => {});
+    fetch("/api/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ event: "visit" }),
+    }).catch(() => {});
+  }, []);
 
-
+  const trackGameOpen = () => {
+    fetch("/api/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ event: "game_open" }),
+    }).catch(() => {});
+  };
 
   const loc = t.locale;
 
@@ -207,6 +228,12 @@ export default function Home() {
               className="rounded-full border border-gold/40 bg-gold/10 px-3 py-1 text-xs font-semibold text-gold transition hover:bg-gold/20 xl:text-sm"
             >
               {t.tabs.download}
+            </Link>
+            <Link
+              href={authUser ? (authUser.role === "admin" ? "/admin" : "/account") : "/login"}
+              className="text-xs text-cream/70 transition hover:text-gold xl:text-sm"
+            >
+              {authUser ? authUser.username : "Войти"}
             </Link>
           </nav>
           <div className="flex items-center gap-3 sm:gap-2">
@@ -338,6 +365,13 @@ export default function Home() {
                 className="rounded-lg px-3 py-2 text-sm font-semibold text-gold hover:bg-gold/10"
               >
                 {t.tabs.download} ↓
+              </Link>
+              <Link
+                href={authUser ? (authUser.role === "admin" ? "/admin" : "/account") : "/login"}
+                onClick={() => setMenuOpen(false)}
+                className="rounded-lg px-3 py-2 text-sm text-cream/75 hover:bg-white/5 hover:text-gold"
+              >
+                {authUser ? `@${authUser.username}` : "Войти / Регистрация"}
               </Link>
             </div>
           </nav>
@@ -625,6 +659,7 @@ export default function Home() {
                           href={GAME_URL}
                           target="_blank"
                           rel="noopener noreferrer"
+                          onClick={trackGameOpen}
                           className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold to-copper px-7 py-3 font-bold text-ink shadow-lg shadow-gold/10 transition hover:brightness-110"
                         >
                           🃏 {t.flow.playCta}
