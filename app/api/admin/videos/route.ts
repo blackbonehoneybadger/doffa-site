@@ -1,5 +1,6 @@
 import { isAuthed } from "../../../lib/adminAuth";
-import { listVideos, deleteVideo, registerVideo, friendlyStorageError, MAX_VIDEOS } from "../../../lib/videoStore";
+import { listVideos, deleteVideo, registerVideo, friendlyStorageError, isValidBlobEntry, MAX_VIDEOS } from "../../../lib/videoStore";
+import { parseJson, videoRegisterSchema } from "../../../lib/validation";
 
 export const dynamic = "force-dynamic";
 
@@ -21,17 +22,17 @@ export async function POST(req: Request) {
   if (!(await isAuthed())) {
     return Response.json({ ok: false, error: "Не авторизован" }, { status: 401 });
   }
-  const body = await req.json().catch(() => null) as { url?: string; pathname?: string } | null;
-  if (!body?.url || !body?.pathname) {
-    return Response.json({ ok: false, error: "url/pathname не указаны" }, { status: 400 });
+  const parsed = await parseJson(req, videoRegisterSchema);
+  if (!parsed.ok) {
+    return Response.json({ ok: false, error: parsed.error }, { status: 400 });
   }
-  // Принимаем только файлы из нашей же папки hero-videos/ — защита от регистрации
-  // произвольных чужих Blob-URL через этот эндпоинт.
-  if (!body.pathname.startsWith("hero-videos/") || body.pathname === "hero-videos/manifest.json") {
-    return Response.json({ ok: false, error: "Недопустимый путь файла" }, { status: 400 });
+  // Принимаем только файлы из нашей папки hero-videos/ на нашем же Blob-хосте —
+  // защита от регистрации произвольных чужих URL через этот эндпоинт.
+  if (!isValidBlobEntry(parsed.data.url, parsed.data.pathname)) {
+    return Response.json({ ok: false, error: "Недопустимый путь или адрес файла" }, { status: 400 });
   }
   try {
-    const videos = await registerVideo({ url: body.url, pathname: body.pathname });
+    const videos = await registerVideo({ url: parsed.data.url, pathname: parsed.data.pathname });
     return Response.json({ ok: true, videos });
   } catch (err) {
     return Response.json({ ok: false, error: friendlyStorageError(err) }, { status: 400 });

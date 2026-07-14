@@ -19,7 +19,9 @@ export async function POST(request: Request) {
       onBeforeGenerateToken: async () => ({
         allowedContentTypes: ["video/mp4", "video/webm", "video/quicktime"],
         addRandomSuffix: true,
-        maximumSizeInBytes: 200 * 1024 * 1024, // 200 МБ с запасом на телефонные видео
+        // Hero-видео должно быть лёгким (сжатое 720p/1080p) — большой файл бьёт
+        // по LCP и Blob/CDN-расходам. 40 МБ достаточно для короткого ролика.
+        maximumSizeInBytes: 40 * 1024 * 1024,
       }),
       onUploadCompleted: async () => {
         // Ничего не делаем здесь — клиент сам регистрирует файл через

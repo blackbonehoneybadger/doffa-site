@@ -13,6 +13,19 @@ export type HeroVideo = {
   uploadedAt: number;
 };
 
+/** Проверяет, что URL действительно указывает на Vercel Blob-хранилище, а путь
+ *  лежит в нашей папке hero-videos/ (и это не сам манифест). Это не даёт
+ *  зарегистрировать произвольный чужой URL через публичный клиентский POST. */
+export function isValidBlobEntry(url: string, pathname: string): boolean {
+  if (!pathname.startsWith("hero-videos/") || pathname === MANIFEST_PATH) return false;
+  try {
+    const host = new URL(url).hostname;
+    return host.endsWith(".public.blob.vercel-storage.com");
+  } catch {
+    return false;
+  }
+}
+
 /** Превращает сырые ошибки Vercel Blob SDK в понятное сообщение для владельца. */
 export function friendlyStorageError(err: unknown): string {
   const raw = err instanceof Error ? err.message : String(err);
