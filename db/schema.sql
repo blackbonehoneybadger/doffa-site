@@ -65,6 +65,10 @@ create index if not exists admin_sessions_expires_idx on admin_sessions (expires
 
 -- Учёт неудачных попыток входа в админку по IP — для rate limit и временной
 -- блокировки после серии неверных паролей.
+-- Старая форма (id/attempted_at/success) несовместима: пересоздаём таблицу.
+-- Данные rate-limit эфемерны, терять их безопасно.
+drop table if exists admin_login_attempts;
+
 create table if not exists admin_login_attempts (
   ip text primary key,
   fail_count integer not null default 0,
