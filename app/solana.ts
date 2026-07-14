@@ -112,10 +112,13 @@ export async function fetchBalance(owner: string): Promise<number> {
 
 /* ---------- Wallet providers ---------- */
 
+type SignMessageResult = { signature: Uint8Array } | Uint8Array;
+
 type StandardProvider = {
   isPhantom?: boolean;
   connect: () => Promise<{ publicKey: { toString: () => string } }>;
   disconnect: () => Promise<void>;
+  signMessage?: (message: Uint8Array, encoding: string) => Promise<SignMessageResult>;
 };
 
 type SolflareProvider = {
@@ -123,6 +126,7 @@ type SolflareProvider = {
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
   publicKey: { toString: () => string } | null;
+  signMessage?: (message: Uint8Array, encoding: string) => Promise<SignMessageResult>;
 };
 
 declare global {
@@ -193,4 +197,32 @@ export async function disconnectWalletById(id: string): Promise<void> {
     else if (id === "trust") await getTrust()?.disconnect();
     else if (id === "backpack") await getBackpack()?.disconnect();
   } catch { /* ignore */ }
+}
+
+function bytesToBase64(bytes: Uint8Array): string {
+  let binary = "";
+  for (const b of bytes) binary += String.fromCharCode(b);
+  return btoa(binary);
+}
+
+function extractSignature(res: SignMessageResult): Uint8Array {
+  return res instanceof Uint8Array ? res : res.signature;
+}
+
+/** Просит кошелёк подписать текстовое сообщение (для входа без пароля). Возвращает подпись в base64. */
+export async function signMessageById(id: string, message: string): Promise<string | null> {
+  const bytes = new TextEncoder().encode(message);
+  try {
+    const provider =
+      id === "phantom" ? getPhantom() :
+      id === "solflare" ? getSolflare() :
+      id === "trust" ? getTrust() :
+      id === "backpack" ? getBackpack() :
+      null;
+    if (!provider?.signMessage) return null;
+    const res = await provider.signMessage(bytes, "utf8");
+    return bytesToBase64(extractSignature(res));
+  } catch {
+    return null; // пользователь отклонил подпись
+  }
 }

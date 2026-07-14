@@ -71,7 +71,7 @@ export type Dict = {
   // locale — для форматирования чисел и дат (Intl). dir — направление письма (rtl для арабского).
   locale: string;
   dir?: "rtl";
-  tabs: { story: string; token: string; cafe: string; merch: string; community: string; buy: string; contact: string; download: string };
+  tabs: { story: string; token: string; cafe: string; merch: string; community: string; buy: string; contact: string; download: string; profile: string };
   hero: { kicker: string; title1: string; title2: string; sub: string; ctaBuy: string; ctaMenu: string };
   story: { tag: string; title: string; body: string[] };
   token: { tag: string; title: string; sub: string; rows: { k: string; v: string }[]; alloc: { name: string; pct: number }[] };
@@ -108,6 +108,27 @@ export type Dict = {
   gallery: { tag: string; title: string; sub: string };
   merch: { tag: string; title: string; sub: string; comingSoon: string; items: { name: string; desc: string }[] };
   buy: { tag: string; title: string; sub: string; connect: string; points: string[]; connected: string; balanceLabel: string; walletNote: string; disconnect: string };
+  profile: {
+    tag: string;
+    title: string;
+    sub: string;
+    connectCta: string;
+    chooseWallet: string;
+    signCta: string;
+    signing: string;
+    connecting: string;
+    nicknameLabel: string;
+    nicknamePlaceholder: string;
+    saveCta: string;
+    saved: string;
+    balanceLabel: string;
+    loyaltyTitle: string;
+    loyaltyPoints: string;
+    loyaltyEmpty: string;
+    logoutCta: string;
+    memberSince: string;
+    errorGeneric: string;
+  };
   roadmap: { tag: string; title: string; phases: { n: string; t: string; d: string; done?: boolean }[] };
   faq: { tag: string; title: string; items: { q: string; a: string }[] };
   contact: { tag: string; title: string; sub: string; address: string; addressVal: string; phone: string; phoneVal: string; hours: string; hoursVal: string; ig: string };
@@ -124,7 +145,7 @@ export type Dict = {
 export const dict: Record<Lang, Dict> = {
   ru: {
     locale: "ru-RU",
-    tabs: { story: "Начало", token: "Токен", cafe: "Кофейня", merch: "Мерч", community: "Сообщество", buy: "Купить", contact: "Контакты", download: "Скачать" },
+    tabs: { story: "Начало", token: "Токен", cafe: "Кофейня", merch: "Мерч", community: "Сообщество", buy: "Купить", contact: "Контакты", download: "Скачать", profile: "Профиль" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "Горная кофейня.",
@@ -278,6 +299,27 @@ export const dict: Record<Lang, Dict> = {
       walletNote: "Показан баланс настоящего $DOFFA на mainnet — подключи Phantom, чтобы увидеть свой баланс.",
       disconnect: "Отключить",
     },
+    profile: {
+      tag: "Личный кабинет",
+      title: "Профиль DOFFA",
+      sub: "Войди по Solana-кошельку — без пароля, только подпись сообщения.",
+      connectCta: "Подключить кошелёк",
+      chooseWallet: "Выбери кошелёк",
+      signCta: "Войти (подписать сообщение)",
+      signing: "Подписываем…",
+      connecting: "Подключаем…",
+      nicknameLabel: "Никнейм",
+      nicknamePlaceholder: "Как к тебе обращаться?",
+      saveCta: "Сохранить",
+      saved: "Сохранено",
+      balanceLabel: "$DOFFA на кошельке",
+      loyaltyTitle: "Бонусы кофейни",
+      loyaltyPoints: "Баллов",
+      loyaltyEmpty: "Пока нет истории покупок — баллы появятся здесь после первой покупки в кофейне.",
+      logoutCta: "Выйти",
+      memberSince: "С нами с",
+      errorGeneric: "Что-то пошло не так, попробуй ещё раз",
+    },
     roadmap: {
       tag: "План",
       title: "Дорожная карта",
@@ -322,7 +364,7 @@ export const dict: Record<Lang, Dict> = {
   },
   en: {
     locale: "en-US",
-    tabs: { story: "Start", token: "Token", cafe: "Café", merch: "Merch", community: "Community", buy: "Buy", contact: "Contact", download: "Download" },
+    tabs: { story: "Start", token: "Token", cafe: "Café", merch: "Merch", community: "Community", buy: "Buy", contact: "Contact", download: "Download", profile: "Profile" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "Mountain coffee bar.",
@@ -476,6 +518,27 @@ export const dict: Record<Lang, Dict> = {
       walletNote: "This shows your real $DOFFA balance on mainnet — connect Phantom to see it.",
       disconnect: "Disconnect",
     },
+    profile: {
+      tag: "Account",
+      title: "DOFFA Profile",
+      sub: "Sign in with your Solana wallet — no password, just a message signature.",
+      connectCta: "Connect wallet",
+      chooseWallet: "Choose a wallet",
+      signCta: "Sign in (sign message)",
+      signing: "Signing…",
+      connecting: "Connecting…",
+      nicknameLabel: "Nickname",
+      nicknamePlaceholder: "What should we call you?",
+      saveCta: "Save",
+      saved: "Saved",
+      balanceLabel: "$DOFFA in wallet",
+      loyaltyTitle: "Coffee shop rewards",
+      loyaltyPoints: "Points",
+      loyaltyEmpty: "No purchase history yet — points will show up here after your first purchase at the coffee shop.",
+      logoutCta: "Sign out",
+      memberSince: "Member since",
+      errorGeneric: "Something went wrong, try again",
+    },
     roadmap: {
       tag: "Plan",
       title: "Roadmap",
@@ -521,7 +584,7 @@ export const dict: Record<Lang, Dict> = {
   ar: {
     locale: "ar",
     dir: "rtl",
-    tabs: { story: "البداية", token: "العملة", cafe: "المقهى", merch: "منتجات", community: "المجتمع", buy: "شراء", contact: "تواصل", download: "تحميل" },
+    tabs: { story: "البداية", token: "العملة", cafe: "المقهى", merch: "منتجات", community: "المجتمع", buy: "شراء", contact: "تواصل", download: "تحميل", profile: "الملف الشخصي" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "مقهى في الجبال.",
@@ -675,6 +738,27 @@ export const dict: Record<Lang, Dict> = {
       walletNote: "يعرض هذا رصيدك الحقيقي من $DOFFA على mainnet — اربط Phantom لرؤيته.",
       disconnect: "قطع الاتصال",
     },
+    profile: {
+      tag: "الحساب",
+      title: "ملف DOFFA الشخصي",
+      sub: "سجّل الدخول بمحفظة Solana — بلا كلمة مرور، فقط توقيع رسالة.",
+      connectCta: "ربط المحفظة",
+      chooseWallet: "اختر محفظة",
+      signCta: "تسجيل الدخول (توقيع الرسالة)",
+      signing: "جارٍ التوقيع…",
+      connecting: "جارٍ الاتصال…",
+      nicknameLabel: "الاسم المستعار",
+      nicknamePlaceholder: "كيف نناديك؟",
+      saveCta: "حفظ",
+      saved: "تم الحفظ",
+      balanceLabel: "$DOFFA في المحفظة",
+      loyaltyTitle: "مكافآت المقهى",
+      loyaltyPoints: "نقاط",
+      loyaltyEmpty: "لا يوجد سجل مشتريات بعد — ستظهر النقاط هنا بعد أول عملية شراء من المقهى.",
+      logoutCta: "تسجيل الخروج",
+      memberSince: "عضو منذ",
+      errorGeneric: "حدث خطأ ما، حاول مرة أخرى",
+    },
     roadmap: {
       tag: "الخطة",
       title: "خارطة الطريق",
@@ -719,7 +803,7 @@ export const dict: Record<Lang, Dict> = {
   },
   tr: {
     locale: "tr-TR",
-    tabs: { story: "Başlangıç", token: "Token", cafe: "Kafe", merch: "Mağaza", community: "Topluluk", buy: "Satın Al", contact: "İletişim", download: "İndir" },
+    tabs: { story: "Başlangıç", token: "Token", cafe: "Kafe", merch: "Mağaza", community: "Topluluk", buy: "Satın Al", contact: "İletişim", download: "İndir", profile: "Profil" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "Dağ kahvesi.",
@@ -873,6 +957,27 @@ export const dict: Record<Lang, Dict> = {
       walletNote: "Bu, mainnet'teki gerçek $DOFFA bakiyenizi gösterir — görmek için Phantom'u bağlayın.",
       disconnect: "Bağlantıyı kes",
     },
+    profile: {
+      tag: "Hesap",
+      title: "DOFFA Profili",
+      sub: "Solana cüzdanınla giriş yap — şifre yok, sadece mesaj imzası.",
+      connectCta: "Cüzdanı bağla",
+      chooseWallet: "Cüzdan seç",
+      signCta: "Giriş yap (mesajı imzala)",
+      signing: "İmzalanıyor…",
+      connecting: "Bağlanıyor…",
+      nicknameLabel: "Takma ad",
+      nicknamePlaceholder: "Sana nasıl hitap edelim?",
+      saveCta: "Kaydet",
+      saved: "Kaydedildi",
+      balanceLabel: "Cüzdandaki $DOFFA",
+      loyaltyTitle: "Kafe ödülleri",
+      loyaltyPoints: "Puan",
+      loyaltyEmpty: "Henüz alışveriş geçmişi yok — puanlar kafeden ilk alışverişten sonra burada görünecek.",
+      logoutCta: "Çıkış yap",
+      memberSince: "Üyelik başlangıcı",
+      errorGeneric: "Bir şeyler ters gitti, tekrar dene",
+    },
     roadmap: {
       tag: "Plan",
       title: "Yol haritası",
@@ -917,7 +1022,7 @@ export const dict: Record<Lang, Dict> = {
   },
   es: {
     locale: "es-ES",
-    tabs: { story: "Inicio", token: "Token", cafe: "Cafetería", merch: "Merch", community: "Comunidad", buy: "Comprar", contact: "Contacto", download: "Descargar" },
+    tabs: { story: "Inicio", token: "Token", cafe: "Cafetería", merch: "Merch", community: "Comunidad", buy: "Comprar", contact: "Contacto", download: "Descargar", profile: "Perfil" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "Cafetería de montaña.",
@@ -1071,6 +1176,27 @@ export const dict: Record<Lang, Dict> = {
       walletNote: "Esto muestra tu saldo real de $DOFFA en mainnet — conecta Phantom para verlo.",
       disconnect: "Desconectar",
     },
+    profile: {
+      tag: "Cuenta",
+      title: "Perfil DOFFA",
+      sub: "Inicia sesión con tu billetera Solana — sin contraseña, solo una firma de mensaje.",
+      connectCta: "Conectar billetera",
+      chooseWallet: "Elige una billetera",
+      signCta: "Iniciar sesión (firmar mensaje)",
+      signing: "Firmando…",
+      connecting: "Conectando…",
+      nicknameLabel: "Apodo",
+      nicknamePlaceholder: "¿Cómo te llamamos?",
+      saveCta: "Guardar",
+      saved: "Guardado",
+      balanceLabel: "$DOFFA en la billetera",
+      loyaltyTitle: "Recompensas de la cafetería",
+      loyaltyPoints: "Puntos",
+      loyaltyEmpty: "Aún no hay historial de compras — los puntos aparecerán aquí tras tu primera compra en la cafetería.",
+      logoutCta: "Cerrar sesión",
+      memberSince: "Miembro desde",
+      errorGeneric: "Algo salió mal, inténtalo de nuevo",
+    },
     roadmap: {
       tag: "Plan",
       title: "Hoja de ruta",
@@ -1115,7 +1241,7 @@ export const dict: Record<Lang, Dict> = {
   },
   fr: {
     locale: "fr-FR",
-    tabs: { story: "Début", token: "Jeton", cafe: "Café", merch: "Boutique", community: "Communauté", buy: "Acheter", contact: "Contact", download: "Télécharger" },
+    tabs: { story: "Début", token: "Jeton", cafe: "Café", merch: "Boutique", community: "Communauté", buy: "Acheter", contact: "Contact", download: "Télécharger", profile: "Profil" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "Café de montagne.",
@@ -1269,6 +1395,27 @@ export const dict: Record<Lang, Dict> = {
       walletNote: "Ceci affiche votre solde réel de $DOFFA sur le mainnet — connectez Phantom pour le voir.",
       disconnect: "Déconnecter",
     },
+    profile: {
+      tag: "Compte",
+      title: "Profil DOFFA",
+      sub: "Connecte-toi avec ton portefeuille Solana — pas de mot de passe, juste une signature de message.",
+      connectCta: "Connecter le portefeuille",
+      chooseWallet: "Choisis un portefeuille",
+      signCta: "Se connecter (signer le message)",
+      signing: "Signature…",
+      connecting: "Connexion…",
+      nicknameLabel: "Pseudo",
+      nicknamePlaceholder: "Comment t'appeler ?",
+      saveCta: "Enregistrer",
+      saved: "Enregistré",
+      balanceLabel: "$DOFFA dans le portefeuille",
+      loyaltyTitle: "Récompenses du café",
+      loyaltyPoints: "Points",
+      loyaltyEmpty: "Pas encore d'historique d'achats — les points apparaîtront ici après ton premier achat au café.",
+      logoutCta: "Se déconnecter",
+      memberSince: "Membre depuis",
+      errorGeneric: "Une erreur est survenue, réessaie",
+    },
     roadmap: {
       tag: "Plan",
       title: "Feuille de route",
@@ -1313,7 +1460,7 @@ export const dict: Record<Lang, Dict> = {
   },
   de: {
     locale: "de-DE",
-    tabs: { story: "Start", token: "Token", cafe: "Café", merch: "Merch", community: "Community", buy: "Kaufen", contact: "Kontakt", download: "Download" },
+    tabs: { story: "Start", token: "Token", cafe: "Café", merch: "Merch", community: "Community", buy: "Kaufen", contact: "Kontakt", download: "Download", profile: "Profil" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "Bergkaffee.",
@@ -1467,6 +1614,27 @@ export const dict: Record<Lang, Dict> = {
       walletNote: "Dies zeigt dein echtes $DOFFA-Guthaben auf dem Mainnet — verbinde Phantom, um es zu sehen.",
       disconnect: "Trennen",
     },
+    profile: {
+      tag: "Konto",
+      title: "DOFFA-Profil",
+      sub: "Melde dich mit deiner Solana-Wallet an — kein Passwort, nur eine Nachrichtensignatur.",
+      connectCta: "Wallet verbinden",
+      chooseWallet: "Wallet wählen",
+      signCta: "Anmelden (Nachricht signieren)",
+      signing: "Signieren…",
+      connecting: "Verbinden…",
+      nicknameLabel: "Spitzname",
+      nicknamePlaceholder: "Wie sollen wir dich nennen?",
+      saveCta: "Speichern",
+      saved: "Gespeichert",
+      balanceLabel: "$DOFFA in der Wallet",
+      loyaltyTitle: "Café-Prämien",
+      loyaltyPoints: "Punkte",
+      loyaltyEmpty: "Noch keine Kaufhistorie — Punkte erscheinen hier nach deinem ersten Kauf im Café.",
+      logoutCta: "Abmelden",
+      memberSince: "Mitglied seit",
+      errorGeneric: "Etwas ist schiefgelaufen, versuch es erneut",
+    },
     roadmap: {
       tag: "Plan",
       title: "Roadmap",
@@ -1511,7 +1679,7 @@ export const dict: Record<Lang, Dict> = {
   },
   zh: {
     locale: "zh-CN",
-    tabs: { story: "起点", token: "代币", cafe: "咖啡馆", merch: "周边", community: "社区", buy: "购买", contact: "联系", download: "下载" },
+    tabs: { story: "起点", token: "代币", cafe: "咖啡馆", merch: "周边", community: "社区", buy: "购买", contact: "联系", download: "下载", profile: "个人主页" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "山地咖啡馆。",
@@ -1665,6 +1833,27 @@ export const dict: Record<Lang, Dict> = {
       walletNote: "这里显示你在主网上的真实 $DOFFA 余额——连接 Phantom 即可查看。",
       disconnect: "断开连接",
     },
+    profile: {
+      tag: "账户",
+      title: "DOFFA 个人主页",
+      sub: "用 Solana 钱包登录——无需密码，只需签名一条消息。",
+      connectCta: "连接钱包",
+      chooseWallet: "选择钱包",
+      signCta: "登录（签名消息）",
+      signing: "签名中…",
+      connecting: "连接中…",
+      nicknameLabel: "昵称",
+      nicknamePlaceholder: "怎么称呼你？",
+      saveCta: "保存",
+      saved: "已保存",
+      balanceLabel: "钱包中的 $DOFFA",
+      loyaltyTitle: "咖啡馆积分",
+      loyaltyPoints: "积分",
+      loyaltyEmpty: "暂无购买记录——首次在咖啡馆消费后积分会显示在这里。",
+      logoutCta: "退出登录",
+      memberSince: "加入时间",
+      errorGeneric: "出了点问题，请重试",
+    },
     roadmap: {
       tag: "计划",
       title: "路线图",
@@ -1709,7 +1898,7 @@ export const dict: Record<Lang, Dict> = {
   },
   hi: {
     locale: "hi-IN",
-    tabs: { story: "शुरुआत", token: "टोकन", cafe: "कैफ़े", merch: "मर्च", community: "समुदाय", buy: "खरीदें", contact: "संपर्क", download: "डाउनलोड" },
+    tabs: { story: "शुरुआत", token: "टोकन", cafe: "कैफ़े", merch: "मर्च", community: "समुदाय", buy: "खरीदें", contact: "संपर्क", download: "डाउनलोड", profile: "प्रोफ़ाइल" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "पहाड़ों का कैफ़े।",
@@ -1863,6 +2052,27 @@ export const dict: Record<Lang, Dict> = {
       walletNote: "यह mainnet पर आपका असली $DOFFA बैलेंस दिखाता है — इसे देखने के लिए Phantom कनेक्ट करें।",
       disconnect: "डिस्कनेक्ट करें",
     },
+    profile: {
+      tag: "खाता",
+      title: "DOFFA प्रोफ़ाइल",
+      sub: "अपने Solana वॉलेट से साइन इन करें — कोई पासवर्ड नहीं, बस एक मैसेज सिग्नेचर।",
+      connectCta: "वॉलेट कनेक्ट करें",
+      chooseWallet: "वॉलेट चुनें",
+      signCta: "साइन इन करें (मैसेज साइन करें)",
+      signing: "साइन हो रहा है…",
+      connecting: "कनेक्ट हो रहा है…",
+      nicknameLabel: "उपनाम",
+      nicknamePlaceholder: "तुम्हें क्या कहकर बुलाएं?",
+      saveCta: "सहेजें",
+      saved: "सहेजा गया",
+      balanceLabel: "वॉलेट में $DOFFA",
+      loyaltyTitle: "कैफ़े रिवॉर्ड्स",
+      loyaltyPoints: "पॉइंट्स",
+      loyaltyEmpty: "अभी कोई खरीद इतिहास नहीं — कैफ़े में पहली खरीद के बाद पॉइंट्स यहाँ दिखेंगे।",
+      logoutCta: "साइन आउट करें",
+      memberSince: "सदस्य बने",
+      errorGeneric: "कुछ गड़बड़ हुई, फिर से कोशिश करें",
+    },
     roadmap: {
       tag: "योजना",
       title: "रोडमैप",
@@ -1907,7 +2117,7 @@ export const dict: Record<Lang, Dict> = {
   },
   pt: {
     locale: "pt-BR",
-    tabs: { story: "Início", token: "Token", cafe: "Cafeteria", merch: "Loja", community: "Comunidade", buy: "Comprar", contact: "Contato", download: "Baixar" },
+    tabs: { story: "Início", token: "Token", cafe: "Cafeteria", merch: "Loja", community: "Comunidade", buy: "Comprar", contact: "Contato", download: "Baixar", profile: "Perfil" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "Cafeteria de montanha.",
@@ -2061,6 +2271,27 @@ export const dict: Record<Lang, Dict> = {
       walletNote: "Isto mostra o seu saldo real de $DOFFA na mainnet — conecte a Phantom para ver.",
       disconnect: "Desconectar",
     },
+    profile: {
+      tag: "Conta",
+      title: "Perfil DOFFA",
+      sub: "Entre com sua carteira Solana — sem senha, apenas uma assinatura de mensagem.",
+      connectCta: "Conectar carteira",
+      chooseWallet: "Escolha uma carteira",
+      signCta: "Entrar (assinar mensagem)",
+      signing: "Assinando…",
+      connecting: "Conectando…",
+      nicknameLabel: "Apelido",
+      nicknamePlaceholder: "Como te chamamos?",
+      saveCta: "Salvar",
+      saved: "Salvo",
+      balanceLabel: "$DOFFA na carteira",
+      loyaltyTitle: "Recompensas da cafeteria",
+      loyaltyPoints: "Pontos",
+      loyaltyEmpty: "Ainda sem histórico de compras — os pontos aparecerão aqui após sua primeira compra na cafeteria.",
+      logoutCta: "Sair",
+      memberSince: "Membro desde",
+      errorGeneric: "Algo deu errado, tente novamente",
+    },
     roadmap: {
       tag: "Plano",
       title: "Roteiro",
@@ -2105,7 +2336,7 @@ export const dict: Record<Lang, Dict> = {
   },
   it: {
     locale: "it-IT",
-    tabs: { story: "Inizio", token: "Token", cafe: "Caffetteria", merch: "Merch", community: "Community", buy: "Acquista", contact: "Contatti", download: "Scarica" },
+    tabs: { story: "Inizio", token: "Token", cafe: "Caffetteria", merch: "Merch", community: "Community", buy: "Acquista", contact: "Contatti", download: "Scarica", profile: "Profilo" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "Caffetteria di montagna.",
@@ -2259,6 +2490,27 @@ export const dict: Record<Lang, Dict> = {
       walletNote: "Questo mostra il tuo saldo reale di $DOFFA sulla mainnet — connetti Phantom per vederlo.",
       disconnect: "Disconnetti",
     },
+    profile: {
+      tag: "Account",
+      title: "Profilo DOFFA",
+      sub: "Accedi con il tuo portafoglio Solana — niente password, solo una firma del messaggio.",
+      connectCta: "Collega portafoglio",
+      chooseWallet: "Scegli un portafoglio",
+      signCta: "Accedi (firma messaggio)",
+      signing: "Firma in corso…",
+      connecting: "Connessione…",
+      nicknameLabel: "Nickname",
+      nicknamePlaceholder: "Come ti chiamiamo?",
+      saveCta: "Salva",
+      saved: "Salvato",
+      balanceLabel: "$DOFFA nel portafoglio",
+      loyaltyTitle: "Premi del bar",
+      loyaltyPoints: "Punti",
+      loyaltyEmpty: "Ancora nessuno storico acquisti — i punti appariranno qui dopo il tuo primo acquisto al bar.",
+      logoutCta: "Esci",
+      memberSince: "Membro da",
+      errorGeneric: "Qualcosa è andato storto, riprova",
+    },
     roadmap: {
       tag: "Piano",
       title: "Roadmap",
@@ -2303,7 +2555,7 @@ export const dict: Record<Lang, Dict> = {
   },
   ja: {
     locale: "ja-JP",
-    tabs: { story: "はじまり", token: "トークン", cafe: "カフェ", merch: "マーチ", community: "コミュニティ", buy: "購入", contact: "お問い合わせ", download: "ダウンロード" },
+    tabs: { story: "はじまり", token: "トークン", cafe: "カフェ", merch: "マーチ", community: "コミュニティ", buy: "購入", contact: "お問い合わせ", download: "ダウンロード", profile: "プロフィール" },
     hero: {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "山のコーヒーバー。",
@@ -2456,6 +2708,27 @@ export const dict: Record<Lang, Dict> = {
       balanceLabel: "あなたの残高",
       walletNote: "mainnet 上のあなたの本物の $DOFFA 残高を表示します——確認するには Phantom を接続してください。",
       disconnect: "切断",
+    },
+    profile: {
+      tag: "アカウント",
+      title: "DOFFA プロフィール",
+      sub: "Solanaウォレットでサインイン——パスワード不要、メッセージ署名だけ。",
+      connectCta: "ウォレットを接続",
+      chooseWallet: "ウォレットを選択",
+      signCta: "サインイン（メッセージに署名）",
+      signing: "署名中…",
+      connecting: "接続中…",
+      nicknameLabel: "ニックネーム",
+      nicknamePlaceholder: "呼び方を教えてください",
+      saveCta: "保存",
+      saved: "保存しました",
+      balanceLabel: "ウォレット内の $DOFFA",
+      loyaltyTitle: "カフェの特典",
+      loyaltyPoints: "ポイント",
+      loyaltyEmpty: "購入履歴はまだありません——カフェでの初回購入後にポイントが表示されます。",
+      logoutCta: "サインアウト",
+      memberSince: "登録日",
+      errorGeneric: "問題が発生しました。もう一度お試しください",
     },
     roadmap: {
       tag: "計画",
