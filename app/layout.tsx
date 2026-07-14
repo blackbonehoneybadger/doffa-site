@@ -18,7 +18,7 @@ const sans = Manrope({
 export const metadata: Metadata = {
   title: "DOFFA — Espresso Bar × Web3 · Solana",
   description:
-    "COFFEE DOFFA — кофейня из Карачаево-Черкесии со своей игровой экономикой: Telegram Tap → Cups → DOFFA Crazy 8 → награда $DOFFA на Solana. Честный, прозрачный, халяльный проект.",
+    "COFFEE DOFFA — кофейня из Карачаево-Черкесии со своей игровой экономикой: тапай и копи Cups, играй в DOFFA Crazy 8, получай награду $DOFFA на Solana. Честный, прозрачный, халяльный проект.",
   metadataBase: new URL("https://doffa.coffee"),
   openGraph: {
     title: "DOFFA — Espresso Bar × Web3",

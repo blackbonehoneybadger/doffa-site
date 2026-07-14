@@ -10,8 +10,8 @@ export const metadata: Metadata = {
 const GAME_URL = "https://zapisnoy-kozel.vercel.app";
 const APK_URL = "https://github.com/blackbonehoneybadger/zapisnoy-kozel/releases";
 
-// Страница «Скачать»: игра DOFFA Crazy 8 и Telegram Tap. Статическая, вне
-// клиентского словаря — RU-основной текст с EN-подстрочником, стиль сайта.
+// Страница «Скачать»: игра DOFFA Crazy 8. Статическая, вне клиентского
+// словаря — RU-основной текст с EN-подстрочником, стиль сайта.
 export default function DownloadPage() {
   return (
     <main className="mx-auto min-h-screen max-w-4xl px-5 pb-24 pt-28">
@@ -69,25 +69,6 @@ export default function DownloadPage() {
           >
             Скачать APK ↗
           </a>
-        </div>
-
-        {/* Telegram Tap */}
-        <div className="card relative flex flex-col overflow-hidden rounded-3xl p-8 sm:col-span-2">
-          <div aria-hidden className="gold-line absolute inset-x-0 top-0 h-px" />
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div className="max-w-xl">
-              <span className="text-3xl">👆</span>
-              <h2 className="display mt-4 text-2xl font-bold text-cream-soft">DOFFA Tap в Telegram</h2>
-              <p className="mt-2 text-sm leading-relaxed text-cream/65">
-                Мини-игра в Telegram: тапай и зарабатывай Cups — внутреннюю
-                игровую энергию экосистемы. Cups тратятся на партии в DOFFA
-                Crazy 8, а победы приносят $DOFFA.
-              </p>
-            </div>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-copper/30 bg-copper/10 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-copper">
-              Скоро · Coming soon
-            </span>
-          </div>
         </div>
       </div>
 
