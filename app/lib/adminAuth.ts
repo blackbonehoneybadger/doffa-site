@@ -1,62 +1,77 @@
-// Простая сессия для админ-панели загрузки видео: один общий пароль на кофейню,
-// без базы пользователей. Сессия — HMAC-подписанная cookie, не JWT-библиотека,
-// потому что здесь ровно один секрет и ровно одна роль ("владелец загрузил видео").
-import { createHmac, timingSafeEqual } from "node:crypto";
+// Обёртка Next.js поверх adminAuthCore: cookie + opaque admin session.
 import { cookies } from "next/headers";
+import {
+  ADMIN_SESSION_MAX_AGE_SECONDS,
+  COOKIE_NAME,
+  decodeSessionCookie,
+  encodeSessionCookie,
+  insertAdminSession,
+  newAdminSessionId,
+  adminSessionExists,
+  revokeAdminSession,
+  requireAdminSecrets,
+  cleanupAdminAuthDebris,
+} from "./adminAuthCore";
 
-const COOKIE_NAME = "doffa_admin_session";
-const MAX_AGE_SECONDS = 60 * 60 * 24 * 30; // 30 дней
+export {
+  COOKIE_NAME,
+  ADMIN_SESSION_MAX_AGE_SECONDS,
+  MAX_FAILED_ATTEMPTS,
+  LOCKOUT_WINDOW_MS,
+  requireAdminSecrets,
+  checkPassword,
+  clientIpFromRequest,
+  encodeSessionCookie,
+  decodeSessionCookie,
+  isIpLockedOut,
+  recordLoginAttempt,
+  insertAdminSession,
+  adminSessionExists,
+  revokeAdminSession,
+  cleanupAdminAuthDebris,
+  newAdminSessionId,
+} from "./adminAuthCore";
 
-// Секрет сессии. Если не задан — генерируем на старте процесса: сессии не
-// переживут рестарт сервера, но это безопаснее захардкоженного дефолта.
-const SESSION_SECRET =
-  process.env.SESSION_SECRET?.trim() || crypto.randomUUID() + crypto.randomUUID();
-
-function sign(value: string): string {
-  return createHmac("sha256", SESSION_SECRET).update(value).digest("hex");
-}
-
-function safeEqual(a: string, b: string): boolean {
-  const bufA = Buffer.from(a);
-  const bufB = Buffer.from(b);
-  if (bufA.length !== bufB.length) return false;
-  return timingSafeEqual(bufA, bufB);
-}
-
-/** Пароль верный? Сравнение защищено от timing-атак. */
-export function checkPassword(input: string): boolean {
-  const expected = process.env.ADMIN_UPLOAD_PASSWORD?.trim();
-  if (!expected) return false;
-  return safeEqual(input, expected);
-}
-
-const SESSION_PAYLOAD = "doffa-admin-v1";
-
-/** Значение cookie для валидной сессии — детерминированное, без штампа времени. */
-function sessionToken(): string {
-  return `${SESSION_PAYLOAD}.${sign(SESSION_PAYLOAD)}`;
-}
-
-export async function createSession(): Promise<void> {
+export async function createSession(opts?: {
+  ip?: string;
+  userAgent?: string;
+}): Promise<void> {
+  requireAdminSecrets();
+  const id = newAdminSessionId();
+  const expiresAtMs = Date.now() + ADMIN_SESSION_MAX_AGE_SECONDS * 1000;
+  await insertAdminSession({
+    id,
+    expiresAtMs,
+    ip: opts?.ip,
+    userAgent: opts?.userAgent,
+  });
+  await cleanupAdminAuthDebris();
   const store = await cookies();
-  store.set(COOKIE_NAME, sessionToken(), {
+  store.set(COOKIE_NAME, encodeSessionCookie(id), {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
-    maxAge: MAX_AGE_SECONDS,
+    maxAge: ADMIN_SESSION_MAX_AGE_SECONDS,
   });
 }
 
 export async function destroySession(): Promise<void> {
   const store = await cookies();
+  const raw = store.get(COOKIE_NAME)?.value;
+  const id = decodeSessionCookie(raw);
+  if (id) await revokeAdminSession(id).catch(() => {});
   store.delete(COOKIE_NAME);
 }
 
-/** Проверяет cookie текущего запроса (для API-роутов и серверных компонентов). */
 export async function isAuthed(): Promise<boolean> {
+  try {
+    requireAdminSecrets();
+  } catch {
+    return false;
+  }
   const store = await cookies();
-  const value = store.get(COOKIE_NAME)?.value;
-  if (!value) return false;
-  return safeEqual(value, sessionToken());
+  const id = decodeSessionCookie(store.get(COOKIE_NAME)?.value);
+  if (!id) return false;
+  return adminSessionExists(id);
 }
