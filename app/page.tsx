@@ -208,6 +208,12 @@ export default function Home() {
             >
               {t.tabs.download}
             </Link>
+            <Link
+              href="/profile"
+              className="text-xs text-cream/70 transition hover:text-gold xl:text-sm"
+            >
+              {t.tabs.profile}
+            </Link>
           </nav>
           <div className="flex items-center gap-3 sm:gap-2">
             {/* Wallet connect button */}
@@ -338,6 +344,13 @@ export default function Home() {
                 className="rounded-lg px-3 py-2 text-sm font-semibold text-gold hover:bg-gold/10"
               >
                 {t.tabs.download} ↓
+              </Link>
+              <Link
+                href="/profile"
+                onClick={() => setMenuOpen(false)}
+                className="rounded-lg px-3 py-2 text-sm text-cream/75 hover:bg-white/5 hover:text-gold"
+              >
+                {t.tabs.profile}
               </Link>
             </div>
           </nav>
