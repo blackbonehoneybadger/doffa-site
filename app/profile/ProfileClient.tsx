@@ -1,9 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { dict, LANGS, type Lang } from "../content";
-import { connectWalletById, disconnectWalletById, signMessageById, fetchBalance } from "../solana";
+import {
+  connectWalletDetailed,
+  disconnectWalletById,
+  signMessageById,
+  fetchBalance,
+  peekPendingWallet,
+  clearPendingWallet,
+  type WalletId,
+} from "../solana";
 import { Identicon } from "../components/Identicon";
 
 type User = {
@@ -20,11 +28,11 @@ type Loyalty = {
 };
 
 const WALLET_OPTS = [
-  { id: "phantom", name: "Phantom" },
-  { id: "solflare", name: "Solflare" },
-  { id: "trust", name: "Trust Wallet" },
-  { id: "backpack", name: "Backpack" },
-] as const;
+  { id: "phantom" as const, name: "Phantom" },
+  { id: "solflare" as const, name: "Solflare" },
+  { id: "trust" as const, name: "Trust Wallet" },
+  { id: "backpack" as const, name: "Backpack" },
+];
 
 export default function ProfileClient() {
   const [lang, setLang] = useState<Lang>("ru");
@@ -39,10 +47,12 @@ export default function ProfileClient() {
   const [connecting, setConnecting] = useState(false);
   const [signing, setSigning] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hint, setHint] = useState<string | null>(null);
 
   const [nickname, setNickname] = useState("");
   const [saving, setSaving] = useState(false);
   const [savedFlash, setSavedFlash] = useState(false);
+  const autoResumeDone = useRef(false);
 
   async function loadProfile() {
     try {
@@ -61,34 +71,10 @@ export default function ProfileClient() {
     }
   }
 
-  useEffect(() => {
-    let cancelled = false;
-    fetch("/api/profile")
-      .then((r) => r.json())
-      .then((data) => {
-        if (cancelled || !data.ok) return;
-        setUser(data.user);
-        setLoyalty(data.loyalty);
-        setNickname(data.user.nickname ?? "");
-        fetchBalance(data.user.wallet_address).then(setBalance).catch(() => setBalance(0));
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  async function handleConnectAndSignIn(id: string) {
-    setError(null);
-    setConnecting(true);
-    const addr = await connectWalletById(id);
-    setConnecting(false);
-    if (!addr) return;
+  async function completeSignIn(id: WalletId, addr: string) {
     setWalletId(id);
     setSigning(true);
+    setError(null);
     try {
       const nonceRes = await fetch("/api/auth/nonce", {
         method: "POST",
@@ -97,13 +83,11 @@ export default function ProfileClient() {
       }).then((r) => r.json());
       if (!nonceRes.token) {
         setError(nonceRes.error ?? t.profile.errorGeneric);
-        setSigning(false);
         return;
       }
       const signature = await signMessageById(id, nonceRes.message);
       if (!signature) {
         setError(t.profile.errorGeneric);
-        setSigning(false);
         return;
       }
       const verifyRes = await fetch("/api/auth/verify", {
@@ -113,9 +97,10 @@ export default function ProfileClient() {
       }).then((r) => r.json());
       if (!verifyRes.ok) {
         setError(verifyRes.error ?? t.profile.errorGeneric);
-        setSigning(false);
         return;
       }
+      clearPendingWallet();
+      setHint(null);
       await loadProfile();
     } catch {
       setError(t.profile.errorGeneric);
@@ -123,6 +108,80 @@ export default function ProfileClient() {
       setSigning(false);
     }
   }
+
+  async function handleConnectAndSignIn(id: WalletId) {
+    setError(null);
+    setHint(null);
+    setConnecting(true);
+    const outcome = await connectWalletDetailed(id);
+    setConnecting(false);
+
+    if (outcome.status === "opened_app") {
+      setHint(
+        lang === "ru"
+          ? "Открываю приложение кошелька… Подтверди вход там — страница откроется внутри кошелька."
+          : "Opening the wallet app… Confirm there — the site will continue inside the wallet browser.",
+      );
+      return;
+    }
+    if (outcome.status === "needs_install") {
+      setError(
+        lang === "ru"
+          ? "Расширение кошелька не найдено. Установи его в браузере и обнови страницу."
+          : "Wallet extension not found. Install it in your browser and refresh.",
+      );
+      return;
+    }
+    if (outcome.status !== "connected") return;
+    await completeSignIn(id, outcome.address);
+  }
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/profile")
+      .then((r) => r.json())
+      .then(async (data) => {
+        if (cancelled) return;
+        if (data.ok) {
+          setUser(data.user);
+          setLoyalty(data.loyalty);
+          setNickname(data.user.nickname ?? "");
+          fetchBalance(data.user.wallet_address).then(setBalance).catch(() => setBalance(0));
+          clearPendingWallet();
+          return;
+        }
+        // Вернулись из приложения кошелька — дожимаем вход автоматически.
+        const pending = peekPendingWallet();
+        if (pending && !autoResumeDone.current) {
+          autoResumeDone.current = true;
+          setConnecting(true);
+          setHint(
+            lang === "ru"
+              ? "Кошелёк открыт — завершаю вход…"
+              : "Wallet ready — finishing sign-in…",
+          );
+          const outcome = await connectWalletDetailed(pending);
+          setConnecting(false);
+          if (outcome.status === "connected") {
+            await completeSignIn(pending, outcome.address);
+          } else if (outcome.status !== "opened_app") {
+            setHint(
+              lang === "ru"
+                ? "Нажми кнопку кошелька ещё раз, чтобы войти."
+                : "Tap your wallet button again to sign in.",
+            );
+          }
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- resume once on mount
+  }, []);
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
@@ -132,6 +191,7 @@ export default function ProfileClient() {
     setBalance(null);
     setWalletId(null);
     setNickname("");
+    clearPendingWallet();
   }
 
   async function handleSaveNickname() {
@@ -194,6 +254,11 @@ export default function ProfileClient() {
           {error}
         </div>
       )}
+      {hint && !error && (
+        <div className="mt-6 rounded-2xl border border-gold/30 bg-gold/10 px-4 py-3 text-sm text-cream/80">
+          {hint}
+        </div>
+      )}
 
       {loading ? (
         <div className="mt-10 h-40 animate-pulse rounded-3xl bg-white/5" />
@@ -215,10 +280,14 @@ export default function ProfileClient() {
               </button>
             ))}
           </div>
+          <p className="mt-5 text-xs leading-relaxed text-cream/45">
+            {lang === "ru"
+              ? "На телефоне откроется приложение кошелька (Phantom и др.) — вход продолжится внутри него. На компьютере нужно расширение браузера."
+              : "On phones this opens your wallet app (Phantom etc.) so you sign in inside it. On desktop you need the browser extension."}
+          </p>
         </div>
       ) : (
         <div className="mt-10 flex flex-col gap-6">
-          {/* Профиль */}
           <div className="card rounded-3xl p-8">
             <div className="flex items-center gap-4">
               <Identicon seed={user.wallet_address} label={user.nickname ?? undefined} size={56} />
@@ -271,7 +340,6 @@ export default function ProfileClient() {
             </button>
           </div>
 
-          {/* Лояльность кофейни */}
           <div className="card rounded-3xl p-8">
             <h2 className="display text-lg font-bold text-cream-soft">{t.profile.loyaltyTitle}</h2>
             <div className="mt-4 flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3">
