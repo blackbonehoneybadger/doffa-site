@@ -77,3 +77,10 @@ create table if not exists admin_login_attempts (
 );
 
 create index if not exists admin_login_attempts_locked_idx on admin_login_attempts (locked_until);
+
+-- Счётчики сайта (просмотры и т.п.) для админ-панели.
+create table if not exists site_counters (
+  key text primary key,
+  value bigint not null default 0,
+  updated_at timestamptz not null default now()
+);

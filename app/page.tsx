@@ -10,6 +10,7 @@ import { REAL, solscanToken, solscanTokenOf, solscanHolders, fetchBalance, conne
 import { SmoothScroll, CursorGlow, MouseParallax, TiltCard, Magnetic, ScrollProgressBar } from "./cinematic";
 import { ThemeToggle } from "./theme-toggle";
 import { Assistant } from "./assistant";
+import { VisitBeacon } from "./visit-beacon";
 
 // three.js + gsap — тяжёлые библиотеки, грузим отдельным чанком только в
 // браузере и только когда компонент реально понадобится (см. hero3d.tsx).
@@ -178,51 +179,64 @@ export default function Home() {
 
   return (
     <main className="relative z-0">
+      <VisitBeacon />
       <SmoothScroll />
       <CursorGlow />
       <ScrollProgressBar />
-      {/* ---------- NAV ---------- */}
+      {/* ---------- NAV: бренд слева · ссылки по центру · язык/тема у правого края ---------- */}
       <header className="theme-pin-dark fixed inset-x-0 top-0 z-50 border-b border-white/5 bg-ink/70 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-5 sm:py-3">
-          <a href="#top" className="flex items-center gap-2.5 sm:gap-3">
-            <Image src="/brand/doffa-logo.jpeg" alt="DOFFA" width={36} height={36} className="rounded-full ring-1 ring-gold/40 sm:w-[40px] sm:h-[40px]" />
+        <div className="mx-auto flex w-full max-w-[1500px] items-center gap-3 px-4 py-3 sm:gap-4 sm:px-6 lg:gap-6 lg:px-8">
+          {/* Дальний левый угол — только бренд */}
+          <a href="#top" className="flex shrink-0 items-center gap-2.5 sm:gap-3">
+            <Image src="/brand/doffa-logo.jpeg" alt="DOFFA" width={36} height={36} className="rounded-full ring-1 ring-gold/40 sm:h-[40px] sm:w-[40px]" />
             <span className="display text-base font-extrabold tracking-tight text-cream-soft sm:text-lg">
               DOFFA<span className="text-teal">.</span>
             </span>
           </a>
-          <nav className="hidden items-center gap-4 xl:gap-5 lg:flex">
-            {tabs.map((t) => (
+
+          {/* Центр — вкладки и действия, с достаточными зазорами */}
+          <nav className="hidden min-w-0 flex-1 items-center justify-center gap-x-5 xl:gap-x-7 lg:flex">
+            {tabs.map((tab) => (
               <button
-                key={t.id}
-                onClick={() => setActiveTab(t.id)}
-                className={`text-xs xl:text-sm transition ${
-                  activeTab === t.id ? "font-semibold text-gold" : "text-cream/70 hover:text-gold"
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`shrink-0 whitespace-nowrap text-sm transition ${
+                  activeTab === tab.id ? "font-semibold text-gold" : "text-cream/70 hover:text-gold"
                 }`}
               >
-                {t.label}
+                {tab.label}
               </button>
             ))}
+            <span className="mx-1 hidden h-4 w-px shrink-0 bg-white/15 xl:block" aria-hidden />
             <Link
               href="/download"
-              className="rounded-full border border-gold/40 bg-gold/10 px-3 py-1 text-xs font-semibold text-gold transition hover:bg-gold/20 xl:text-sm"
+              className="shrink-0 whitespace-nowrap rounded-full border border-gold/40 bg-gold/10 px-3.5 py-1.5 text-sm font-semibold text-gold transition hover:bg-gold/20"
             >
               {t.tabs.download}
             </Link>
             <Link
               href="/profile"
-              className="text-xs text-cream/70 transition hover:text-gold xl:text-sm"
+              className="shrink-0 whitespace-nowrap rounded-full border border-white/15 px-3.5 py-1.5 text-sm text-cream/80 transition hover:border-gold/40 hover:text-gold"
             >
               {t.tabs.profile}
             </Link>
+            <Link
+              href="/admin"
+              className="shrink-0 whitespace-nowrap text-xs tracking-wide text-cream/35 transition hover:text-gold"
+              title="Только для владельца"
+            >
+              Админ
+            </Link>
           </nav>
-          <div className="flex items-center gap-3 sm:gap-2">
-            {/* Wallet connect button */}
+
+          {/* Дальний правый угол — кошелёк · язык · тема · меню */}
+          <div className="ml-auto flex shrink-0 items-center gap-2.5 sm:gap-3">
             <div className="relative hidden sm:block">
               {wallet ? (
                 <>
                   <button
                     onClick={() => setWalletModal((v) => !v)}
-                    className="flex items-center gap-1.5 rounded-full border border-teal/40 bg-teal/10 px-3 py-1.5 text-xs font-semibold text-teal transition hover:border-teal/60"
+                    className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-teal/40 bg-teal/10 px-3 py-1.5 text-xs font-semibold text-teal transition hover:border-teal/60"
                   >
                     <span className="h-1.5 w-1.5 rounded-full bg-teal" />
                     {wallet.slice(0, 4)}…{wallet.slice(-4)}
@@ -232,7 +246,7 @@ export default function Home() {
                       <div className="fixed inset-0 z-40" onClick={() => setWalletModal(false)} />
                       <div className="absolute right-0 top-10 z-50 w-52 rounded-xl border border-white/10 bg-ink/95 p-3 shadow-xl backdrop-blur-md">
                         <p className="mb-1 text-[10px] uppercase tracking-wider text-cream/40">{WALLET_OPTS.find((w) => w.id === walletId)?.name}</p>
-                        <p className="mb-3 font-mono text-[11px] text-cream/50 break-all">{wallet.slice(0, 8)}…{wallet.slice(-8)}</p>
+                        <p className="mb-3 break-all font-mono text-[11px] text-cream/50">{wallet.slice(0, 8)}…{wallet.slice(-8)}</p>
                         {walletBal !== null && (
                           <p className="mb-3 text-xs font-semibold text-gold">{walletBal.toLocaleString(loc)} $DOFFA</p>
                         )}
@@ -247,7 +261,7 @@ export default function Home() {
                 <>
                   <button
                     onClick={() => setWalletModal((v) => !v)}
-                    className="flex items-center gap-1.5 rounded-full border border-gold/40 bg-gold/10 px-3 py-1.5 text-xs font-semibold text-gold transition hover:border-gold/60"
+                    className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-gold/40 bg-gold/10 px-3 py-1.5 text-xs font-semibold text-gold transition hover:border-gold/60"
                   >
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-80"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
                     {t.buy.connect}
@@ -276,6 +290,9 @@ export default function Home() {
                 </>
               )}
             </div>
+
+            <span className="hidden h-5 w-px bg-white/15 sm:block" aria-hidden />
+
             <label className="relative flex items-center">
               <span className="sr-only">Language</span>
               <svg className="pointer-events-none absolute left-2.5 h-3.5 w-3.5 text-cream/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -318,39 +335,45 @@ export default function Home() {
           </div>
         </div>
 
-        {/* мобильное меню вкладок */}
         {menuOpen && (
           <nav className="border-t border-white/10 bg-ink/95 backdrop-blur-md lg:hidden">
-            <div className="mx-auto grid max-w-6xl grid-cols-2 gap-x-4 gap-y-1 px-5 py-4">
-              {tabs.map((t) => (
+            <div className="mx-auto grid max-w-6xl grid-cols-2 gap-x-4 gap-y-2 px-5 py-4">
+              {tabs.map((tab) => (
                 <button
-                  key={t.id}
+                  key={tab.id}
                   onClick={() => {
-                    setActiveTab(t.id);
+                    setActiveTab(tab.id);
                     setMenuOpen(false);
                   }}
-                  className={`rounded-lg px-3 py-2 text-sm transition ${
-                    activeTab === t.id
+                  className={`rounded-lg px-3 py-2.5 text-sm transition ${
+                    activeTab === tab.id
                       ? "bg-gold/20 font-semibold text-gold"
                       : "text-cream/75 hover:bg-white/5 hover:text-gold"
                   }`}
                 >
-                  {t.label}
+                  {tab.label}
                 </button>
               ))}
               <Link
                 href="/download"
                 onClick={() => setMenuOpen(false)}
-                className="rounded-lg px-3 py-2 text-sm font-semibold text-gold hover:bg-gold/10"
+                className="rounded-lg px-3 py-2.5 text-sm font-semibold text-gold hover:bg-gold/10"
               >
                 {t.tabs.download} ↓
               </Link>
               <Link
                 href="/profile"
                 onClick={() => setMenuOpen(false)}
-                className="rounded-lg px-3 py-2 text-sm text-cream/75 hover:bg-white/5 hover:text-gold"
+                className="rounded-lg px-3 py-2.5 text-sm text-cream/75 hover:bg-white/5 hover:text-gold"
               >
                 {t.tabs.profile}
+              </Link>
+              <Link
+                href="/admin"
+                onClick={() => setMenuOpen(false)}
+                className="rounded-lg px-3 py-2.5 text-sm text-cream/45 hover:bg-white/5 hover:text-gold"
+              >
+                Админ
               </Link>
             </div>
           </nav>
