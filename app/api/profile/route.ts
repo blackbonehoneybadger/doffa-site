@@ -1,5 +1,6 @@
 import { currentWallet } from "../../lib/userAuth";
 import { getUser, updateProfile, getLoyalty } from "../../lib/users";
+import { parseJson, profilePatchSchema } from "../../lib/validation";
 
 export async function GET() {
   const wallet = await currentWallet();
@@ -20,13 +21,12 @@ export async function PATCH(request: Request) {
   if (!wallet) {
     return Response.json({ ok: false, error: "Не авторизован" }, { status: 401 });
   }
-  const body = (await request.json().catch(() => null)) as { nickname?: string } | null;
-  const nickname = body?.nickname?.trim().slice(0, 40);
-  if (!nickname) {
-    return Response.json({ ok: false, error: "Нечего сохранять" }, { status: 400 });
+  const parsed = await parseJson(request, profilePatchSchema);
+  if (!parsed.ok) {
+    return Response.json({ ok: false, error: parsed.error }, { status: 400 });
   }
   try {
-    const user = await updateProfile(wallet, { nickname });
+    const user = await updateProfile(wallet, { nickname: parsed.data.nickname });
     return Response.json({ ok: true, user });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);

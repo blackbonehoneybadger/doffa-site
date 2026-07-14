@@ -1,12 +1,14 @@
 import { verifyNonceToken, consumeNonce, createUserSession } from "../../../lib/userAuth";
 import { verifyWalletSignature } from "../../../lib/solanaAuth";
 import { upsertUserLogin } from "../../../lib/users";
+import { parseJson, verifyRequestSchema } from "../../../lib/validation";
 
 export async function POST(request: Request) {
-  const body = (await request.json().catch(() => null)) as { token?: string; signature?: string } | null;
-  if (!body?.token || !body?.signature) {
-    return Response.json({ error: "Не хватает данных" }, { status: 400 });
+  const parsed = await parseJson(request, verifyRequestSchema);
+  if (!parsed.ok) {
+    return Response.json({ error: parsed.error }, { status: 400 });
   }
+  const body = parsed.data;
 
   const nonce = verifyNonceToken(body.token);
   if (!nonce) {
