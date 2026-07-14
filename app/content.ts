@@ -167,7 +167,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Tap → Cups → Игра → $DOFFA",
       sub: "Простая и честная цепочка наград, которую может проверить каждый.",
       steps: [
-        { icon: "👆", t: "Telegram Tap", d: "Тапай в Telegram-мини-игре DOFFA и зарабатывай Cups — внутреннюю игровую энергию." },
+        { icon: "👆", t: "Тапай — копи Cups", d: "Тапай в игре DOFFA и зарабатывай Cups — внутреннюю игровую энергию." },
         { icon: "☕", t: "Копи Cups", d: "Cups — энергия экосистемы. Она не продаётся и не является токеном — только зарабатывается." },
         { icon: "🃏", t: "Играй в DOFFA Crazy 8", d: "Трать Cups на партии в фирменную карточную игру DOFFA Crazy 8." },
         { icon: "🏆", t: "Побеждай", d: "За победу начисляется настоящая награда — $DOFFA из ограниченного Reward Vault." },
@@ -293,7 +293,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Частые вопросы",
       items: [
         { q: "Это мем-койн?", a: "Нет. За токеном стоит реальная кофейня в горах и живая игровая экосистема. $DOFFA зарабатывается в игре, а не раздаётся за хайп." },
-        { q: "Что такое Cups?", a: "Cups — внутренняя игровая энергия. Она начисляется за активность в Telegram Tap и партиях, не продаётся и токеном не является." },
+        { q: "Что такое Cups?", a: "Cups — внутренняя игровая энергия. Она начисляется за тапы и партии в игре, не продаётся и токеном не является." },
         { q: "Как получить $DOFFA?", a: "Побеждай в DOFFA Crazy 8 и нажимай «Забрать награду» — $DOFFA из Reward Vault закрепляется за твоим Solana-кошельком." },
         { q: "Где хранятся мои токены?", a: "Только в вашем личном кошельке (Phantom / Solflare). Сайт и игра не хранят средства и не имеют к ним доступа." },
         { q: "Это инвестиция?", a: "Нет. Мы не обещаем доход и не даём финансовых советов. Участвуйте только из интереса к проекту, игре и кофейне." },
@@ -365,7 +365,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Tap → Cups → Game → $DOFFA",
       sub: "A simple, honest reward chain anyone can verify.",
       steps: [
-        { icon: "👆", t: "Telegram Tap", d: "Tap in the DOFFA Telegram mini-game and earn Cups — the internal game energy." },
+        { icon: "👆", t: "Tap — earn Cups", d: "Tap in the DOFFA game and earn Cups — the internal game energy." },
         { icon: "☕", t: "Stack Cups", d: "Cups are ecosystem energy. Not for sale and not a token — they can only be earned." },
         { icon: "🃏", t: "Play DOFFA Crazy 8", d: "Spend Cups on matches in DOFFA Crazy 8, the brand card game." },
         { icon: "🏆", t: "Win", d: "Victories earn the real reward — $DOFFA from the limited Reward Vault." },
@@ -491,7 +491,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Frequently asked",
       items: [
         { q: "Is this a meme coin?", a: "No. Behind the token is a real mountain coffee bar and a live play economy. $DOFFA is earned in the game, not airdropped for hype." },
-        { q: "What are Cups?", a: "Cups are the internal game energy. Earned through Telegram Tap and matches; not for sale and not a token." },
+        { q: "What are Cups?", a: "Cups are the internal game energy. Earned through taps and matches in the game; not for sale and not a token." },
         { q: "How do I get $DOFFA?", a: "Win DOFFA Crazy 8 matches and press “Claim reward” — $DOFFA from the Reward Vault is pinned to your Solana wallet." },
         { q: "Where are my tokens stored?", a: "Only in your own wallet (Phantom / Solflare). The site and the game never hold your funds." },
         { q: "Is this an investment?", a: "No. We promise no profit and give no financial advice. Join for the project, the game and the coffee." },
@@ -564,7 +564,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Tap → Cups → لعبة → $DOFFA",
       sub: "سلسلة مكافآت بسيطة وصادقة يمكن لأي شخص التحقق منها.",
       steps: [
-        { icon: "👆", t: "Telegram Tap", d: "انقر في لعبة DOFFA المصغّرة على تيليجرام واكسب Cups — طاقة اللعب الداخلية." },
+        { icon: "👆", t: "اضغط واجمع Cups", d: "اضغط داخل لعبة DOFFA واكسب Cups — طاقة اللعب الداخلية." },
         { icon: "☕", t: "اجمع Cups", d: "Cups طاقة النظام. لا تُباع وليست عملة — تُكتسب فقط." },
         { icon: "🃏", t: "العب DOFFA Crazy 8", d: "أنفق Cups على جولات لعبة الورق DOFFA Crazy 8." },
         { icon: "🏆", t: "انتصر", d: "الانتصارات تمنح المكافأة الحقيقية — $DOFFA من خزينة المكافآت المحدودة." },
@@ -690,7 +690,7 @@ export const dict: Record<Lang, Dict> = {
       title: "الأسئلة الشائعة",
       items: [
         { q: "هل هذه عملة ميم؟", a: "لا. خلف العملة مقهى جبلي حقيقي واقتصاد لعب حي. $DOFFA تُكسب في اللعبة ولا تُوزَّع للضجة." },
-        { q: "ما هي Cups؟", a: "Cups طاقة اللعب الداخلية. تُكسب عبر Telegram Tap والجولات؛ لا تُباع وليست عملة." },
+        { q: "ما هي Cups؟", a: "Cups طاقة اللعب الداخلية. تُكسب عبر الضغطات والجولات داخل اللعبة؛ لا تُباع وليست عملة." },
         { q: "كيف أحصل على $DOFFA؟", a: "انتصر في DOFFA Crazy 8 واضغط «استلام المكافأة» — $DOFFA من الخزينة تُثبَّت على محفظتك." },
         { q: "أين تُحفظ عملاتي؟", a: "فقط في محفظتك الخاصة (Phantom / Solflare). الموقع واللعبة لا يحتفظان بأموالك." },
         { q: "هل هذا استثمار؟", a: "لا. لا نعد بأي ربح ولا نقدم نصائح مالية. شارك من أجل المشروع واللعبة والقهوة." },
@@ -762,7 +762,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Tap → Cups → Oyun → $DOFFA",
       sub: "Herkesin doğrulayabileceği basit ve dürüst bir ödül zinciri.",
       steps: [
-        { icon: "👆", t: "Telegram Tap", d: "DOFFA Telegram mini oyununda tıkla ve Cups kazan — içsel oyun enerjisi." },
+        { icon: "👆", t: "Dokun — Cups biriktir", d: "DOFFA oyununda dokun ve Cups kazan — içsel oyun enerjisi." },
         { icon: "☕", t: "Cups biriktir", d: "Cups ekosistem enerjisidir. Satılmaz ve token değildir — yalnızca kazanılır." },
         { icon: "🃏", t: "DOFFA Crazy 8 oyna", d: "Cups’ı marka kart oyunu DOFFA Crazy 8 turlarına harca." },
         { icon: "🏆", t: "Kazan", d: "Zaferler gerçek ödülü getirir — sınırlı Reward Vault’tan $DOFFA." },
@@ -888,7 +888,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Sıkça sorulanlar",
       items: [
         { q: "Bu bir meme coin mi?", a: "Hayır. Tokenin arkasında gerçek bir dağ kahvecisi ve canlı bir oyun ekonomisi var. $DOFFA oyunda kazanılır, hype için dağıtılmaz." },
-        { q: "Cups nedir?", a: "Cups içsel oyun enerjisidir. Telegram Tap ve turlarla kazanılır; satılmaz ve token değildir." },
+        { q: "Cups nedir?", a: "Cups içsel oyun enerjisidir. Oyun içi dokunuşlar ve turlarla kazanılır; satılmaz ve token değildir." },
         { q: "$DOFFA nasıl alınır?", a: "DOFFA Crazy 8 turlarını kazan ve “Ödülü al”a bas — Reward Vault’tan $DOFFA cüzdanına sabitlenir." },
         { q: "Tokenlerim nerede saklanır?", a: "Yalnızca kendi cüzdanında (Phantom / Solflare). Site ve oyun fonlarını tutmaz." },
         { q: "Bu bir yatırım mı?", a: "Hayır. Kazanç vaat etmiyoruz, finansal tavsiye vermiyoruz. Proje, oyun ve kahve için katıl." },
@@ -960,7 +960,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Tap → Cups → Juego → $DOFFA",
       sub: "Una cadena de recompensas simple y honesta que cualquiera puede verificar.",
       steps: [
-        { icon: "👆", t: "Telegram Tap", d: "Toca en el minijuego de Telegram de DOFFA y gana Cups — la energía interna del juego." },
+        { icon: "👆", t: "Toca y acumula Cups", d: "Toca dentro del juego DOFFA y gana Cups — la energía interna del juego." },
         { icon: "☕", t: "Acumula Cups", d: "Cups es la energía del ecosistema. No se vende y no es un token: solo se gana." },
         { icon: "🃏", t: "Juega DOFFA Crazy 8", d: "Gasta Cups en partidas del juego de cartas DOFFA Crazy 8." },
         { icon: "🏆", t: "Gana", d: "Las victorias otorgan la recompensa real: $DOFFA del Reward Vault limitado." },
@@ -1086,7 +1086,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Preguntas frecuentes",
       items: [
         { q: "¿Es una meme coin?", a: "No. Detrás del token hay una cafetería de montaña real y una economía de juego viva. $DOFFA se gana jugando, no se regala por hype." },
-        { q: "¿Qué son los Cups?", a: "Cups es la energía interna del juego. Se gana con Telegram Tap y partidas; no se vende y no es un token." },
+        { q: "¿Qué son los Cups?", a: "Cups es la energía interna del juego. Se gana con toques y partidas dentro del juego; no se vende y no es un token." },
         { q: "¿Cómo consigo $DOFFA?", a: "Gana partidas de DOFFA Crazy 8 y pulsa «Reclamar recompensa»: $DOFFA del Reward Vault se fija a tu billetera Solana." },
         { q: "¿Dónde se guardan mis tokens?", a: "Solo en tu propia billetera (Phantom / Solflare). El sitio y el juego nunca custodian tus fondos." },
         { q: "¿Es una inversión?", a: "No. No prometemos ganancias ni damos consejos financieros. Participa por el proyecto, el juego y el café." },
@@ -1158,7 +1158,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Tap → Cups → Jeu → $DOFFA",
       sub: "Une chaîne de récompenses simple et honnête que chacun peut vérifier.",
       steps: [
-        { icon: "👆", t: "Telegram Tap", d: "Tape dans le mini-jeu Telegram DOFFA et gagne des Cups — l’énergie interne du jeu." },
+        { icon: "👆", t: "Tape et accumule des Cups", d: "Tape dans le jeu DOFFA et gagne des Cups — l’énergie interne du jeu." },
         { icon: "☕", t: "Accumule des Cups", d: "Les Cups sont l’énergie de l’écosystème. Pas à vendre, pas un jeton : ils se gagnent." },
         { icon: "🃏", t: "Joue à DOFFA Crazy 8", d: "Dépense tes Cups dans des parties du jeu de cartes DOFFA Crazy 8." },
         { icon: "🏆", t: "Gagne", d: "Les victoires rapportent la vraie récompense — du $DOFFA du Reward Vault limité." },
@@ -1284,7 +1284,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Questions fréquentes",
       items: [
         { q: "C’est un meme coin ?", a: "Non. Derrière le jeton, un vrai café de montagne et une économie de jeu vivante. Le $DOFFA se gagne en jouant, pas en hype." },
-        { q: "Que sont les Cups ?", a: "Les Cups sont l’énergie interne du jeu. Gagnés via Telegram Tap et les parties ; pas à vendre, pas un jeton." },
+        { q: "Que sont les Cups ?", a: "Les Cups sont l’énergie interne du jeu. Gagnés en tapant et en jouant des parties ; pas à vendre, pas un jeton." },
         { q: "Comment obtenir du $DOFFA ?", a: "Gagne des parties de DOFFA Crazy 8 et appuie sur « Réclamer la récompense » : le $DOFFA du Reward Vault est attaché à ton portefeuille Solana." },
         { q: "Où sont conservés mes jetons ?", a: "Uniquement dans ton propre portefeuille (Phantom / Solflare). Le site et le jeu ne détiennent jamais tes fonds." },
         { q: "C’est un investissement ?", a: "Non. Nous ne promettons aucun profit et ne donnons aucun conseil financier. Participe pour le projet, le jeu et le café." },
@@ -1356,7 +1356,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Tap → Cups → Spiel → $DOFFA",
       sub: "Eine einfache, ehrliche Belohnungskette, die jeder überprüfen kann.",
       steps: [
-        { icon: "👆", t: "Telegram Tap", d: "Tippe im DOFFA-Telegram-Minispiel und verdiene Cups — die interne Spielenergie." },
+        { icon: "👆", t: "Tippen — Cups sammeln", d: "Tippe im DOFFA-Spiel und verdiene Cups — die interne Spielenergie." },
         { icon: "☕", t: "Cups sammeln", d: "Cups sind die Energie des Ökosystems. Nicht käuflich, kein Token — nur verdienbar." },
         { icon: "🃏", t: "DOFFA Crazy 8 spielen", d: "Setze Cups für Partien im Marken-Kartenspiel DOFFA Crazy 8 ein." },
         { icon: "🏆", t: "Gewinnen", d: "Siege bringen die echte Belohnung — $DOFFA aus dem begrenzten Reward Vault." },
@@ -1482,7 +1482,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Häufige Fragen",
       items: [
         { q: "Ist das ein Meme-Coin?", a: "Nein. Hinter dem Token stehen eine echte Bergkaffeebar und eine lebendige Spiel-Ökonomie. $DOFFA wird im Spiel verdient, nicht für Hype verteilt." },
-        { q: "Was sind Cups?", a: "Cups sind die interne Spielenergie. Verdient über Telegram Tap und Partien; nicht käuflich, kein Token." },
+        { q: "Was sind Cups?", a: "Cups sind die interne Spielenergie. Verdient durch Tippen und Partien im Spiel; nicht käuflich, kein Token." },
         { q: "Wie bekomme ich $DOFFA?", a: "Gewinne DOFFA-Crazy-8-Partien und drücke „Belohnung abholen“ — $DOFFA aus dem Reward Vault wird deiner Solana-Wallet zugeordnet." },
         { q: "Wo werden meine Token verwahrt?", a: "Nur in deiner eigenen Wallet (Phantom / Solflare). Website und Spiel verwahren nie deine Mittel." },
         { q: "Ist das eine Investition?", a: "Nein. Wir versprechen keinen Gewinn und geben keine Finanzberatung. Mach mit für Projekt, Spiel und Kaffee." },
@@ -1554,7 +1554,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Tap → Cups → 游戏 → $DOFFA",
       sub: "一条简单诚实、人人可验证的奖励链。",
       steps: [
-        { icon: "👆", t: "Telegram Tap", d: "在 DOFFA 的 Telegram 小游戏里点击，赚取 Cups——内部游戏能量。" },
+        { icon: "👆", t: "点击，攒 Cups", d: "在 DOFFA 游戏里点击，赚取 Cups——内部游戏能量。" },
         { icon: "☕", t: "积攒 Cups", d: "Cups 是生态能量。不出售、不是代币——只能靠玩赚取。" },
         { icon: "🃏", t: "玩 DOFFA Crazy 8", d: "用 Cups 参加品牌纸牌游戏 DOFFA Crazy 8 的对局。" },
         { icon: "🏆", t: "获胜", d: "胜利带来真正的奖励——来自限量 Reward Vault 的 $DOFFA。" },
@@ -1680,7 +1680,7 @@ export const dict: Record<Lang, Dict> = {
       title: "常见问题",
       items: [
         { q: "这是 meme 币吗？", a: "不是。代币背后是真实的山间咖啡馆和活跃的游戏经济。$DOFFA 靠游戏赚取，不为炒作空投。" },
-        { q: "Cups 是什么？", a: "Cups 是内部游戏能量。通过 Telegram Tap 和对局赚取；不出售、不是代币。" },
+        { q: "Cups 是什么？", a: "Cups 是内部游戏能量。通过游戏内点击和对局赚取；不出售、不是代币。" },
         { q: "如何获得 $DOFFA？", a: "赢下 DOFFA Crazy 8 对局并点击「领取奖励」——Reward Vault 中的 $DOFFA 将绑定到你的 Solana 钱包。" },
         { q: "我的代币存放在哪里？", a: "只存放在你自己的钱包（Phantom / Solflare）。网站和游戏绝不保管你的资金。" },
         { q: "这是投资吗？", a: "不是。我们不承诺收益，也不提供理财建议。请为项目、游戏和咖啡而参与。" },
@@ -1752,7 +1752,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Tap → Cups → गेम → $DOFFA",
       sub: "एक सरल, ईमानदार इनाम-श्रृंखला जिसे कोई भी सत्यापित कर सकता है।",
       steps: [
-        { icon: "👆", t: "Telegram Tap", d: "DOFFA के Telegram मिनी-गेम में टैप करो और Cups कमाओ — आंतरिक गेम ऊर्जा।" },
+        { icon: "👆", t: "टैप करो — Cups जमा करो", d: "DOFFA गेम में टैप करो और Cups कमाओ — आंतरिक गेम ऊर्जा।" },
         { icon: "☕", t: "Cups जमा करो", d: "Cups इकोसिस्टम की ऊर्जा है। बिकती नहीं, टोकन नहीं — सिर्फ़ कमाई जाती है।" },
         { icon: "🃏", t: "DOFFA Crazy 8 खेलो", d: "ब्रांड कार्ड गेम DOFFA Crazy 8 की बाज़ियों पर Cups खर्च करो।" },
         { icon: "🏆", t: "जीतो", d: "जीत असली इनाम देती है — सीमित Reward Vault से $DOFFA।" },
@@ -1878,7 +1878,7 @@ export const dict: Record<Lang, Dict> = {
       title: "अक्सर पूछे जाने वाले सवाल",
       items: [
         { q: "क्या यह मीम कॉइन है?", a: "नहीं। टोकन के पीछे असली पहाड़ी कॉफ़ी बार और जीवंत गेम इकॉनमी है। $DOFFA गेम में कमाया जाता है, हाइप पर बाँटा नहीं जाता।" },
-        { q: "Cups क्या है?", a: "Cups आंतरिक गेम ऊर्जा है। Telegram Tap और बाज़ियों से कमाई जाती है; बिकती नहीं, टोकन नहीं।" },
+        { q: "Cups क्या है?", a: "Cups आंतरिक गेम ऊर्जा है। गेम के अंदर टैप और बाज़ियों से कमाई जाती है; बिकती नहीं, टोकन नहीं।" },
         { q: "$DOFFA कैसे पाएँ?", a: "DOFFA Crazy 8 की बाज़ियाँ जीतो और «इनाम लें» दबाओ — Reward Vault का $DOFFA तुम्हारे Solana वॉलेट से जुड़ जाता है।" },
         { q: "मेरे टोकन कहाँ रहते हैं?", a: "सिर्फ़ तुम्हारे अपने वॉलेट (Phantom / Solflare) में। साइट और गेम कभी तुम्हारे फ़ंड नहीं रखते।" },
         { q: "क्या यह निवेश है?", a: "नहीं। हम मुनाफ़े का वादा नहीं करते और वित्तीय सलाह नहीं देते। प्रोजेक्ट, गेम और कॉफ़ी के लिए जुड़ो।" },
@@ -1950,7 +1950,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Tap → Cups → Jogo → $DOFFA",
       sub: "Uma cadeia de recompensas simples e honesta que qualquer um pode verificar.",
       steps: [
-        { icon: "👆", t: "Telegram Tap", d: "Toque no minijogo do Telegram da DOFFA e ganhe Cups — a energia interna do jogo." },
+        { icon: "👆", t: "Toque e acumule Cups", d: "Toque dentro do jogo DOFFA e ganhe Cups — a energia interna do jogo." },
         { icon: "☕", t: "Acumule Cups", d: "Cups é a energia do ecossistema. Não se vende e não é token — só se ganha." },
         { icon: "🃏", t: "Jogue DOFFA Crazy 8", d: "Gaste Cups em partidas do jogo de cartas DOFFA Crazy 8." },
         { icon: "🏆", t: "Vença", d: "Vitórias dão a recompensa real — $DOFFA do Reward Vault limitado." },
@@ -2076,7 +2076,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Perguntas frequentes",
       items: [
         { q: "É uma meme coin?", a: "Não. Por trás do token há uma cafeteria de montanha real e uma economia de jogo viva. $DOFFA se ganha jogando, não é distribuído por hype." },
-        { q: "O que são Cups?", a: "Cups é a energia interna do jogo. Ganha-se no Telegram Tap e nas partidas; não se vende e não é token." },
+        { q: "O que são Cups?", a: "Cups é a energia interna do jogo. Ganha-se tocando e jogando partidas dentro do jogo; não se vende e não é token." },
         { q: "Como consigo $DOFFA?", a: "Vença partidas de DOFFA Crazy 8 e toque em «Resgatar recompensa» — o $DOFFA do Reward Vault fica vinculado à sua carteira Solana." },
         { q: "Onde ficam meus tokens?", a: "Só na sua própria carteira (Phantom / Solflare). O site e o jogo nunca guardam seus fundos." },
         { q: "É um investimento?", a: "Não. Não prometemos lucro nem damos conselhos financeiros. Participe pelo projeto, pelo jogo e pelo café." },
@@ -2148,7 +2148,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Tap → Cups → Gioco → $DOFFA",
       sub: "Una catena di ricompense semplice e onesta che chiunque può verificare.",
       steps: [
-        { icon: "👆", t: "Telegram Tap", d: "Tocca nel mini-gioco Telegram di DOFFA e guadagna Cups — l’energia interna di gioco." },
+        { icon: "👆", t: "Tocca e accumula Cups", d: "Tocca dentro il gioco DOFFA e guadagna Cups — l’energia interna di gioco." },
         { icon: "☕", t: "Accumula Cups", d: "I Cups sono l’energia dell’ecosistema. Non in vendita e non un token: si guadagnano soltanto." },
         { icon: "🃏", t: "Gioca a DOFFA Crazy 8", d: "Spendi i Cups nelle partite del gioco di carte DOFFA Crazy 8." },
         { icon: "🏆", t: "Vinci", d: "Le vittorie danno la ricompensa vera — $DOFFA dal Reward Vault limitato." },
@@ -2274,7 +2274,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Domande frequenti",
       items: [
         { q: "È una meme coin?", a: "No. Dietro il token ci sono una vera caffetteria di montagna e un’economia di gioco viva. Il $DOFFA si guadagna giocando, non si regala per hype." },
-        { q: "Cosa sono i Cups?", a: "I Cups sono l’energia interna di gioco. Si guadagnano con Telegram Tap e le partite; non in vendita e non token." },
+        { q: "Cosa sono i Cups?", a: "I Cups sono l’energia interna di gioco. Si guadagnano toccando e giocando partite dentro il gioco; non in vendita e non token." },
         { q: "Come ottengo $DOFFA?", a: "Vinci le partite di DOFFA Crazy 8 e premi «Ritira la ricompensa»: il $DOFFA del Reward Vault viene collegato al tuo wallet Solana." },
         { q: "Dove sono conservati i miei token?", a: "Solo nel tuo wallet personale (Phantom / Solflare). Il sito e il gioco non custodiscono mai i tuoi fondi." },
         { q: "È un investimento?", a: "No. Non promettiamo profitti e non diamo consigli finanziari. Partecipa per il progetto, il gioco e il caffè." },
@@ -2346,7 +2346,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Tap → Cups → ゲーム → $DOFFA",
       sub: "誰でも検証できる、シンプルで誠実な報酬の流れ。",
       steps: [
-        { icon: "👆", t: "Telegram Tap", d: "DOFFA の Telegram ミニゲームでタップして Cups を稼ぐ——内部ゲームエネルギー。" },
+        { icon: "👆", t: "タップして Cups を貯める", d: "DOFFA ゲーム内でタップして Cups を稼ぐ——内部ゲームエネルギー。" },
         { icon: "☕", t: "Cups を貯める", d: "Cups はエコシステムのエネルギー。販売されずトークンでもない——稼ぐだけ。" },
         { icon: "🃏", t: "DOFFA Crazy 8 で遊ぶ", d: "Cups を使ってブランドカードゲーム DOFFA Crazy 8 の対戦へ。" },
         { icon: "🏆", t: "勝つ", d: "勝利には本物の報酬——限定 Reward Vault からの $DOFFA。" },
@@ -2472,7 +2472,7 @@ export const dict: Record<Lang, Dict> = {
       title: "よくある質問",
       items: [
         { q: "これはミームコイン？", a: "いいえ。トークンの背後には実在の山のカフェと生きたゲーム経済があります。$DOFFA はゲームで稼ぐもので、話題づくりの配布ではありません。" },
-        { q: "Cups とは？", a: "Cups は内部ゲームエネルギー。Telegram Tap と対戦で稼ぎます。販売されずトークンでもありません。" },
+        { q: "Cups とは？", a: "Cups は内部ゲームエネルギー。ゲーム内のタップと対戦で稼ぎます。販売されずトークンでもありません。" },
         { q: "$DOFFA の入手方法は？", a: "DOFFA Crazy 8 の対戦に勝ち「報酬を受け取る」を押すと、Reward Vault の $DOFFA があなたの Solana ウォレットに紐づきます。" },
         { q: "トークンはどこに保管される？", a: "あなた自身のウォレット（Phantom / Solflare）だけです。サイトもゲームも資金を預かりません。" },
         { q: "これは投資？", a: "いいえ。利益は約束せず、金融アドバイスも行いません。プロジェクトとゲームとコーヒーのために参加してください。" },
