@@ -51,7 +51,7 @@ export async function trackEvent(
   event: TrackEvent,
   visitorId?: string | null,
 ): Promise<SiteStats> {
-  let stats = rollDay(await load());
+  const stats = rollDay(await load());
   const today = utcDayKey();
 
   if (event === "visit") {

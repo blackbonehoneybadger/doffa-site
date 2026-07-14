@@ -301,6 +301,7 @@ function UploadPanel() {
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [dayNumber] = useState(() => Math.floor(Date.now() / 86_400_000));
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -398,8 +399,7 @@ function UploadPanel() {
 
   const count = videos?.length ?? 0;
   const full = count >= MAX_VIDEOS;
-  const todayIndex =
-    count > 0 ? Math.floor(Date.now() / 86_400_000) % count : null;
+  const todayIndex = count > 0 ? dayNumber % count : null;
 
   return (
     <div>
