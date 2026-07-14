@@ -1,4 +1,4 @@
-import { verifyNonceToken, createUserSession } from "../../../lib/userAuth";
+import { verifyNonceToken, consumeNonce, createUserSession } from "../../../lib/userAuth";
 import { verifyWalletSignature } from "../../../lib/solanaAuth";
 import { upsertUserLogin } from "../../../lib/users";
 
@@ -18,8 +18,13 @@ export async function POST(request: Request) {
   }
 
   try {
+    // Одноразовость: если этот nonce уже был потрачен — это повтор, отклоняем.
+    const fresh = await consumeNonce(nonce.nonce, nonce.exp);
+    if (!fresh) {
+      return Response.json({ error: "Код уже использован, войди заново" }, { status: 401 });
+    }
     const user = await upsertUserLogin(nonce.wallet);
-    await createUserSession(nonce.wallet);
+    await createUserSession(nonce.wallet, request.headers.get("user-agent") ?? undefined);
     return Response.json({ ok: true, user });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
