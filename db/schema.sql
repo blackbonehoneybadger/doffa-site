@@ -50,3 +50,26 @@ create table if not exists sessions (
 
 create index if not exists sessions_wallet_idx on sessions (wallet_address);
 create index if not exists sessions_expires_idx on sessions (expires_at);
+
+-- Серверные сессии админ-панели (/admin). В cookie — только случайный opaque id,
+-- подписанный отдельным ADMIN_SESSION_SECRET; срок и возможность отзыва — здесь.
+create table if not exists admin_sessions (
+  id text primary key,
+  created_at timestamptz not null default now(),
+  expires_at timestamptz not null,
+  ip text,
+  user_agent text
+);
+
+create index if not exists admin_sessions_expires_idx on admin_sessions (expires_at);
+
+-- Учёт неудачных попыток входа в админку по IP — для rate limit и временной
+-- блокировки после серии неверных паролей.
+create table if not exists admin_login_attempts (
+  ip text primary key,
+  fail_count integer not null default 0,
+  first_failed_at timestamptz not null default now(),
+  locked_until timestamptz
+);
+
+create index if not exists admin_login_attempts_locked_idx on admin_login_attempts (locked_until);
