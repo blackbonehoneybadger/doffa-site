@@ -77,3 +77,13 @@ create table if not exists admin_login_attempts (
 );
 
 create index if not exists admin_login_attempts_locked_idx on admin_login_attempts (locked_until);
+
+-- Rate limit для /api/auth/nonce и /api/auth/verify (по IP / кошельку).
+-- Ключ вида "nonce:ip:1.2.3.4" или "verify:wallet:…". Счётчик в окне 5 минут.
+create table if not exists auth_rate_limits (
+  rate_key text primary key,
+  hit_count integer not null default 0,
+  window_started_at timestamptz not null default now()
+);
+
+create index if not exists auth_rate_limits_window_idx on auth_rate_limits (window_started_at);

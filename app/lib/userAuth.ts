@@ -6,51 +6,40 @@
 // (used_nonces), и повторная отправка того же токена+подписи отклоняется.
 //
 // Сессия: в cookie кладётся только случайный opaque id, а вся суть сессии
-// (кошелёк, время создания, срок годности) хранится в таблице sessions. Это
-// даёт истечение по времени и отзыв конкретной сессии — в отличие от прежней
-// детерминированной cookie, которую нельзя было ни погасить, ни просрочить.
-import { createHmac, timingSafeEqual, randomBytes, createHash } from "node:crypto";
+// (кошелёк, время создания, срок годности) хранится в таблице sessions.
+import { randomBytes, createHash } from "node:crypto";
 import { cookies } from "next/headers";
 import { query } from "./db";
+import {
+  issueNonceWithSecret,
+  verifyNonceTokenWithSecret,
+  userAuthConfigError,
+  type VerifiedNonce,
+} from "./userAuthCore";
+
+export type { VerifiedNonce };
+export { userAuthConfigError };
 
 const COOKIE_NAME = "doffa_user_session";
 const SESSION_TTL_MS = 90 * 24 * 60 * 60 * 1000; // 90 дней
-const NONCE_TTL_MS = 5 * 60 * 1000; // 5 минут на подпись
 
-const SESSION_SECRET =
-  process.env.SESSION_SECRET?.trim() || crypto.randomUUID() + crypto.randomUUID();
-
-function sign(value: string): string {
-  return createHmac("sha256", SESSION_SECRET).update(value).digest("hex");
-}
-
-function safeEqual(a: string, b: string): boolean {
-  const bufA = Buffer.from(a);
-  const bufB = Buffer.from(b);
-  if (bufA.length !== bufB.length) return false;
-  return timingSafeEqual(bufA, bufB);
-}
-
-function buildMessage(wallet: string, nonce: string, exp: number): string {
-  return [
-    "doffa.coffee просит подтвердить вход.",
-    "",
-    `Кошелёк: ${wallet}`,
-    `Код: ${nonce}`,
-    `Действителен до: ${new Date(exp).toISOString()}`,
-  ].join("\n");
+/**
+ * В production SESSION_SECRET обязателен (fail-closed).
+ * В dev без секрета — эфемерный на процесс (сессии/nonce не переживают рестарт).
+ */
+function sessionSecret(): string {
+  const fromEnv = process.env.SESSION_SECRET?.trim();
+  if (fromEnv) return fromEnv;
+  if (process.env.NODE_ENV === "production") return "";
+  return randomBytes(32).toString("hex");
 }
 
 /** Выдаёт сообщение для подписи и токен с зашитым nonce (без записи в БД). */
 export function issueNonce(wallet: string): { message: string; token: string } {
-  const nonce = randomBytes(12).toString("hex");
-  const exp = Date.now() + NONCE_TTL_MS;
-  const payload = `${wallet}.${nonce}.${exp}`;
-  const token = `${payload}.${sign(payload)}`;
-  return { message: buildMessage(wallet, nonce, exp), token };
+  const secret = sessionSecret();
+  if (!secret) throw new Error("SESSION_SECRET не задан");
+  return issueNonceWithSecret(wallet, secret);
 }
-
-export type VerifiedNonce = { wallet: string; message: string; nonce: string; exp: number };
 
 /**
  * Проверяет токен nonce (подпись и срок годности) и возвращает кошелёк,
@@ -58,14 +47,9 @@ export type VerifiedNonce = { wallet: string; message: string; nonce: string; ex
  * Одноразовость проверяется отдельно — через consumeNonce().
  */
 export function verifyNonceToken(token: string): VerifiedNonce | null {
-  const parts = token.split(".");
-  if (parts.length !== 4) return null;
-  const [wallet, nonce, expStr, sig] = parts;
-  const payload = `${wallet}.${nonce}.${expStr}`;
-  if (!safeEqual(sig, sign(payload))) return null;
-  const exp = Number(expStr);
-  if (!Number.isFinite(exp) || Date.now() > exp) return null;
-  return { wallet, message: buildMessage(wallet, nonce, exp), nonce, exp };
+  const secret = sessionSecret();
+  if (!secret) return null;
+  return verifyNonceTokenWithSecret(token, secret);
 }
 
 /**
@@ -81,7 +65,6 @@ export async function consumeNonce(nonce: string, exp: number): Promise<boolean>
      returning nonce_hash`,
     [nonceHash, exp],
   );
-  // Опортунистическая уборка просроченных записей — таблица не растёт бесконечно.
   await query(`delete from used_nonces where expires_at < now()`).catch(() => {});
   return rows.length > 0;
 }

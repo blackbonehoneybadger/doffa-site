@@ -43,8 +43,11 @@ npm run dev      # http://localhost:3000
 
 | Имя | Описание |
 |-----|----------|
-| `ADMIN_UPLOAD_PASSWORD` | Пароль для входа на `/admin` (придумай сам) |
-| `SESSION_SECRET` | Любая случайная строка для подписи сессии |
+| `ADMIN_UPLOAD_PASSWORD` | Пароль для входа на `/admin` |
+| `ADMIN_SESSION_SECRET` | Отдельная случайная строка ≥32 символов для админ-сессий (не путать с `SESSION_SECRET`) |
+| `SESSION_SECRET` | Случайная строка ≥32 символов для пользовательских nonce/HMAC (в production **обязателен**) |
+| `DATABASE_URL` | Postgres (Neon) — или `POSTGRES_URL` из Vercel Storage |
+| `BLOB_READ_WRITE_TOKEN` | Обычно ставится автоматически при создании Blob |
 
 Локально для разработки — те же переменные в `.env.local` (не коммитится).
 
@@ -54,7 +57,7 @@ npm run dev      # http://localhost:3000
 вошёл). Хранит никнейм и бонусные баллы в Postgres (Neon, через Vercel Storage).
 Баланс $DOFFA на странице — реальный, читается напрямую из блокчейна, в базе не
 хранится. Сессии серверные (таблица `sessions`), вход — одноразовый nonce
-(`used_nonces`).
+(`used_nonces`). Rate limit по IP (и кошельку на verify) — таблица `auth_rate_limits`.
 
 **Разовая настройка на Vercel:**
 1. Vercel → проект → **Storage** → **Create Database** → **Postgres** (Neon) → подключить к проекту
@@ -66,8 +69,8 @@ npm run dev      # http://localhost:3000
    ```
    Либо вставить содержимое `db/schema.sql` вручную в Vercel → Storage → база → **Query**.
 
-`SESSION_SECRET` (см. выше) используется и здесь — для подписи сессии и
-одноразового кода на вход, отдельная переменная не нужна.
+В production без `SESSION_SECRET` эндпоинты `/api/auth/*` отвечают **503** (fail-closed).
+Админка дополнительно требует `ADMIN_SESSION_SECRET` и `ADMIN_UPLOAD_PASSWORD`.
 
 ---
 
