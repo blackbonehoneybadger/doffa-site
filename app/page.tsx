@@ -210,9 +210,15 @@ export default function Home() {
             </Link>
             <Link
               href="/profile"
-              className="text-xs text-cream/70 transition hover:text-gold xl:text-sm"
+              className="rounded-full border border-gold/35 bg-gold/10 px-3 py-1 text-xs font-semibold text-gold transition hover:bg-gold/20 xl:text-sm"
             >
-              {t.tabs.profile}
+              Регистрация пользователя
+            </Link>
+            <Link
+              href="/admin"
+              className="rounded-full border border-teal/40 bg-teal/10 px-3 py-1 text-xs font-semibold text-teal transition hover:bg-teal/20 xl:text-sm"
+            >
+              Регистрация администратора
             </Link>
           </nav>
           <div className="flex items-center gap-3 sm:gap-2">
@@ -348,9 +354,23 @@ export default function Home() {
               <Link
                 href="/profile"
                 onClick={() => setMenuOpen(false)}
-                className="rounded-lg px-3 py-2 text-sm text-cream/75 hover:bg-white/5 hover:text-gold"
+                className="rounded-lg px-3 py-2 text-sm font-semibold text-gold hover:bg-gold/10"
               >
-                {t.tabs.profile}
+                Регистрация пользователя
+              </Link>
+              <Link
+                href="/admin"
+                onClick={() => setMenuOpen(false)}
+                className="rounded-lg px-3 py-2 text-sm font-semibold text-teal hover:bg-teal/10"
+              >
+                Регистрация администратора
+              </Link>
+              <Link
+                href="/join"
+                onClick={() => setMenuOpen(false)}
+                className="rounded-lg px-3 py-2 text-sm text-cream/60 hover:bg-white/5 hover:text-gold"
+              >
+                Выбрать тип аккаунта
               </Link>
             </div>
           </nav>

@@ -242,12 +242,18 @@ export default function ProfileClient() {
 
       <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.4em] text-amber">
         <span aria-hidden className="h-px w-9 bg-gradient-to-r from-transparent to-amber" />
-        {t.profile.tag}
+        Регистрация пользователя
       </p>
       <h1 className="display mt-4 text-4xl font-extrabold leading-[0.98] tracking-tight text-cream-soft sm:text-5xl">
         {t.profile.title}
       </h1>
       <p className="mt-4 max-w-lg text-base leading-relaxed text-cream/70">{t.profile.sub}</p>
+      <p className="mt-2 text-sm text-cream/45">
+        Нужен вход администратора?{" "}
+        <Link href="/admin" className="font-semibold text-teal hover:text-gold">
+          Регистрация администратора →
+        </Link>
+      </p>
 
       {error && (
         <div className="mt-6 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">

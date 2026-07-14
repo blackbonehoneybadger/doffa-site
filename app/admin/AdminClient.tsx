@@ -12,12 +12,19 @@ export default function AdminClient({ initialAuthed }: { initialAuthed: boolean 
 
   return (
     <main className="mx-auto min-h-screen max-w-2xl px-5 py-16">
-      <h1 className="display text-3xl font-extrabold text-cream-soft">DOFFA · Видео на главной</h1>
+      <p className="text-xs font-semibold uppercase tracking-[0.35em] text-teal">Администратор</p>
+      <h1 className="display mt-3 text-3xl font-extrabold text-cream-soft">
+        Регистрация администратора
+      </h1>
       <p className="mt-2 text-sm text-cream/60">
-        Загружай видео для главной страницы сайта. Каждый день сайт автоматически показывает
-        следующее по кругу — когда доходит до последнего, начинает сначала.
+        Вход владельца: загрузка видео на главную. Каждый день сайт показывает следующее видео по кругу.
       </p>
       <div className="mt-8">{authed ? <UploadPanel onLoggedOut={() => setAuthed(false)} /> : <LoginForm onSuccess={() => setAuthed(true)} />}</div>
+      <p className="mt-10 text-center text-sm text-cream/40">
+        <a href="/join" className="hover:text-gold">← Выбрать тип аккаунта</a>
+        {" · "}
+        <a href="/profile" className="hover:text-gold">Регистрация пользователя</a>
+      </p>
     </main>
   );
 }
@@ -67,8 +74,11 @@ function LoginForm({ onSuccess }: { onSuccess: () => void }) {
         disabled={loading || !password}
         className="mt-5 w-full rounded-full bg-gold px-6 py-3 font-bold text-ink transition hover:brightness-110 disabled:opacity-50"
       >
-        {loading ? "Проверяю…" : "Войти"}
+        {loading ? "Проверяю…" : "Войти как администратор"}
       </button>
+      <p className="mt-4 text-center text-xs text-cream/45">
+        Пароль задаётся в Vercel: ADMIN_UPLOAD_PASSWORD
+      </p>
     </form>
   );
 }
