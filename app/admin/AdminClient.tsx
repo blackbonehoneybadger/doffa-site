@@ -32,7 +32,7 @@ export default function AdminClient({ initialAuthed }: { initialAuthed: boolean 
 }
 
 type Stats = {
-  visits: number;
+  visits: number | null;
   circulating: number | null;
   burned: number | null;
   initialSupply: number;
@@ -40,15 +40,20 @@ type Stats = {
 
 function StatsPanel() {
   const [stats, setStats] = useState<Stats | null>(null);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     fetch("/api/admin/stats")
       .then((r) => r.json())
       .then((d) => {
-        if (!cancelled && d.ok) setStats(d);
+        if (cancelled) return;
+        if (d.ok) setStats(d);
+        else setFailed(true);
       })
-      .catch(() => {});
+      .catch(() => {
+        if (!cancelled) setFailed(true);
+      });
     return () => {
       cancelled = true;
     };
@@ -57,10 +62,12 @@ function StatsPanel() {
   const fmt = (n: number | null | undefined) =>
     n === null || n === undefined ? "—" : n.toLocaleString("ru-RU");
 
+  // Пока грузится — «…»; при сбое запроса — «—»; при успехе — значение.
+  const placeholder = failed ? "—" : "…";
   const cards = [
-    { label: "Посетителей", value: stats ? stats.visits.toLocaleString("ru-RU") : "…", sub: "всего заходов на сайт" },
-    { label: "В обороте", value: stats ? fmt(stats.circulating) : "…", sub: "$DOFFA на mainnet" },
-    { label: "Сожжено", value: stats ? fmt(stats.burned) : "…", sub: "$DOFFA (выпуск − оборот)" },
+    { label: "Посетителей", value: stats ? fmt(stats.visits) : placeholder, sub: "всего заходов на сайт" },
+    { label: "В обороте", value: stats ? fmt(stats.circulating) : placeholder, sub: "$DOFFA на mainnet" },
+    { label: "Сожжено", value: stats ? fmt(stats.burned) : placeholder, sub: "$DOFFA (выпуск − оборот)" },
   ];
 
   return (
