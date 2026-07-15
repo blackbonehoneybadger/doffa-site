@@ -523,7 +523,7 @@ export default function Home() {
                 </div>
               </Section>
 
-              {/* FLOW: Tap → Cups → Game → $DOFFA */}
+              {/* FLOW: Tap → Зёрна → Game → $DOFFA */}
               <Section id="flow">
                 <Reveal>
                   <div className="text-center">

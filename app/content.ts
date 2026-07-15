@@ -150,7 +150,7 @@ export const dict: Record<Lang, Dict> = {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "Горная кофейня.",
       title2: "Своя экономика.",
-      sub: "Кофе из аула в горах Карачаево-Черкесии — и своя игровая экономика: играй, зарабатывай Cups и получай $DOFFA.",
+      sub: "Кофе из аула в горах Карачаево-Черкесии — и своя игровая экономика: играй, зарабатывай Зёрна и получай $DOFFA.",
       ctaBuy: "Узнать про $DOFFA",
       ctaMenu: "Смотреть мерч",
     },
@@ -159,7 +159,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Настоящая кофейня, а не мем",
       body: [
         "DOFFA — это эспрессо-бар, который с 2021 года живёт в горах Карачаево-Черкесии. Его построили своими руками: тёплый свет, уютная стойка, ароматный кофе и кот, встречающий гостей у входа.",
-        "Мы связали любимое дело с честной идеей: у DOFFA есть собственный токен на Solana и своя игровая экономика — Cups за активность и $DOFFA за победы.",
+        "Мы связали любимое дело с честной идеей: у DOFFA есть собственный токен на Solana и своя игровая экономика — Зёрна за активность и $DOFFA за победы.",
         "Это прозрачный и халяльный по духу проект про труд, гостеприимство и сообщество — а не про спекуляцию.",
       ],
     },
@@ -185,12 +185,12 @@ export const dict: Record<Lang, Dict> = {
     },
     flow: {
       tag: "Как это работает",
-      title: "Tap → Cups → Игра → $DOFFA",
+      title: "Tap → Зёрна → Игра → $DOFFA",
       sub: "Простая и честная цепочка наград, которую может проверить каждый.",
       steps: [
-        { icon: "👆", t: "Тапай — копи Cups", d: "Тапай в игре DOFFA и зарабатывай Cups — внутреннюю игровую энергию." },
-        { icon: "☕", t: "Копи Cups", d: "Cups — энергия экосистемы. Она не продаётся и не является токеном — только зарабатывается." },
-        { icon: "🃏", t: "Играй в DOFFA Crazy 8", d: "Трать Cups на партии в фирменную карточную игру DOFFA Crazy 8." },
+        { icon: "👆", t: "Тапай — копи Зёрна", d: "Тапай в игре DOFFA и зарабатывай Зёрна — внутреннюю игровую энергию." },
+        { icon: "☕", t: "Копи Зёрна", d: "Зёрна — энергия экосистемы. Она не продаётся и не является токеном — только зарабатывается." },
+        { icon: "🃏", t: "Играй в DOFFA Crazy 8", d: "Трать Зёрна на партии в фирменную карточную игру DOFFA Crazy 8." },
         { icon: "🏆", t: "Побеждай", d: "За победу начисляется настоящая награда — $DOFFA из ограниченного Reward Vault." },
         { icon: "💰", t: "Забирай награду", d: "Кнопка «Забрать награду» закрепляет $DOFFA за твоим Solana-кошельком." },
       ],
@@ -335,7 +335,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Частые вопросы",
       items: [
         { q: "Это мем-койн?", a: "Нет. За токеном стоит реальная кофейня в горах и живая игровая экосистема. $DOFFA зарабатывается в игре, а не раздаётся за хайп." },
-        { q: "Что такое Cups?", a: "Cups — внутренняя игровая энергия. Она начисляется за тапы и партии в игре, не продаётся и токеном не является." },
+        { q: "Что такое Зёрна?", a: "Зёрна — внутренняя игровая энергия. Она начисляется за тапы и партии в игре, не продаётся и токеном не является." },
         { q: "Как получить $DOFFA?", a: "Побеждай в DOFFA Crazy 8 и нажимай «Забрать награду» — $DOFFA из Reward Vault закрепляется за твоим Solana-кошельком." },
         { q: "Где хранятся мои токены?", a: "Только в вашем личном кошельке (Phantom / Solflare). Сайт и игра не хранят средства и не имеют к ним доступа." },
         { q: "Это инвестиция?", a: "Нет. Мы не обещаем доход и не даём финансовых советов. Участвуйте только из интереса к проекту, игре и кофейне." },
@@ -360,7 +360,7 @@ export const dict: Record<Lang, Dict> = {
       copy: "копировать",
     },
     legal:
-      "$DOFFA — экспериментальный комьюнити/утилити-токен экосистемы кофейни DOFFA. Это НЕ инвестиция и НЕ обещание прибыли. Токен не является ценной бумагой, инвестиционным продуктом или предложением о покупке ценных бумаг. Мы не гарантируем никакого дохода и не даём финансовых советов. Игровые награды выплачиваются из ограниченного Reward Vault и не гарантируют цену токена; Cups — внутриигровая энергия, не имеющая денежной стоимости. Криптоактивы крайне волатильны и рискованны: можно потерять все вложенные средства. Материалы сайта носят информационный характер и не являются финансовой, юридической или налоговой консультацией. Участвуйте ответственно и в рамках законов вашей юрисдикции.",
+      "$DOFFA — экспериментальный комьюнити/утилити-токен экосистемы кофейни DOFFA. Это НЕ инвестиция и НЕ обещание прибыли. Токен не является ценной бумагой, инвестиционным продуктом или предложением о покупке ценных бумаг. Мы не гарантируем никакого дохода и не даём финансовых советов. Игровые награды выплачиваются из ограниченного Reward Vault и не гарантируют цену токена; Зёрна — внутриигровая энергия, не имеющая денежной стоимости. Криптоактивы крайне волатильны и рискованны: можно потерять все вложенные средства. Материалы сайта носят информационный характер и не являются финансовой, юридической или налоговой консультацией. Участвуйте ответственно и в рамках законов вашей юрисдикции.",
   },
   en: {
     locale: "en-US",
@@ -369,7 +369,7 @@ export const dict: Record<Lang, Dict> = {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "Mountain coffee bar.",
       title2: "Its own economy.",
-      sub: "Coffee from a mountain village in Karachay-Cherkessia — with its own play economy: play, earn Cups, win $DOFFA.",
+      sub: "Coffee from a mountain village in Karachay-Cherkessia — with its own play economy: play, earn Beans, win $DOFFA.",
       ctaBuy: "Learn about $DOFFA",
       ctaMenu: "View the merch",
     },
@@ -378,7 +378,7 @@ export const dict: Record<Lang, Dict> = {
       title: "A real coffee bar, not a meme",
       body: [
         "DOFFA is an espresso bar that has lived in the mountains of Karachay-Cherkessia since 2021. It was built by hand: warm light, a cozy bar, fragrant coffee, and a cat greeting guests at the door.",
-        "We tied our craft to an honest idea: DOFFA has its own token on Solana and its own play economy — Cups for activity and $DOFFA for victories.",
+        "We tied our craft to an honest idea: DOFFA has its own token on Solana and its own play economy — Beans for activity and $DOFFA for victories.",
         "A transparent, halal-spirited project about work, hospitality and community — not speculation.",
       ],
     },
@@ -404,12 +404,12 @@ export const dict: Record<Lang, Dict> = {
     },
     flow: {
       tag: "How it works",
-      title: "Tap → Cups → Game → $DOFFA",
+      title: "Tap → Beans → Game → $DOFFA",
       sub: "A simple, honest reward chain anyone can verify.",
       steps: [
-        { icon: "👆", t: "Tap — earn Cups", d: "Tap in the DOFFA game and earn Cups — the internal game energy." },
-        { icon: "☕", t: "Stack Cups", d: "Cups are ecosystem energy. Not for sale and not a token — they can only be earned." },
-        { icon: "🃏", t: "Play DOFFA Crazy 8", d: "Spend Cups on matches in DOFFA Crazy 8, the brand card game." },
+        { icon: "👆", t: "Tap — earn Beans", d: "Tap in the DOFFA game and earn Beans — the internal game energy." },
+        { icon: "☕", t: "Stack Beans", d: "Beans are ecosystem energy. Not for sale and not a token — they can only be earned." },
+        { icon: "🃏", t: "Play DOFFA Crazy 8", d: "Spend Beans on matches in DOFFA Crazy 8, the brand card game." },
         { icon: "🏆", t: "Win", d: "Victories earn the real reward — $DOFFA from the limited Reward Vault." },
         { icon: "💰", t: "Claim your reward", d: "The “Claim reward” button pins $DOFFA to your Solana wallet." },
       ],
@@ -554,7 +554,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Frequently asked",
       items: [
         { q: "Is this a meme coin?", a: "No. Behind the token is a real mountain coffee bar and a live play economy. $DOFFA is earned in the game, not airdropped for hype." },
-        { q: "What are Cups?", a: "Cups are the internal game energy. Earned through taps and matches in the game; not for sale and not a token." },
+        { q: "What are Beans?", a: "Beans are the internal game energy. Earned through taps and matches in the game; not for sale and not a token." },
         { q: "How do I get $DOFFA?", a: "Win DOFFA Crazy 8 matches and press “Claim reward” — $DOFFA from the Reward Vault is pinned to your Solana wallet." },
         { q: "Where are my tokens stored?", a: "Only in your own wallet (Phantom / Solflare). The site and the game never hold your funds." },
         { q: "Is this an investment?", a: "No. We promise no profit and give no financial advice. Join for the project, the game and the coffee." },
@@ -579,7 +579,7 @@ export const dict: Record<Lang, Dict> = {
       copy: "copy",
     },
     legal:
-      "$DOFFA is an experimental community/utility token of the DOFFA coffee bar ecosystem. It is NOT an investment and NOT a promise of profit. The token is not a security, an investment product or an offer to buy securities. We guarantee no income and give no financial advice. Game rewards are paid from a limited Reward Vault and do not guarantee the token price; Cups are in-game energy with no monetary value. Crypto assets are highly volatile and risky: you can lose everything you put in. This site is informational and is not financial, legal or tax advice. Participate responsibly and within the laws of your jurisdiction.",
+      "$DOFFA is an experimental community/utility token of the DOFFA coffee bar ecosystem. It is NOT an investment and NOT a promise of profit. The token is not a security, an investment product or an offer to buy securities. We guarantee no income and give no financial advice. Game rewards are paid from a limited Reward Vault and do not guarantee the token price; Beans are in-game energy with no monetary value. Crypto assets are highly volatile and risky: you can lose everything you put in. This site is informational and is not financial, legal or tax advice. Participate responsibly and within the laws of your jurisdiction.",
   },
   ar: {
     locale: "ar",
@@ -589,7 +589,7 @@ export const dict: Record<Lang, Dict> = {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "مقهى في الجبال.",
       title2: "اقتصاده الخاص.",
-      sub: "قهوة من قرية جبلية في قره تشاي تشيركيسيا — مع اقتصاد لعب خاص: العب، اكسب Cups، واحصل على $DOFFA.",
+      sub: "قهوة من قرية جبلية في قره تشاي تشيركيسيا — مع اقتصاد لعب خاص: العب، اكسب الحبوب، واحصل على $DOFFA.",
       ctaBuy: "تعرّف على $DOFFA",
       ctaMenu: "شاهد المنتجات",
     },
@@ -598,7 +598,7 @@ export const dict: Record<Lang, Dict> = {
       title: "مقهى حقيقي، وليس ميماً",
       body: [
         "DOFFA هو بار إسبريسو يعيش في جبال قره تشاي تشيركيسيا منذ عام 2021. بُني باليد: إضاءة دافئة، طاولة مريحة، قهوة عطرة، وقطّ يستقبل الضيوف عند الباب.",
-        "ربطنا شغفنا بفكرة صادقة: لدى DOFFA عملتها الخاصة على سولانا واقتصاد لعب خاص — Cups مقابل النشاط و$DOFFA مقابل الانتصارات.",
+        "ربطنا شغفنا بفكرة صادقة: لدى DOFFA عملتها الخاصة على سولانا واقتصاد لعب خاص — الحبوب مقابل النشاط و$DOFFA مقابل الانتصارات.",
         "مشروع شفّاف وحلال الروح عن العمل والضيافة والمجتمع — وليس عن المضاربة.",
       ],
     },
@@ -624,12 +624,12 @@ export const dict: Record<Lang, Dict> = {
     },
     flow: {
       tag: "كيف يعمل",
-      title: "Tap → Cups → لعبة → $DOFFA",
+      title: "Tap → الحبوب → لعبة → $DOFFA",
       sub: "سلسلة مكافآت بسيطة وصادقة يمكن لأي شخص التحقق منها.",
       steps: [
-        { icon: "👆", t: "اضغط واجمع Cups", d: "اضغط داخل لعبة DOFFA واكسب Cups — طاقة اللعب الداخلية." },
-        { icon: "☕", t: "اجمع Cups", d: "Cups طاقة النظام. لا تُباع وليست عملة — تُكتسب فقط." },
-        { icon: "🃏", t: "العب DOFFA Crazy 8", d: "أنفق Cups على جولات لعبة الورق DOFFA Crazy 8." },
+        { icon: "👆", t: "اضغط واجمع الحبوب", d: "اضغط داخل لعبة DOFFA واكسب الحبوب — طاقة اللعب الداخلية." },
+        { icon: "☕", t: "اجمع الحبوب", d: "الحبوب طاقة النظام. لا تُباع وليست عملة — تُكتسب فقط." },
+        { icon: "🃏", t: "العب DOFFA Crazy 8", d: "أنفق الحبوب على جولات لعبة الورق DOFFA Crazy 8." },
         { icon: "🏆", t: "انتصر", d: "الانتصارات تمنح المكافأة الحقيقية — $DOFFA من خزينة المكافآت المحدودة." },
         { icon: "💰", t: "استلم مكافأتك", d: "زر «استلام المكافأة» يثبّت $DOFFA على محفظة سولانا الخاصة بك." },
       ],
@@ -774,7 +774,7 @@ export const dict: Record<Lang, Dict> = {
       title: "الأسئلة الشائعة",
       items: [
         { q: "هل هذه عملة ميم؟", a: "لا. خلف العملة مقهى جبلي حقيقي واقتصاد لعب حي. $DOFFA تُكسب في اللعبة ولا تُوزَّع للضجة." },
-        { q: "ما هي Cups؟", a: "Cups طاقة اللعب الداخلية. تُكسب عبر الضغطات والجولات داخل اللعبة؛ لا تُباع وليست عملة." },
+        { q: "ما هي الحبوب؟", a: "الحبوب طاقة اللعب الداخلية. تُكسب عبر الضغطات والجولات داخل اللعبة؛ لا تُباع وليست عملة." },
         { q: "كيف أحصل على $DOFFA؟", a: "انتصر في DOFFA Crazy 8 واضغط «استلام المكافأة» — $DOFFA من الخزينة تُثبَّت على محفظتك." },
         { q: "أين تُحفظ عملاتي؟", a: "فقط في محفظتك الخاصة (Phantom / Solflare). الموقع واللعبة لا يحتفظان بأموالك." },
         { q: "هل هذا استثمار؟", a: "لا. لا نعد بأي ربح ولا نقدم نصائح مالية. شارك من أجل المشروع واللعبة والقهوة." },
@@ -799,7 +799,7 @@ export const dict: Record<Lang, Dict> = {
       copy: "نسخ",
     },
     legal:
-      "$DOFFA عملة مجتمعية/خدمية تجريبية لنظام مقهى DOFFA. هي ليست استثماراً ولا وعداً بالربح. العملة ليست ورقة مالية ولا منتجاً استثمارياً ولا عرضاً لشراء أوراق مالية. لا نضمن أي دخل ولا نقدم نصائح مالية. تُدفع مكافآت اللعبة من خزينة محدودة ولا تضمن سعر العملة؛ Cups طاقة داخل اللعبة بلا قيمة نقدية. الأصول المشفرة شديدة التقلب والمخاطر: قد تخسر كل ما تضعه. محتوى الموقع معلوماتي وليس نصيحة مالية أو قانونية أو ضريبية. شارك بمسؤولية ووفق قوانين بلدك.",
+      "$DOFFA عملة مجتمعية/خدمية تجريبية لنظام مقهى DOFFA. هي ليست استثماراً ولا وعداً بالربح. العملة ليست ورقة مالية ولا منتجاً استثمارياً ولا عرضاً لشراء أوراق مالية. لا نضمن أي دخل ولا نقدم نصائح مالية. تُدفع مكافآت اللعبة من خزينة محدودة ولا تضمن سعر العملة؛ الحبوب طاقة داخل اللعبة بلا قيمة نقدية. الأصول المشفرة شديدة التقلب والمخاطر: قد تخسر كل ما تضعه. محتوى الموقع معلوماتي وليس نصيحة مالية أو قانونية أو ضريبية. شارك بمسؤولية ووفق قوانين بلدك.",
   },
   tr: {
     locale: "tr-TR",
@@ -808,7 +808,7 @@ export const dict: Record<Lang, Dict> = {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "Dağ kahvesi.",
       title2: "Kendi ekonomisi.",
-      sub: "Karaçay-Çerkesya dağ köyünden kahve — ve kendi oyun ekonomisi: oyna, Cups kazan, $DOFFA al.",
+      sub: "Karaçay-Çerkesya dağ köyünden kahve — ve kendi oyun ekonomisi: oyna, Çekirdek kazan, $DOFFA al.",
       ctaBuy: "$DOFFA hakkında bilgi al",
       ctaMenu: "Mağazaya göz at",
     },
@@ -817,7 +817,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Gerçek bir kahve barı, mem değil",
       body: [
         "DOFFA, 2021'den beri Karaçay-Çerkesya dağlarında yaşayan bir espresso barıdır. Elle inşa edildi: sıcak ışık, rahat bir tezgâh, mis kokulu kahve ve kapıda misafirleri karşılayan bir kedi.",
-        "İşimizi dürüst bir fikre bağladık: DOFFA’nın Solana’da kendi tokeni ve kendi oyun ekonomisi var — aktiviteye Cups, zaferlere $DOFFA.",
+        "İşimizi dürüst bir fikre bağladık: DOFFA’nın Solana’da kendi tokeni ve kendi oyun ekonomisi var — aktiviteye Çekirdek, zaferlere $DOFFA.",
         "Spekülasyon değil; emek, misafirperverlik ve topluluk üzerine şeffaf, helal ruhlu bir proje.",
       ],
     },
@@ -843,12 +843,12 @@ export const dict: Record<Lang, Dict> = {
     },
     flow: {
       tag: "Nasıl çalışır",
-      title: "Tap → Cups → Oyun → $DOFFA",
+      title: "Tap → Çekirdek → Oyun → $DOFFA",
       sub: "Herkesin doğrulayabileceği basit ve dürüst bir ödül zinciri.",
       steps: [
-        { icon: "👆", t: "Dokun — Cups biriktir", d: "DOFFA oyununda dokun ve Cups kazan — içsel oyun enerjisi." },
-        { icon: "☕", t: "Cups biriktir", d: "Cups ekosistem enerjisidir. Satılmaz ve token değildir — yalnızca kazanılır." },
-        { icon: "🃏", t: "DOFFA Crazy 8 oyna", d: "Cups’ı marka kart oyunu DOFFA Crazy 8 turlarına harca." },
+        { icon: "👆", t: "Dokun — Çekirdek biriktir", d: "DOFFA oyununda dokun ve Çekirdek kazan — içsel oyun enerjisi." },
+        { icon: "☕", t: "Çekirdek biriktir", d: "Çekirdek ekosistem enerjisidir. Satılmaz ve token değildir — yalnızca kazanılır." },
+        { icon: "🃏", t: "DOFFA Crazy 8 oyna", d: "Çekirdek’ı marka kart oyunu DOFFA Crazy 8 turlarına harca." },
         { icon: "🏆", t: "Kazan", d: "Zaferler gerçek ödülü getirir — sınırlı Reward Vault’tan $DOFFA." },
         { icon: "💰", t: "Ödülünü al", d: "“Ödülü al” düğmesi $DOFFA’yı Solana cüzdanına sabitler." },
       ],
@@ -993,7 +993,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Sıkça sorulanlar",
       items: [
         { q: "Bu bir meme coin mi?", a: "Hayır. Tokenin arkasında gerçek bir dağ kahvecisi ve canlı bir oyun ekonomisi var. $DOFFA oyunda kazanılır, hype için dağıtılmaz." },
-        { q: "Cups nedir?", a: "Cups içsel oyun enerjisidir. Oyun içi dokunuşlar ve turlarla kazanılır; satılmaz ve token değildir." },
+        { q: "Çekirdek nedir?", a: "Çekirdek içsel oyun enerjisidir. Oyun içi dokunuşlar ve turlarla kazanılır; satılmaz ve token değildir." },
         { q: "$DOFFA nasıl alınır?", a: "DOFFA Crazy 8 turlarını kazan ve “Ödülü al”a bas — Reward Vault’tan $DOFFA cüzdanına sabitlenir." },
         { q: "Tokenlerim nerede saklanır?", a: "Yalnızca kendi cüzdanında (Phantom / Solflare). Site ve oyun fonlarını tutmaz." },
         { q: "Bu bir yatırım mı?", a: "Hayır. Kazanç vaat etmiyoruz, finansal tavsiye vermiyoruz. Proje, oyun ve kahve için katıl." },
@@ -1018,7 +1018,7 @@ export const dict: Record<Lang, Dict> = {
       copy: "kopyala",
     },
     legal:
-      "$DOFFA, DOFFA kahve ekosisteminin deneysel topluluk/fayda tokenidir. Yatırım DEĞİLDİR ve kâr vaadi DEĞİLDİR. Token menkul kıymet, yatırım ürünü veya menkul kıymet alım teklifi değildir. Hiçbir gelir garanti etmiyor, finansal tavsiye vermiyoruz. Oyun ödülleri sınırlı Reward Vault’tan ödenir ve token fiyatını garanti etmez; Cups parasal değeri olmayan oyun içi enerjidir. Kripto varlıklar son derece oynak ve risklidir: yatırdığınız her şeyi kaybedebilirsiniz. Site içeriği bilgilendirme amaçlıdır; finansal, hukuki veya vergisel danışmanlık değildir. Sorumlu ve ülkenizin yasalarına uygun katılın.",
+      "$DOFFA, DOFFA kahve ekosisteminin deneysel topluluk/fayda tokenidir. Yatırım DEĞİLDİR ve kâr vaadi DEĞİLDİR. Token menkul kıymet, yatırım ürünü veya menkul kıymet alım teklifi değildir. Hiçbir gelir garanti etmiyor, finansal tavsiye vermiyoruz. Oyun ödülleri sınırlı Reward Vault’tan ödenir ve token fiyatını garanti etmez; Çekirdek parasal değeri olmayan oyun içi enerjidir. Kripto varlıklar son derece oynak ve risklidir: yatırdığınız her şeyi kaybedebilirsiniz. Site içeriği bilgilendirme amaçlıdır; finansal, hukuki veya vergisel danışmanlık değildir. Sorumlu ve ülkenizin yasalarına uygun katılın.",
   },
   es: {
     locale: "es-ES",
@@ -1027,7 +1027,7 @@ export const dict: Record<Lang, Dict> = {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "Cafetería de montaña.",
       title2: "Su propia economía.",
-      sub: "Café de un pueblo de montaña en Karacháevo-Cherkesia — con su propia economía de juego: juega, gana Cups y recibe $DOFFA.",
+      sub: "Café de un pueblo de montaña en Karacháevo-Cherkesia — con su propia economía de juego: juega, gana Granos y recibe $DOFFA.",
       ctaBuy: "Conoce $DOFFA",
       ctaMenu: "Ver la línea de merch",
     },
@@ -1036,7 +1036,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Una cafetería real, no un meme",
       body: [
         "DOFFA es un bar de espresso que vive en las montañas de Karacháevo-Cherkesia desde 2021. Se construyó a mano: luz cálida, una barra acogedora, café aromático y un gato que recibe a los visitantes en la puerta.",
-        "Unimos nuestro oficio a una idea honesta: DOFFA tiene su propio token en Solana y su propia economía de juego — Cups por actividad y $DOFFA por victorias.",
+        "Unimos nuestro oficio a una idea honesta: DOFFA tiene su propio token en Solana y su propia economía de juego — Granos por actividad y $DOFFA por victorias.",
         "Un proyecto transparente y de espíritu halal sobre el trabajo, la hospitalidad y la comunidad, no sobre la especulación.",
       ],
     },
@@ -1062,12 +1062,12 @@ export const dict: Record<Lang, Dict> = {
     },
     flow: {
       tag: "Cómo funciona",
-      title: "Tap → Cups → Juego → $DOFFA",
+      title: "Tap → Granos → Juego → $DOFFA",
       sub: "Una cadena de recompensas simple y honesta que cualquiera puede verificar.",
       steps: [
-        { icon: "👆", t: "Toca y acumula Cups", d: "Toca dentro del juego DOFFA y gana Cups — la energía interna del juego." },
-        { icon: "☕", t: "Acumula Cups", d: "Cups es la energía del ecosistema. No se vende y no es un token: solo se gana." },
-        { icon: "🃏", t: "Juega DOFFA Crazy 8", d: "Gasta Cups en partidas del juego de cartas DOFFA Crazy 8." },
+        { icon: "👆", t: "Toca y acumula Granos", d: "Toca dentro del juego DOFFA y gana Granos — la energía interna del juego." },
+        { icon: "☕", t: "Acumula Granos", d: "Granos es la energía del ecosistema. No se vende y no es un token: solo se gana." },
+        { icon: "🃏", t: "Juega DOFFA Crazy 8", d: "Gasta Granos en partidas del juego de cartas DOFFA Crazy 8." },
         { icon: "🏆", t: "Gana", d: "Las victorias otorgan la recompensa real: $DOFFA del Reward Vault limitado." },
         { icon: "💰", t: "Reclama tu recompensa", d: "El botón «Reclamar recompensa» fija $DOFFA a tu billetera Solana." },
       ],
@@ -1212,7 +1212,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Preguntas frecuentes",
       items: [
         { q: "¿Es una meme coin?", a: "No. Detrás del token hay una cafetería de montaña real y una economía de juego viva. $DOFFA se gana jugando, no se regala por hype." },
-        { q: "¿Qué son los Cups?", a: "Cups es la energía interna del juego. Se gana con toques y partidas dentro del juego; no se vende y no es un token." },
+        { q: "¿Qué son los Granos?", a: "Granos es la energía interna del juego. Se gana con toques y partidas dentro del juego; no se vende y no es un token." },
         { q: "¿Cómo consigo $DOFFA?", a: "Gana partidas de DOFFA Crazy 8 y pulsa «Reclamar recompensa»: $DOFFA del Reward Vault se fija a tu billetera Solana." },
         { q: "¿Dónde se guardan mis tokens?", a: "Solo en tu propia billetera (Phantom / Solflare). El sitio y el juego nunca custodian tus fondos." },
         { q: "¿Es una inversión?", a: "No. No prometemos ganancias ni damos consejos financieros. Participa por el proyecto, el juego y el café." },
@@ -1237,7 +1237,7 @@ export const dict: Record<Lang, Dict> = {
       copy: "copiar",
     },
     legal:
-      "$DOFFA es un token experimental comunitario/utilitario del ecosistema de la cafetería DOFFA. NO es una inversión ni una promesa de ganancias. El token no es un valor, un producto de inversión ni una oferta de compra de valores. No garantizamos ingresos ni damos consejos financieros. Las recompensas del juego se pagan desde un Reward Vault limitado y no garantizan el precio del token; Cups es energía dentro del juego sin valor monetario. Los criptoactivos son muy volátiles y arriesgados: puedes perder todo lo aportado. El contenido del sitio es informativo y no constituye asesoría financiera, legal o fiscal. Participa con responsabilidad y conforme a las leyes de tu jurisdicción.",
+      "$DOFFA es un token experimental comunitario/utilitario del ecosistema de la cafetería DOFFA. NO es una inversión ni una promesa de ganancias. El token no es un valor, un producto de inversión ni una oferta de compra de valores. No garantizamos ingresos ni damos consejos financieros. Las recompensas del juego se pagan desde un Reward Vault limitado y no garantizan el precio del token; Granos es energía dentro del juego sin valor monetario. Los criptoactivos son muy volátiles y arriesgados: puedes perder todo lo aportado. El contenido del sitio es informativo y no constituye asesoría financiera, legal o fiscal. Participa con responsabilidad y conforme a las leyes de tu jurisdicción.",
   },
   fr: {
     locale: "fr-FR",
@@ -1246,7 +1246,7 @@ export const dict: Record<Lang, Dict> = {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "Café de montagne.",
       title2: "Sa propre économie.",
-      sub: "Du café d’un village de montagne en Karatchaïévo-Tcherkessie — avec sa propre économie de jeu : joue, gagne des Cups, reçois du $DOFFA.",
+      sub: "Du café d’un village de montagne en Karatchaïévo-Tcherkessie — avec sa propre économie de jeu : joue, gagne des Grains, reçois du $DOFFA.",
       ctaBuy: "Découvrir $DOFFA",
       ctaMenu: "Voir la boutique",
     },
@@ -1255,7 +1255,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Un vrai bar à café, pas un mème",
       body: [
         "DOFFA est un bar à espresso installé depuis 2021 dans les montagnes de Karatchaïévo-Tcherkessie. Il a été construit à la main : lumière chaude, comptoir chaleureux, café parfumé et un chat qui accueille les visiteurs à la porte.",
-        "Nous avons lié notre métier à une idée honnête : DOFFA a son propre jeton sur Solana et sa propre économie de jeu — des Cups pour l’activité et du $DOFFA pour les victoires.",
+        "Nous avons lié notre métier à une idée honnête : DOFFA a son propre jeton sur Solana et sa propre économie de jeu — des Grains pour l’activité et du $DOFFA pour les victoires.",
         "Un projet transparent et d'esprit halal autour du travail, de l'hospitalité et de la communauté, et non de la spéculation.",
       ],
     },
@@ -1281,12 +1281,12 @@ export const dict: Record<Lang, Dict> = {
     },
     flow: {
       tag: "Comment ça marche",
-      title: "Tap → Cups → Jeu → $DOFFA",
+      title: "Tap → Grains → Jeu → $DOFFA",
       sub: "Une chaîne de récompenses simple et honnête que chacun peut vérifier.",
       steps: [
-        { icon: "👆", t: "Tape et accumule des Cups", d: "Tape dans le jeu DOFFA et gagne des Cups — l’énergie interne du jeu." },
-        { icon: "☕", t: "Accumule des Cups", d: "Les Cups sont l’énergie de l’écosystème. Pas à vendre, pas un jeton : ils se gagnent." },
-        { icon: "🃏", t: "Joue à DOFFA Crazy 8", d: "Dépense tes Cups dans des parties du jeu de cartes DOFFA Crazy 8." },
+        { icon: "👆", t: "Tape et accumule des Grains", d: "Tape dans le jeu DOFFA et gagne des Grains — l’énergie interne du jeu." },
+        { icon: "☕", t: "Accumule des Grains", d: "Les Grains sont l’énergie de l’écosystème. Pas à vendre, pas un jeton : ils se gagnent." },
+        { icon: "🃏", t: "Joue à DOFFA Crazy 8", d: "Dépense tes Grains dans des parties du jeu de cartes DOFFA Crazy 8." },
         { icon: "🏆", t: "Gagne", d: "Les victoires rapportent la vraie récompense — du $DOFFA du Reward Vault limité." },
         { icon: "💰", t: "Réclame ta récompense", d: "Le bouton « Réclamer la récompense » attache le $DOFFA à ton portefeuille Solana." },
       ],
@@ -1431,7 +1431,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Questions fréquentes",
       items: [
         { q: "C’est un meme coin ?", a: "Non. Derrière le jeton, un vrai café de montagne et une économie de jeu vivante. Le $DOFFA se gagne en jouant, pas en hype." },
-        { q: "Que sont les Cups ?", a: "Les Cups sont l’énergie interne du jeu. Gagnés en tapant et en jouant des parties ; pas à vendre, pas un jeton." },
+        { q: "Que sont les Grains ?", a: "Les Grains sont l’énergie interne du jeu. Gagnés en tapant et en jouant des parties ; pas à vendre, pas un jeton." },
         { q: "Comment obtenir du $DOFFA ?", a: "Gagne des parties de DOFFA Crazy 8 et appuie sur « Réclamer la récompense » : le $DOFFA du Reward Vault est attaché à ton portefeuille Solana." },
         { q: "Où sont conservés mes jetons ?", a: "Uniquement dans ton propre portefeuille (Phantom / Solflare). Le site et le jeu ne détiennent jamais tes fonds." },
         { q: "C’est un investissement ?", a: "Non. Nous ne promettons aucun profit et ne donnons aucun conseil financier. Participe pour le projet, le jeu et le café." },
@@ -1456,7 +1456,7 @@ export const dict: Record<Lang, Dict> = {
       copy: "copier",
     },
     legal:
-      "$DOFFA est un jeton communautaire/utilitaire expérimental de l’écosystème du café DOFFA. Ce n’est PAS un investissement ni une promesse de profit. Le jeton n’est ni une valeur mobilière, ni un produit d’investissement, ni une offre d’achat de titres. Nous ne garantissons aucun revenu et ne donnons aucun conseil financier. Les récompenses du jeu sont payées depuis un Reward Vault limité et ne garantissent pas le prix du jeton ; les Cups sont une énergie de jeu sans valeur monétaire. Les crypto-actifs sont très volatils et risqués : vous pouvez tout perdre. Le contenu du site est informatif et ne constitue pas un conseil financier, juridique ou fiscal. Participez de façon responsable et dans le respect des lois de votre juridiction.",
+      "$DOFFA est un jeton communautaire/utilitaire expérimental de l’écosystème du café DOFFA. Ce n’est PAS un investissement ni une promesse de profit. Le jeton n’est ni une valeur mobilière, ni un produit d’investissement, ni une offre d’achat de titres. Nous ne garantissons aucun revenu et ne donnons aucun conseil financier. Les récompenses du jeu sont payées depuis un Reward Vault limité et ne garantissent pas le prix du jeton ; les Grains sont une énergie de jeu sans valeur monétaire. Les crypto-actifs sont très volatils et risqués : vous pouvez tout perdre. Le contenu du site est informatif et ne constitue pas un conseil financier, juridique ou fiscal. Participez de façon responsable et dans le respect des lois de votre juridiction.",
   },
   de: {
     locale: "de-DE",
@@ -1465,7 +1465,7 @@ export const dict: Record<Lang, Dict> = {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "Bergkaffee.",
       title2: "Eigene Ökonomie.",
-      sub: "Kaffee aus einem Bergdorf in Karatschai-Tscherkessien — mit eigener Spiel-Ökonomie: spiele, verdiene Cups, erhalte $DOFFA.",
+      sub: "Kaffee aus einem Bergdorf in Karatschai-Tscherkessien — mit eigener Spiel-Ökonomie: spiele, verdiene Bohnen, erhalte $DOFFA.",
       ctaBuy: "Mehr über $DOFFA",
       ctaMenu: "Merch ansehen",
     },
@@ -1474,7 +1474,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Eine echte Kaffeebar, kein Meme",
       body: [
         "DOFFA ist eine Espressobar, die seit 2021 in den Bergen von Karatschai-Tscherkessien lebt. Sie wurde von Hand gebaut: warmes Licht, ein gemütlicher Tresen, duftender Kaffee und eine Katze, die Gäste an der Tür begrüßt.",
-        "Wir haben unser Handwerk mit einer ehrlichen Idee verbunden: DOFFA hat einen eigenen Token auf Solana und eine eigene Spiel-Ökonomie — Cups für Aktivität, $DOFFA für Siege.",
+        "Wir haben unser Handwerk mit einer ehrlichen Idee verbunden: DOFFA hat einen eigenen Token auf Solana und eine eigene Spiel-Ökonomie — Bohnen für Aktivität, $DOFFA für Siege.",
         "Ein transparentes, im Geiste halal gehaltenes Projekt über Arbeit, Gastfreundschaft und Gemeinschaft – nicht über Spekulation.",
       ],
     },
@@ -1500,12 +1500,12 @@ export const dict: Record<Lang, Dict> = {
     },
     flow: {
       tag: "So funktioniert es",
-      title: "Tap → Cups → Spiel → $DOFFA",
+      title: "Tap → Bohnen → Spiel → $DOFFA",
       sub: "Eine einfache, ehrliche Belohnungskette, die jeder überprüfen kann.",
       steps: [
-        { icon: "👆", t: "Tippen — Cups sammeln", d: "Tippe im DOFFA-Spiel und verdiene Cups — die interne Spielenergie." },
-        { icon: "☕", t: "Cups sammeln", d: "Cups sind die Energie des Ökosystems. Nicht käuflich, kein Token — nur verdienbar." },
-        { icon: "🃏", t: "DOFFA Crazy 8 spielen", d: "Setze Cups für Partien im Marken-Kartenspiel DOFFA Crazy 8 ein." },
+        { icon: "👆", t: "Tippen — Bohnen sammeln", d: "Tippe im DOFFA-Spiel und verdiene Bohnen — die interne Spielenergie." },
+        { icon: "☕", t: "Bohnen sammeln", d: "Bohnen sind die Energie des Ökosystems. Nicht käuflich, kein Token — nur verdienbar." },
+        { icon: "🃏", t: "DOFFA Crazy 8 spielen", d: "Setze Bohnen für Partien im Marken-Kartenspiel DOFFA Crazy 8 ein." },
         { icon: "🏆", t: "Gewinnen", d: "Siege bringen die echte Belohnung — $DOFFA aus dem begrenzten Reward Vault." },
         { icon: "💰", t: "Belohnung abholen", d: "Der Button „Belohnung abholen“ heftet $DOFFA an deine Solana-Wallet." },
       ],
@@ -1650,7 +1650,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Häufige Fragen",
       items: [
         { q: "Ist das ein Meme-Coin?", a: "Nein. Hinter dem Token stehen eine echte Bergkaffeebar und eine lebendige Spiel-Ökonomie. $DOFFA wird im Spiel verdient, nicht für Hype verteilt." },
-        { q: "Was sind Cups?", a: "Cups sind die interne Spielenergie. Verdient durch Tippen und Partien im Spiel; nicht käuflich, kein Token." },
+        { q: "Was sind Bohnen?", a: "Bohnen sind die interne Spielenergie. Verdient durch Tippen und Partien im Spiel; nicht käuflich, kein Token." },
         { q: "Wie bekomme ich $DOFFA?", a: "Gewinne DOFFA-Crazy-8-Partien und drücke „Belohnung abholen“ — $DOFFA aus dem Reward Vault wird deiner Solana-Wallet zugeordnet." },
         { q: "Wo werden meine Token verwahrt?", a: "Nur in deiner eigenen Wallet (Phantom / Solflare). Website und Spiel verwahren nie deine Mittel." },
         { q: "Ist das eine Investition?", a: "Nein. Wir versprechen keinen Gewinn und geben keine Finanzberatung. Mach mit für Projekt, Spiel und Kaffee." },
@@ -1675,7 +1675,7 @@ export const dict: Record<Lang, Dict> = {
       copy: "kopieren",
     },
     legal:
-      "$DOFFA ist ein experimenteller Community-/Utility-Token des DOFFA-Kaffee-Ökosystems. Er ist KEINE Investition und KEIN Gewinnversprechen. Der Token ist kein Wertpapier, kein Anlageprodukt und kein Angebot zum Kauf von Wertpapieren. Wir garantieren kein Einkommen und geben keine Finanzberatung. Spielbelohnungen werden aus einem begrenzten Reward Vault gezahlt und garantieren keinen Tokenpreis; Cups sind Spielenergie ohne Geldwert. Kryptowerte sind hochvolatil und riskant: Ein Totalverlust ist möglich. Die Inhalte der Website dienen der Information und sind keine Finanz-, Rechts- oder Steuerberatung. Beteilige dich verantwortungsvoll und im Rahmen der Gesetze deiner Jurisdiktion.",
+      "$DOFFA ist ein experimenteller Community-/Utility-Token des DOFFA-Kaffee-Ökosystems. Er ist KEINE Investition und KEIN Gewinnversprechen. Der Token ist kein Wertpapier, kein Anlageprodukt und kein Angebot zum Kauf von Wertpapieren. Wir garantieren kein Einkommen und geben keine Finanzberatung. Spielbelohnungen werden aus einem begrenzten Reward Vault gezahlt und garantieren keinen Tokenpreis; Bohnen sind Spielenergie ohne Geldwert. Kryptowerte sind hochvolatil und riskant: Ein Totalverlust ist möglich. Die Inhalte der Website dienen der Information und sind keine Finanz-, Rechts- oder Steuerberatung. Beteilige dich verantwortungsvoll und im Rahmen der Gesetze deiner Jurisdiktion.",
   },
   zh: {
     locale: "zh-CN",
@@ -1684,7 +1684,7 @@ export const dict: Record<Lang, Dict> = {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "山地咖啡馆。",
       title2: "自成经济体系。",
-      sub: "来自卡拉恰伊-切尔克斯山村的咖啡——拥有自己的游戏经济：玩游戏、赚 Cups、赢取 $DOFFA。",
+      sub: "来自卡拉恰伊-切尔克斯山村的咖啡——拥有自己的游戏经济：玩游戏、赚 咖啡豆、赢取 $DOFFA。",
       ctaBuy: "了解 $DOFFA",
       ctaMenu: "查看周边",
     },
@@ -1693,7 +1693,7 @@ export const dict: Record<Lang, Dict> = {
       title: "一家真实的咖啡馆，而非梗币",
       body: [
         "DOFFA 是一家自 2021 年起就扎根于卡拉恰伊-切尔克斯山区的浓缩咖啡吧。它由双手打造：温暖的灯光、舒适的吧台、香醇的咖啡，还有一只在门口迎客的猫。",
-        "我们把热爱的事业与诚实的理念结合：DOFFA 在 Solana 上有自己的代币和游戏经济——活动赚 Cups，胜利得 $DOFFA。",
+        "我们把热爱的事业与诚实的理念结合：DOFFA 在 Solana 上有自己的代币和游戏经济——活动赚 咖啡豆，胜利得 $DOFFA。",
         "这是一个透明、秉持清真精神的项目，关乎劳动、好客与社区，而非投机。",
       ],
     },
@@ -1719,12 +1719,12 @@ export const dict: Record<Lang, Dict> = {
     },
     flow: {
       tag: "运作方式",
-      title: "Tap → Cups → 游戏 → $DOFFA",
+      title: "Tap → 咖啡豆 → 游戏 → $DOFFA",
       sub: "一条简单诚实、人人可验证的奖励链。",
       steps: [
-        { icon: "👆", t: "点击，攒 Cups", d: "在 DOFFA 游戏里点击，赚取 Cups——内部游戏能量。" },
-        { icon: "☕", t: "积攒 Cups", d: "Cups 是生态能量。不出售、不是代币——只能靠玩赚取。" },
-        { icon: "🃏", t: "玩 DOFFA Crazy 8", d: "用 Cups 参加品牌纸牌游戏 DOFFA Crazy 8 的对局。" },
+        { icon: "👆", t: "点击，攒 咖啡豆", d: "在 DOFFA 游戏里点击，赚取 咖啡豆——内部游戏能量。" },
+        { icon: "☕", t: "积攒 咖啡豆", d: "咖啡豆 是生态能量。不出售、不是代币——只能靠玩赚取。" },
+        { icon: "🃏", t: "玩 DOFFA Crazy 8", d: "用 咖啡豆 参加品牌纸牌游戏 DOFFA Crazy 8 的对局。" },
         { icon: "🏆", t: "获胜", d: "胜利带来真正的奖励——来自限量 Reward Vault 的 $DOFFA。" },
         { icon: "💰", t: "领取奖励", d: "点击「领取奖励」，$DOFFA 将绑定到你的 Solana 钱包。" },
       ],
@@ -1869,7 +1869,7 @@ export const dict: Record<Lang, Dict> = {
       title: "常见问题",
       items: [
         { q: "这是 meme 币吗？", a: "不是。代币背后是真实的山间咖啡馆和活跃的游戏经济。$DOFFA 靠游戏赚取，不为炒作空投。" },
-        { q: "Cups 是什么？", a: "Cups 是内部游戏能量。通过游戏内点击和对局赚取；不出售、不是代币。" },
+        { q: "咖啡豆 是什么？", a: "咖啡豆 是内部游戏能量。通过游戏内点击和对局赚取；不出售、不是代币。" },
         { q: "如何获得 $DOFFA？", a: "赢下 DOFFA Crazy 8 对局并点击「领取奖励」——Reward Vault 中的 $DOFFA 将绑定到你的 Solana 钱包。" },
         { q: "我的代币存放在哪里？", a: "只存放在你自己的钱包（Phantom / Solflare）。网站和游戏绝不保管你的资金。" },
         { q: "这是投资吗？", a: "不是。我们不承诺收益，也不提供理财建议。请为项目、游戏和咖啡而参与。" },
@@ -1894,7 +1894,7 @@ export const dict: Record<Lang, Dict> = {
       copy: "复制",
     },
     legal:
-      "$DOFFA 是 DOFFA 咖啡生态的实验性社区/实用型代币。它不是投资，也不是收益承诺。该代币不是证券、投资产品或证券购买要约。我们不保证任何收入，也不提供理财建议。游戏奖励从限量 Reward Vault 支付，不保证代币价格；Cups 是无货币价值的游戏内能量。加密资产波动大、风险高：可能损失全部投入。本站内容仅供参考，不构成财务、法律或税务建议。请负责任地并在所在司法辖区法律允许范围内参与。",
+      "$DOFFA 是 DOFFA 咖啡生态的实验性社区/实用型代币。它不是投资，也不是收益承诺。该代币不是证券、投资产品或证券购买要约。我们不保证任何收入，也不提供理财建议。游戏奖励从限量 Reward Vault 支付，不保证代币价格；咖啡豆 是无货币价值的游戏内能量。加密资产波动大、风险高：可能损失全部投入。本站内容仅供参考，不构成财务、法律或税务建议。请负责任地并在所在司法辖区法律允许范围内参与。",
   },
   hi: {
     locale: "hi-IN",
@@ -1903,7 +1903,7 @@ export const dict: Record<Lang, Dict> = {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "पहाड़ों का कैफ़े।",
       title2: "अपनी खुद की अर्थव्यवस्था।",
-      sub: "कराचाय-चर्केसिया के पहाड़ी गाँव की कॉफ़ी — अपनी गेम इकॉनमी के साथ: खेलो, Cups कमाओ, $DOFFA पाओ।",
+      sub: "कराचाय-चर्केसिया के पहाड़ी गाँव की कॉफ़ी — अपनी गेम इकॉनमी के साथ: खेलो, बीन्स कमाओ, $DOFFA पाओ।",
       ctaBuy: "$DOFFA के बारे में जानें",
       ctaMenu: "मर्च देखें",
     },
@@ -1912,7 +1912,7 @@ export const dict: Record<Lang, Dict> = {
       title: "एक असली कॉफ़ी बार, कोई मीम नहीं",
       body: [
         "DOFFA एक एस्प्रेसो बार है जो 2021 से कराचाय-चर्केसिया के पहाड़ों में बसा है। इसे हाथ से बनाया गया: गर्म रोशनी, आरामदायक काउंटर, खुशबूदार कॉफ़ी, और दरवाज़े पर मेहमानों का स्वागत करती एक बिल्ली।",
-        "हमने अपने काम को एक ईमानदार विचार से जोड़ा: DOFFA का Solana पर अपना टोकन और अपनी गेम इकॉनमी है — गतिविधि पर Cups, जीत पर $DOFFA।",
+        "हमने अपने काम को एक ईमानदार विचार से जोड़ा: DOFFA का Solana पर अपना टोकन और अपनी गेम इकॉनमी है — गतिविधि पर बीन्स, जीत पर $DOFFA।",
         "यह एक पारदर्शी, हलाल भावना वाला प्रोजेक्ट है — मेहनत, मेहमाननवाज़ी और समुदाय के बारे में, सट्टेबाज़ी के बारे में नहीं।",
       ],
     },
@@ -1938,12 +1938,12 @@ export const dict: Record<Lang, Dict> = {
     },
     flow: {
       tag: "यह कैसे काम करता है",
-      title: "Tap → Cups → गेम → $DOFFA",
+      title: "Tap → बीन्स → गेम → $DOFFA",
       sub: "एक सरल, ईमानदार इनाम-श्रृंखला जिसे कोई भी सत्यापित कर सकता है।",
       steps: [
-        { icon: "👆", t: "टैप करो — Cups जमा करो", d: "DOFFA गेम में टैप करो और Cups कमाओ — आंतरिक गेम ऊर्जा।" },
-        { icon: "☕", t: "Cups जमा करो", d: "Cups इकोसिस्टम की ऊर्जा है। बिकती नहीं, टोकन नहीं — सिर्फ़ कमाई जाती है।" },
-        { icon: "🃏", t: "DOFFA Crazy 8 खेलो", d: "ब्रांड कार्ड गेम DOFFA Crazy 8 की बाज़ियों पर Cups खर्च करो।" },
+        { icon: "👆", t: "टैप करो — बीन्स जमा करो", d: "DOFFA गेम में टैप करो और बीन्स कमाओ — आंतरिक गेम ऊर्जा।" },
+        { icon: "☕", t: "बीन्स जमा करो", d: "बीन्स इकोसिस्टम की ऊर्जा है। बिकती नहीं, टोकन नहीं — सिर्फ़ कमाई जाती है।" },
+        { icon: "🃏", t: "DOFFA Crazy 8 खेलो", d: "ब्रांड कार्ड गेम DOFFA Crazy 8 की बाज़ियों पर बीन्स खर्च करो।" },
         { icon: "🏆", t: "जीतो", d: "जीत असली इनाम देती है — सीमित Reward Vault से $DOFFA।" },
         { icon: "💰", t: "इनाम लो", d: "«इनाम लें» बटन $DOFFA को तुम्हारे Solana वॉलेट से जोड़ देता है।" },
       ],
@@ -2088,7 +2088,7 @@ export const dict: Record<Lang, Dict> = {
       title: "अक्सर पूछे जाने वाले सवाल",
       items: [
         { q: "क्या यह मीम कॉइन है?", a: "नहीं। टोकन के पीछे असली पहाड़ी कॉफ़ी बार और जीवंत गेम इकॉनमी है। $DOFFA गेम में कमाया जाता है, हाइप पर बाँटा नहीं जाता।" },
-        { q: "Cups क्या है?", a: "Cups आंतरिक गेम ऊर्जा है। गेम के अंदर टैप और बाज़ियों से कमाई जाती है; बिकती नहीं, टोकन नहीं।" },
+        { q: "बीन्स क्या है?", a: "बीन्स आंतरिक गेम ऊर्जा है। गेम के अंदर टैप और बाज़ियों से कमाई जाती है; बिकती नहीं, टोकन नहीं।" },
         { q: "$DOFFA कैसे पाएँ?", a: "DOFFA Crazy 8 की बाज़ियाँ जीतो और «इनाम लें» दबाओ — Reward Vault का $DOFFA तुम्हारे Solana वॉलेट से जुड़ जाता है।" },
         { q: "मेरे टोकन कहाँ रहते हैं?", a: "सिर्फ़ तुम्हारे अपने वॉलेट (Phantom / Solflare) में। साइट और गेम कभी तुम्हारे फ़ंड नहीं रखते।" },
         { q: "क्या यह निवेश है?", a: "नहीं। हम मुनाफ़े का वादा नहीं करते और वित्तीय सलाह नहीं देते। प्रोजेक्ट, गेम और कॉफ़ी के लिए जुड़ो।" },
@@ -2113,7 +2113,7 @@ export const dict: Record<Lang, Dict> = {
       copy: "कॉपी करें",
     },
     legal:
-      "$DOFFA, DOFFA कॉफ़ी इकोसिस्टम का प्रयोगात्मक कम्युनिटी/यूटिलिटी टोकन है। यह निवेश नहीं है और मुनाफ़े का वादा नहीं है। टोकन प्रतिभूति, निवेश उत्पाद या प्रतिभूतियों की खरीद का प्रस्ताव नहीं है। हम किसी आय की गारंटी नहीं देते और वित्तीय सलाह नहीं देते। गेम इनाम सीमित Reward Vault से चुकाए जाते हैं और टोकन की क़ीमत की गारंटी नहीं देते; Cups बिना मौद्रिक मूल्य की इन-गेम ऊर्जा है। क्रिप्टो संपत्तियाँ अत्यधिक अस्थिर और जोखिम भरी हैं: पूरा निवेश डूब सकता है। साइट की सामग्री सूचना हेतु है; यह वित्तीय, क़ानूनी या कर सलाह नहीं है। ज़िम्मेदारी से और अपने क्षेत्र के क़ानूनों के भीतर भाग लें।",
+      "$DOFFA, DOFFA कॉफ़ी इकोसिस्टम का प्रयोगात्मक कम्युनिटी/यूटिलिटी टोकन है। यह निवेश नहीं है और मुनाफ़े का वादा नहीं है। टोकन प्रतिभूति, निवेश उत्पाद या प्रतिभूतियों की खरीद का प्रस्ताव नहीं है। हम किसी आय की गारंटी नहीं देते और वित्तीय सलाह नहीं देते। गेम इनाम सीमित Reward Vault से चुकाए जाते हैं और टोकन की क़ीमत की गारंटी नहीं देते; बीन्स बिना मौद्रिक मूल्य की इन-गेम ऊर्जा है। क्रिप्टो संपत्तियाँ अत्यधिक अस्थिर और जोखिम भरी हैं: पूरा निवेश डूब सकता है। साइट की सामग्री सूचना हेतु है; यह वित्तीय, क़ानूनी या कर सलाह नहीं है। ज़िम्मेदारी से और अपने क्षेत्र के क़ानूनों के भीतर भाग लें।",
   },
   pt: {
     locale: "pt-BR",
@@ -2122,7 +2122,7 @@ export const dict: Record<Lang, Dict> = {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "Cafeteria de montanha.",
       title2: "Sua própria economia.",
-      sub: "Café de uma vila nas montanhas de Karatchai-Tcherkéssia — com economia de jogo própria: jogue, ganhe Cups, receba $DOFFA.",
+      sub: "Café de uma vila nas montanhas de Karatchai-Tcherkéssia — com economia de jogo própria: jogue, ganhe Grãos, receba $DOFFA.",
       ctaBuy: "Conheça o $DOFFA",
       ctaMenu: "Ver a loja",
     },
@@ -2131,7 +2131,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Uma cafeteria de verdade, não um meme",
       body: [
         "A DOFFA é um bar de espresso que vive nas montanhas da Karatchai-Tcherkéssia desde 2021. Foi construída à mão: luz quente, um balcão aconchegante, café aromático e um gato que recebe os visitantes à porta.",
-        "Unimos nosso ofício a uma ideia honesta: a DOFFA tem seu próprio token na Solana e sua própria economia de jogo — Cups por atividade e $DOFFA por vitórias.",
+        "Unimos nosso ofício a uma ideia honesta: a DOFFA tem seu próprio token na Solana e sua própria economia de jogo — Grãos por atividade e $DOFFA por vitórias.",
         "Um projeto transparente e de espírito halal sobre trabalho, hospitalidade e comunidade — não sobre especulação.",
       ],
     },
@@ -2157,12 +2157,12 @@ export const dict: Record<Lang, Dict> = {
     },
     flow: {
       tag: "Como funciona",
-      title: "Tap → Cups → Jogo → $DOFFA",
+      title: "Tap → Grãos → Jogo → $DOFFA",
       sub: "Uma cadeia de recompensas simples e honesta que qualquer um pode verificar.",
       steps: [
-        { icon: "👆", t: "Toque e acumule Cups", d: "Toque dentro do jogo DOFFA e ganhe Cups — a energia interna do jogo." },
-        { icon: "☕", t: "Acumule Cups", d: "Cups é a energia do ecossistema. Não se vende e não é token — só se ganha." },
-        { icon: "🃏", t: "Jogue DOFFA Crazy 8", d: "Gaste Cups em partidas do jogo de cartas DOFFA Crazy 8." },
+        { icon: "👆", t: "Toque e acumule Grãos", d: "Toque dentro do jogo DOFFA e ganhe Grãos — a energia interna do jogo." },
+        { icon: "☕", t: "Acumule Grãos", d: "Grãos é a energia do ecossistema. Não se vende e não é token — só se ganha." },
+        { icon: "🃏", t: "Jogue DOFFA Crazy 8", d: "Gaste Grãos em partidas do jogo de cartas DOFFA Crazy 8." },
         { icon: "🏆", t: "Vença", d: "Vitórias dão a recompensa real — $DOFFA do Reward Vault limitado." },
         { icon: "💰", t: "Resgate a recompensa", d: "O botão «Resgatar recompensa» vincula $DOFFA à sua carteira Solana." },
       ],
@@ -2307,7 +2307,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Perguntas frequentes",
       items: [
         { q: "É uma meme coin?", a: "Não. Por trás do token há uma cafeteria de montanha real e uma economia de jogo viva. $DOFFA se ganha jogando, não é distribuído por hype." },
-        { q: "O que são Cups?", a: "Cups é a energia interna do jogo. Ganha-se tocando e jogando partidas dentro do jogo; não se vende e não é token." },
+        { q: "O que são Grãos?", a: "Grãos é a energia interna do jogo. Ganha-se tocando e jogando partidas dentro do jogo; não se vende e não é token." },
         { q: "Como consigo $DOFFA?", a: "Vença partidas de DOFFA Crazy 8 e toque em «Resgatar recompensa» — o $DOFFA do Reward Vault fica vinculado à sua carteira Solana." },
         { q: "Onde ficam meus tokens?", a: "Só na sua própria carteira (Phantom / Solflare). O site e o jogo nunca guardam seus fundos." },
         { q: "É um investimento?", a: "Não. Não prometemos lucro nem damos conselhos financeiros. Participe pelo projeto, pelo jogo e pelo café." },
@@ -2332,7 +2332,7 @@ export const dict: Record<Lang, Dict> = {
       copy: "copiar",
     },
     legal:
-      "$DOFFA é um token experimental comunitário/utilitário do ecossistema da cafeteria DOFFA. NÃO é investimento nem promessa de lucro. O token não é valor mobiliário, produto de investimento ou oferta de compra de valores mobiliários. Não garantimos renda nem damos conselhos financeiros. As recompensas do jogo são pagas de um Reward Vault limitado e não garantem o preço do token; Cups é energia de jogo sem valor monetário. Criptoativos são muito voláteis e arriscados: você pode perder tudo o que aportar. O conteúdo do site é informativo e não constitui aconselhamento financeiro, jurídico ou fiscal. Participe com responsabilidade e conforme as leis da sua jurisdição.",
+      "$DOFFA é um token experimental comunitário/utilitário do ecossistema da cafeteria DOFFA. NÃO é investimento nem promessa de lucro. O token não é valor mobiliário, produto de investimento ou oferta de compra de valores mobiliários. Não garantimos renda nem damos conselhos financeiros. As recompensas do jogo são pagas de um Reward Vault limitado e não garantem o preço do token; Grãos é energia de jogo sem valor monetário. Criptoativos são muito voláteis e arriscados: você pode perder tudo o que aportar. O conteúdo do site é informativo e não constitui aconselhamento financeiro, jurídico ou fiscal. Participe com responsabilidade e conforme as leis da sua jurisdição.",
   },
   it: {
     locale: "it-IT",
@@ -2341,7 +2341,7 @@ export const dict: Record<Lang, Dict> = {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "Caffetteria di montagna.",
       title2: "La sua economia.",
-      sub: "Caffè da un villaggio di montagna nella Karačaj-Circassia — con la sua economia di gioco: gioca, guadagna Cups, ottieni $DOFFA.",
+      sub: "Caffè da un villaggio di montagna nella Karačaj-Circassia — con la sua economia di gioco: gioca, guadagna Chicchi, ottieni $DOFFA.",
       ctaBuy: "Scopri $DOFFA",
       ctaMenu: "Guarda il merch",
     },
@@ -2350,7 +2350,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Una vera caffetteria, non un meme",
       body: [
         "DOFFA è un espresso bar che vive tra le montagne della Karačaj-Circassia dal 2021. È stato costruito a mano: luce calda, un bancone accogliente, caffè profumato e un gatto che accoglie gli ospiti alla porta.",
-        "Abbiamo legato il nostro mestiere a un’idea onesta: DOFFA ha il suo token su Solana e la sua economia di gioco — Cups per l’attività e $DOFFA per le vittorie.",
+        "Abbiamo legato il nostro mestiere a un’idea onesta: DOFFA ha il suo token su Solana e la sua economia di gioco — Chicchi per l’attività e $DOFFA per le vittorie.",
         "Un progetto trasparente e di spirito halal su lavoro, ospitalità e comunità — non sulla speculazione.",
       ],
     },
@@ -2376,12 +2376,12 @@ export const dict: Record<Lang, Dict> = {
     },
     flow: {
       tag: "Come funziona",
-      title: "Tap → Cups → Gioco → $DOFFA",
+      title: "Tap → Chicchi → Gioco → $DOFFA",
       sub: "Una catena di ricompense semplice e onesta che chiunque può verificare.",
       steps: [
-        { icon: "👆", t: "Tocca e accumula Cups", d: "Tocca dentro il gioco DOFFA e guadagna Cups — l’energia interna di gioco." },
-        { icon: "☕", t: "Accumula Cups", d: "I Cups sono l’energia dell’ecosistema. Non in vendita e non un token: si guadagnano soltanto." },
-        { icon: "🃏", t: "Gioca a DOFFA Crazy 8", d: "Spendi i Cups nelle partite del gioco di carte DOFFA Crazy 8." },
+        { icon: "👆", t: "Tocca e accumula Chicchi", d: "Tocca dentro il gioco DOFFA e guadagna Chicchi — l’energia interna di gioco." },
+        { icon: "☕", t: "Accumula Chicchi", d: "I Chicchi sono l’energia dell’ecosistema. Non in vendita e non un token: si guadagnano soltanto." },
+        { icon: "🃏", t: "Gioca a DOFFA Crazy 8", d: "Spendi i Chicchi nelle partite del gioco di carte DOFFA Crazy 8." },
         { icon: "🏆", t: "Vinci", d: "Le vittorie danno la ricompensa vera — $DOFFA dal Reward Vault limitato." },
         { icon: "💰", t: "Ritira la ricompensa", d: "Il pulsante «Ritira la ricompensa» collega $DOFFA al tuo wallet Solana." },
       ],
@@ -2526,7 +2526,7 @@ export const dict: Record<Lang, Dict> = {
       title: "Domande frequenti",
       items: [
         { q: "È una meme coin?", a: "No. Dietro il token ci sono una vera caffetteria di montagna e un’economia di gioco viva. Il $DOFFA si guadagna giocando, non si regala per hype." },
-        { q: "Cosa sono i Cups?", a: "I Cups sono l’energia interna di gioco. Si guadagnano toccando e giocando partite dentro il gioco; non in vendita e non token." },
+        { q: "Cosa sono i Chicchi?", a: "I Chicchi sono l’energia interna di gioco. Si guadagnano toccando e giocando partite dentro il gioco; non in vendita e non token." },
         { q: "Come ottengo $DOFFA?", a: "Vinci le partite di DOFFA Crazy 8 e premi «Ritira la ricompensa»: il $DOFFA del Reward Vault viene collegato al tuo wallet Solana." },
         { q: "Dove sono conservati i miei token?", a: "Solo nel tuo wallet personale (Phantom / Solflare). Il sito e il gioco non custodiscono mai i tuoi fondi." },
         { q: "È un investimento?", a: "No. Non promettiamo profitti e non diamo consigli finanziari. Partecipa per il progetto, il gioco e il caffè." },
@@ -2551,7 +2551,7 @@ export const dict: Record<Lang, Dict> = {
       copy: "copia",
     },
     legal:
-      "$DOFFA è un token sperimentale community/utility dell’ecosistema della caffetteria DOFFA. NON è un investimento né una promessa di profitto. Il token non è uno strumento finanziario, un prodotto d’investimento o un’offerta di acquisto di titoli. Non garantiamo alcun reddito e non forniamo consulenza finanziaria. Le ricompense di gioco sono pagate da un Reward Vault limitato e non garantiscono il prezzo del token; i Cups sono energia di gioco senza valore monetario. Le cripto-attività sono estremamente volatili e rischiose: puoi perdere tutto. I contenuti del sito sono informativi e non costituiscono consulenza finanziaria, legale o fiscale. Partecipa responsabilmente e nel rispetto delle leggi della tua giurisdizione.",
+      "$DOFFA è un token sperimentale community/utility dell’ecosistema della caffetteria DOFFA. NON è un investimento né una promessa di profitto. Il token non è uno strumento finanziario, un prodotto d’investimento o un’offerta di acquisto di titoli. Non garantiamo alcun reddito e non forniamo consulenza finanziaria. Le ricompense di gioco sono pagate da un Reward Vault limitato e non garantiscono il prezzo del token; i Chicchi sono energia di gioco senza valore monetario. Le cripto-attività sono estremamente volatili e rischiose: puoi perdere tutto. I contenuti del sito sono informativi e non costituiscono consulenza finanziaria, legale o fiscale. Partecipa responsabilmente e nel rispetto delle leggi della tua giurisdizione.",
   },
   ja: {
     locale: "ja-JP",
@@ -2560,7 +2560,7 @@ export const dict: Record<Lang, Dict> = {
       kicker: "COFFEE DOFFA · ESPRESSO BAR · SINCE 2021",
       title1: "山のコーヒーバー。",
       title2: "独自の経済圏。",
-      sub: "カラチャイ・チェルケスの山村から届くコーヒー——独自のゲーム経済つき。遊んで Cups を稼ぎ、$DOFFA を手に入れよう。",
+      sub: "カラチャイ・チェルケスの山村から届くコーヒー——独自のゲーム経済つき。遊んで ビーンズ を稼ぎ、$DOFFA を手に入れよう。",
       ctaBuy: "$DOFFA について知る",
       ctaMenu: "マーチを見る",
     },
@@ -2569,7 +2569,7 @@ export const dict: Record<Lang, Dict> = {
       title: "ミームではなく、本物のコーヒーバー",
       body: [
         "DOFFA は2021年からカラチャイ・チェルケスの山々にあるエスプレッソバーです。手づくりで生まれました——温かな灯り、居心地のよいカウンター、香り高いコーヒー、そして入口で客を迎える猫。",
-        "私たちは仕事を誠実なアイデアと結びつけました。DOFFA には Solana 上の独自トークンと独自のゲーム経済があります——活動には Cups、勝利には $DOFFA。",
+        "私たちは仕事を誠実なアイデアと結びつけました。DOFFA には Solana 上の独自トークンと独自のゲーム経済があります——活動には ビーンズ、勝利には $DOFFA。",
         "投機ではなく、労働・もてなし・コミュニティについての、透明でハラールの精神を持つプロジェクトです。",
       ],
     },
@@ -2595,12 +2595,12 @@ export const dict: Record<Lang, Dict> = {
     },
     flow: {
       tag: "仕組み",
-      title: "Tap → Cups → ゲーム → $DOFFA",
+      title: "Tap → ビーンズ → ゲーム → $DOFFA",
       sub: "誰でも検証できる、シンプルで誠実な報酬の流れ。",
       steps: [
-        { icon: "👆", t: "タップして Cups を貯める", d: "DOFFA ゲーム内でタップして Cups を稼ぐ——内部ゲームエネルギー。" },
-        { icon: "☕", t: "Cups を貯める", d: "Cups はエコシステムのエネルギー。販売されずトークンでもない——稼ぐだけ。" },
-        { icon: "🃏", t: "DOFFA Crazy 8 で遊ぶ", d: "Cups を使ってブランドカードゲーム DOFFA Crazy 8 の対戦へ。" },
+        { icon: "👆", t: "タップして ビーンズ を貯める", d: "DOFFA ゲーム内でタップして ビーンズ を稼ぐ——内部ゲームエネルギー。" },
+        { icon: "☕", t: "ビーンズ を貯める", d: "ビーンズ はエコシステムのエネルギー。販売されずトークンでもない——稼ぐだけ。" },
+        { icon: "🃏", t: "DOFFA Crazy 8 で遊ぶ", d: "ビーンズ を使ってブランドカードゲーム DOFFA Crazy 8 の対戦へ。" },
         { icon: "🏆", t: "勝つ", d: "勝利には本物の報酬——限定 Reward Vault からの $DOFFA。" },
         { icon: "💰", t: "報酬を受け取る", d: "「報酬を受け取る」ボタンで $DOFFA が Solana ウォレットに紐づきます。" },
       ],
@@ -2745,7 +2745,7 @@ export const dict: Record<Lang, Dict> = {
       title: "よくある質問",
       items: [
         { q: "これはミームコイン？", a: "いいえ。トークンの背後には実在の山のカフェと生きたゲーム経済があります。$DOFFA はゲームで稼ぐもので、話題づくりの配布ではありません。" },
-        { q: "Cups とは？", a: "Cups は内部ゲームエネルギー。ゲーム内のタップと対戦で稼ぎます。販売されずトークンでもありません。" },
+        { q: "ビーンズ とは？", a: "ビーンズ は内部ゲームエネルギー。ゲーム内のタップと対戦で稼ぎます。販売されずトークンでもありません。" },
         { q: "$DOFFA の入手方法は？", a: "DOFFA Crazy 8 の対戦に勝ち「報酬を受け取る」を押すと、Reward Vault の $DOFFA があなたの Solana ウォレットに紐づきます。" },
         { q: "トークンはどこに保管される？", a: "あなた自身のウォレット（Phantom / Solflare）だけです。サイトもゲームも資金を預かりません。" },
         { q: "これは投資？", a: "いいえ。利益は約束せず、金融アドバイスも行いません。プロジェクトとゲームとコーヒーのために参加してください。" },
@@ -2770,6 +2770,6 @@ export const dict: Record<Lang, Dict> = {
       copy: "コピー",
     },
     legal:
-      "$DOFFA は DOFFA コーヒーエコシステムの実験的なコミュニティ／ユーティリティトークンです。投資ではなく、利益の約束でもありません。本トークンは有価証券・投資商品・証券購入の申し出ではありません。いかなる収益も保証せず、金融アドバイスも行いません。ゲーム報酬は限定の Reward Vault から支払われ、トークン価格を保証しません。Cups は金銭的価値のないゲーム内エネルギーです。暗号資産は非常に変動が大きくリスクが高く、投入したすべてを失う可能性があります。本サイトの内容は情報提供であり、金融・法務・税務の助言ではありません。責任を持って、お住まいの法域の法律の範囲内でご参加ください。",
+      "$DOFFA は DOFFA コーヒーエコシステムの実験的なコミュニティ／ユーティリティトークンです。投資ではなく、利益の約束でもありません。本トークンは有価証券・投資商品・証券購入の申し出ではありません。いかなる収益も保証せず、金融アドバイスも行いません。ゲーム報酬は限定の Reward Vault から支払われ、トークン価格を保証しません。ビーンズ は金銭的価値のないゲーム内エネルギーです。暗号資産は非常に変動が大きくリスクが高く、投入したすべてを失う可能性があります。本サイトの内容は情報提供であり、金融・法務・税務の助言ではありません。責任を持って、お住まいの法域の法律の範囲内でご参加ください。",
   },
 };
