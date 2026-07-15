@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Скачать · DOFFA Crazy 8",
   description:
-    "Играй в DOFFA Crazy 8 в браузере, установи PWA или скачай APK. Зарабатывай Cups и получай $DOFFA на Solana-кошелёк.",
+    "Играй в DOFFA Crazy 8 в браузере, установи PWA или скачай APK. Зарабатывай зёрна и получай $DOFFA на Solana-кошелёк.",
 };
 
 const GAME_URL = "https://zapisnoy-kozel.vercel.app";
@@ -27,11 +27,11 @@ export default function DownloadPage() {
         </span>
       </h1>
       <p className="mt-6 max-w-2xl text-lg leading-relaxed text-cream/75">
-        Фирменная карточная игра экосистемы DOFFA. Зарабатывай Cups, побеждай и
+        Фирменная карточная игра экосистемы DOFFA. Зарабатывай зёрна, побеждай и
         забирай награду в $DOFFA на свой Solana-кошелёк.
       </p>
       <p className="mt-1 text-sm text-cream/40">
-        The DOFFA ecosystem card game — earn Cups, win, claim $DOFFA to your Solana wallet.
+        The DOFFA ecosystem card game — earn beans, win, claim $DOFFA to your Solana wallet.
       </p>
 
       <div className="mt-12 grid gap-6 sm:grid-cols-2">
