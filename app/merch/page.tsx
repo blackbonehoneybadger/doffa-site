@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { MARKETPLACE, MERCH_FLAGS, MARKETPLACE_FAQ, MERCH } from "../config/merch";
+import { MARKETPLACE, MARKETPLACE_FAQ, MERCH } from "../config/merch";
 import { CONTACT } from "../content";
+import CatalogSection from "./CatalogSection";
 
 export const metadata: Metadata = {
   title: "DOFFA Merch — фирменные товары и изделия на заказ",
@@ -80,7 +81,12 @@ const LEGAL_LINKS = [
   { href: "/legal/payments", label: "Оплата" },
 ];
 
-export default function MerchPage() {
+export default async function MerchPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const sp = await searchParams;
   return (
     <main className="mx-auto min-h-screen max-w-5xl px-5 pb-28 pt-28">
       {/* ---------- HERO ---------- */}
@@ -132,30 +138,10 @@ export default function MerchPage() {
       <section id="catalog" className="mt-24 scroll-mt-24">
         <Kicker>Каталог</Kicker>
         <h2 className="display mt-4 text-3xl font-extrabold text-cream-soft sm:text-4xl">Готовые товары</h2>
-        {MERCH_FLAGS.catalogEnabled ? (
-          // Каталог включён — карточки товаров подтягиваются из БД (реализуется на
-          // следующем этапе). Пустых категорий не показываем.
-          <p className="mt-4 text-sm text-cream/55">Загрузка каталога…</p>
-        ) : (
-          <div className="card mt-8 rounded-3xl p-10 text-center">
-            <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03]">
-              <IconBag />
-            </span>
-            <h3 className="display mt-5 text-xl font-bold text-cream-soft">Товары появятся после публикации продавцами</h3>
-            <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-cream/60">
-              Каталог наполняется проверенными продавцами. Мы не выкладываем выдуманные товары и
-              фотографии — пока витрина пуста, здесь честный пустой экран.
-            </p>
-            <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <Link href="/merch/become-a-seller" className="rounded-full bg-gradient-to-r from-gold to-copper px-6 py-2.5 text-sm font-bold text-ink transition hover:brightness-110">
-                Стать продавцом
-              </Link>
-              <Link href="/merch/custom-leather" className="rounded-full border border-cream/25 px-6 py-2.5 text-sm font-semibold text-cream transition hover:border-gold hover:text-gold">
-                Заказать изделие из кожи
-              </Link>
-            </div>
-          </div>
-        )}
+        <p className="mt-3 max-w-2xl text-sm text-cream/55">
+          Поиск, фильтры и сортировка. Показываем только публичные товары одобренных продавцов.
+        </p>
+        <CatalogSection searchParams={sp} />
       </section>
 
       {/* ---------- КОЖА НА ЗАКАЗ (краткий блок → отдельная страница) ---------- */}
