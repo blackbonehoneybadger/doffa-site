@@ -77,3 +77,11 @@ create table if not exists admin_login_attempts (
 );
 
 create index if not exists admin_login_attempts_locked_idx on admin_login_attempts (locked_until);
+
+-- Простой счётчик посещений сайта (одна строка на ключ) — для админ-дашборда.
+-- Не критичен: сбой записи молча игнорируется на стороне API.
+create table if not exists site_stats (
+  key text primary key,
+  value bigint not null default 0,
+  updated_at timestamptz not null default now()
+);
