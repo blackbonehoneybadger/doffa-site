@@ -202,17 +202,23 @@ export default function Home() {
             </span>
           </a>
           <nav className="hidden flex-1 items-center justify-center gap-3 whitespace-nowrap px-4 xl:gap-4 lg:flex">
-            {tabs.map((t) => (
-              <button
-                key={t.id}
-                onClick={() => setActiveTab(t.id)}
-                className={`text-xs xl:text-sm transition ${
-                  activeTab === t.id ? "font-semibold text-gold" : "text-cream/70 hover:text-gold"
-                }`}
-              >
-                {t.label}
-              </button>
-            ))}
+            {tabs.map((t) =>
+              t.id === "merch" ? (
+                <Link key={t.id} href="/merch" className="text-xs text-cream/70 transition hover:text-gold xl:text-sm">
+                  {t.label}
+                </Link>
+              ) : (
+                <button
+                  key={t.id}
+                  onClick={() => setActiveTab(t.id)}
+                  className={`text-xs xl:text-sm transition ${
+                    activeTab === t.id ? "font-semibold text-gold" : "text-cream/70 hover:text-gold"
+                  }`}
+                >
+                  {t.label}
+                </button>
+              ),
+            )}
             <Link
               href="/download"
               className="rounded-full border border-gold/40 bg-gold/10 px-3 py-1 text-xs font-semibold text-gold transition hover:bg-gold/20 xl:text-sm"
@@ -333,22 +339,33 @@ export default function Home() {
         {menuOpen && (
           <nav className="border-t border-white/10 bg-ink/95 backdrop-blur-md lg:hidden">
             <div className="mx-auto grid max-w-6xl grid-cols-2 gap-x-4 gap-y-1 px-5 py-4">
-              {tabs.map((t) => (
-                <button
-                  key={t.id}
-                  onClick={() => {
-                    setActiveTab(t.id);
-                    setMenuOpen(false);
-                  }}
-                  className={`rounded-lg px-3 py-2 text-sm transition ${
-                    activeTab === t.id
-                      ? "bg-gold/20 font-semibold text-gold"
-                      : "text-cream/75 hover:bg-white/5 hover:text-gold"
-                  }`}
-                >
-                  {t.label}
-                </button>
-              ))}
+              {tabs.map((t) =>
+                t.id === "merch" ? (
+                  <Link
+                    key={t.id}
+                    href="/merch"
+                    onClick={() => setMenuOpen(false)}
+                    className="rounded-lg px-3 py-2 text-sm text-cream/75 transition hover:bg-white/5 hover:text-gold"
+                  >
+                    {t.label}
+                  </Link>
+                ) : (
+                  <button
+                    key={t.id}
+                    onClick={() => {
+                      setActiveTab(t.id);
+                      setMenuOpen(false);
+                    }}
+                    className={`rounded-lg px-3 py-2 text-sm transition ${
+                      activeTab === t.id
+                        ? "bg-gold/20 font-semibold text-gold"
+                        : "text-cream/75 hover:bg-white/5 hover:text-gold"
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                ),
+              )}
               <Link
                 href="/download"
                 onClick={() => setMenuOpen(false)}
@@ -431,9 +448,9 @@ export default function Home() {
                 </button>
               </Magnetic>
               <Magnetic>
-                <button onClick={() => setActiveTab("merch")} className="rounded-full border border-cream/30 px-7 py-3 font-semibold text-cream transition hover:border-gold hover:text-gold">
+                <Link href="/merch" className="rounded-full border border-cream/30 px-7 py-3 font-semibold text-cream transition hover:border-gold hover:text-gold">
                   {t.hero.ctaMenu}
-                </button>
+                </Link>
               </Magnetic>
             </div>
           </motion.div>

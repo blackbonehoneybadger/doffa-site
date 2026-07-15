@@ -85,3 +85,29 @@ create table if not exists site_stats (
   value bigint not null default 0,
   updated_at timestamptz not null default now()
 );
+
+-- Заявки на кожаные изделия на заказ (форма /merch). Персональные данные
+-- клиента; наружу не отдаём, доступ — только на бэкенде.
+create table if not exists merch_orders (
+  id bigserial primary key,
+  name text not null,
+  contact text not null,
+  product_type text,
+  quantity text,
+  personalization text,
+  perso_text text,
+  idea text,
+  deadline text,
+  budget text,
+  location text,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists merch_orders_created_idx on merch_orders (created_at);
+
+-- Rate limit на форму заказа по IP (антиспам).
+create table if not exists merch_order_attempts (
+  ip text primary key,
+  count integer not null default 0,
+  window_start timestamptz not null default now()
+);
