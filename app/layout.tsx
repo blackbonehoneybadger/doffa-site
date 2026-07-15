@@ -16,23 +16,23 @@ const sans = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "DOFFA — Espresso Bar × Web3 · Solana",
+  title: "DOFFA — Espresso Bar × DOFFA Games · Solana",
   description:
-    "COFFEE DOFFA — кофейня из Карачаево-Черкесии со своей игровой экономикой: тапай и копи зёрна, играй в DOFFA Crazy 8, получай награду $DOFFA на Solana. Честный, прозрачный, халяльный проект.",
+    "COFFEE DOFFA — кофейня из Карачаево-Черкесии со своей игровой экономикой DOFFA Games: тапай и копи зёрна, входи в дуэли DOFFA Bean Duel и забирай подтверждённые награды $DOFFA на Solana. Честный, прозрачный, халяльный проект.",
   metadataBase: new URL("https://doffa.coffee"),
   openGraph: {
-    title: "DOFFA — Espresso Bar × Web3",
+    title: "DOFFA — Espresso Bar × DOFFA Games",
     description:
-      "Играй, зарабатывай зёрна и получай $DOFFA на Solana. Since 2021.",
+      "Собирай зёрна, входи в Bean Duel и забирай награды $DOFFA на Solana. Since 2021.",
     type: "website",
     locale: "ru_RU",
     siteName: "DOFFA",
-    images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "DOFFA Espresso Bar" }],
+    images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "DOFFA Espresso Bar × DOFFA Games" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "DOFFA — Espresso Bar × Web3",
-    description: "Играй, зарабатывай зёрна и получай $DOFFA на Solana. Since 2021.",
+    title: "DOFFA — Espresso Bar × DOFFA Games",
+    description: "Собирай зёрна, входи в Bean Duel и забирай награды $DOFFA на Solana. Since 2021.",
     images: ["/og.jpg"],
   },
 };

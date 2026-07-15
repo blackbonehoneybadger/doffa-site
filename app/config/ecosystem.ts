@@ -23,7 +23,20 @@ const mint = envStr(process.env.NEXT_PUBLIC_DOFFA_MINT) ?? DEFAULT_MINT;
 const vaultAddress = envStr(process.env.NEXT_PUBLIC_REWARD_VAULT_ADDRESS);
 const apkUrl = envStr(process.env.NEXT_PUBLIC_ANDROID_APK_URL);
 
+// Доля награды: игроку / на сжигание. Берётся из env, дефолт 80/20.
+function pct(v: string | undefined, fallback: number): number {
+  const s = (v ?? "").trim();
+  if (!s) return fallback; // пусто → дефолт (Number("") === 0 иначе прошёл бы проверку)
+  const n = Number(s);
+  return Number.isFinite(n) && n >= 0 && n <= 100 ? n : fallback;
+}
+const playerRewardPercent = pct(process.env.NEXT_PUBLIC_PLAYER_REWARD_PERCENT, 80);
+const burnPercent = pct(process.env.NEXT_PUBLIC_BURN_PERCENT, 20);
+
 export const ECOSYSTEM = {
+  // Публичное название игрового направления и главной игры.
+  productName: envStr(process.env.NEXT_PUBLIC_GAMES_NAME) ?? "DOFFA Games",
+  primaryGameName: envStr(process.env.NEXT_PUBLIC_PRIMARY_GAME_NAME) ?? "DOFFA Bean Duel",
   token: {
     symbol: "$DOFFA",
     mint,
@@ -49,6 +62,11 @@ export const ECOSYSTEM = {
   dex: {
     /** URL стороннего DEX-пула DOFFA/SOL. null — «Пул пока не запущен». */
     url: envStr(process.env.NEXT_PUBLIC_DEX_URL),
+  },
+  // Наградная модель Bean Duel. Доли берутся из конфигурации, не из «воздуха».
+  reward: {
+    playerPercent: playerRewardPercent,
+    burnPercent,
   },
   // Честные статусы функций. UI обязан показывать их, а не выдавать Planned за Live.
   status: {

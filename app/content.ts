@@ -185,12 +185,12 @@ export const dict: Record<Lang, Dict> = {
     },
     flow: {
       tag: "Как это работает",
-      title: "Tap → Зёрна → Игра → $DOFFA",
+      title: "Tap → Зёрна → Дуэль → $DOFFA",
       sub: "Простая и честная цепочка наград, которую может проверить каждый.",
       steps: [
         { icon: "👆", t: "Тапай — копи Зёрна", d: "Тапай в игре DOFFA и зарабатывай Зёрна — внутреннюю игровую энергию." },
         { icon: "☕", t: "Копи Зёрна", d: "Зёрна — энергия экосистемы. Она не продаётся и не является токеном — только зарабатывается." },
-        { icon: "🃏", t: "Играй в DOFFA Crazy 8", d: "Трать Зёрна на партии в фирменную карточную игру DOFFA Crazy 8." },
+        { icon: "⚔️", t: "Входи в дуэль", d: "Зёрна — входной билет в короткую дуэль DOFFA Bean Duel: два персонажа, реакция и способности." },
         { icon: "🏆", t: "Побеждай", d: "За победу начисляется настоящая награда — $DOFFA из ограниченного Reward Vault." },
         { icon: "💰", t: "Забирай награду", d: "Кнопка «Забрать награду» закрепляет $DOFFA за твоим Solana-кошельком." },
       ],
@@ -201,8 +201,8 @@ export const dict: Record<Lang, Dict> = {
       vaultSupplyLabel: "Общий выпуск",
       vaultShareLabel: "Доля эмиссии",
       claimTitle: "Забрать награду",
-      claimNote: "Выиграл в DOFFA Crazy 8? Нажми «Забрать награду» в игре — $DOFFA закрепляется за твоим кошельком как заявка на вывод в сеть Solana.",
-      playCta: "Играть в DOFFA Crazy 8",
+      claimNote: "Выиграл в DOFFA Bean Duel? Нажми «Забрать награду» в игре — $DOFFA закрепляется за твоим кошельком как заявка на вывод в сеть Solana.",
+      playCta: "Играть в DOFFA Bean Duel",
       downloadCta: "Скачать игру",
     },
     verify: {
@@ -324,7 +324,7 @@ export const dict: Record<Lang, Dict> = {
       tag: "План",
       title: "Дорожная карта",
       phases: [
-        { n: "Q3 2026", t: "Основание", d: "Выпуск $DOFFA на mainnet (100M, mint/freeze отозваны), игра DOFFA Crazy 8, Reward Vault на 1 000 000 $DOFFA.", done: true },
+        { n: "Q3 2026", t: "Основание", d: "Выпуск $DOFFA на mainnet (100M, mint/freeze отозваны), игра DOFFA Bean Duel, Reward Vault на 1 000 000 $DOFFA.", done: true },
         { n: "Q4 2026", t: "Рост", d: "Пул ликвидности на Raydium, привилегии для держателей." },
         { n: "Q1–Q2 2027", t: "Экосистема", d: "Партнёрство с кофейнями, программа лояльности, монетизация удержания." },
         { n: "Q3 2027+", t: "Расширение", d: "Мульти-площадка, DAO-голосование, листинг на CEX." },
@@ -336,7 +336,7 @@ export const dict: Record<Lang, Dict> = {
       items: [
         { q: "Это мем-койн?", a: "Нет. За токеном стоит реальная кофейня в горах и живая игровая экосистема. $DOFFA зарабатывается в игре, а не раздаётся за хайп." },
         { q: "Что такое Зёрна?", a: "Зёрна — внутренняя игровая энергия. Она начисляется за тапы и партии в игре, не продаётся и токеном не является." },
-        { q: "Как получить $DOFFA?", a: "Побеждай в DOFFA Crazy 8 и нажимай «Забрать награду» — $DOFFA из Reward Vault закрепляется за твоим Solana-кошельком." },
+        { q: "Как получить $DOFFA?", a: "Побеждай в DOFFA Bean Duel и нажимай «Забрать награду» — $DOFFA из Reward Vault закрепляется за твоим Solana-кошельком." },
         { q: "Где хранятся мои токены?", a: "Только в вашем личном кошельке (Phantom / Solflare). Сайт и игра не хранят средства и не имеют к ним доступа." },
         { q: "Это инвестиция?", a: "Нет. Мы не обещаем доход и не даём финансовых советов. Участвуйте только из интереса к проекту, игре и кофейне." },
       ],
@@ -404,12 +404,12 @@ export const dict: Record<Lang, Dict> = {
     },
     flow: {
       tag: "How it works",
-      title: "Tap → Beans → Game → $DOFFA",
+      title: "Tap → Beans → Duel → $DOFFA",
       sub: "A simple, honest reward chain anyone can verify.",
       steps: [
         { icon: "👆", t: "Tap — earn Beans", d: "Tap in the DOFFA game and earn Beans — the internal game energy." },
         { icon: "☕", t: "Stack Beans", d: "Beans are ecosystem energy. Not for sale and not a token — they can only be earned." },
-        { icon: "🃏", t: "Play DOFFA Crazy 8", d: "Spend Beans on matches in DOFFA Crazy 8, the brand card game." },
+        { icon: "⚔️", t: "Enter the duel", d: "Beans are your entry ticket to a short DOFFA Bean Duel — two characters, reflexes and abilities." },
         { icon: "🏆", t: "Win", d: "Victories earn the real reward — $DOFFA from the limited Reward Vault." },
         { icon: "💰", t: "Claim your reward", d: "The “Claim reward” button pins $DOFFA to your Solana wallet." },
       ],
@@ -420,8 +420,8 @@ export const dict: Record<Lang, Dict> = {
       vaultSupplyLabel: "Total supply",
       vaultShareLabel: "Share of supply",
       claimTitle: "Claim your reward",
-      claimNote: "Won a DOFFA Crazy 8 match? Hit “Claim reward” in the game — $DOFFA is pinned to your wallet as a payout request to Solana.",
-      playCta: "Play DOFFA Crazy 8",
+      claimNote: "Won a DOFFA Bean Duel match? Hit “Claim reward” in the game — $DOFFA is pinned to your wallet as a payout request to Solana.",
+      playCta: "Play DOFFA Bean Duel",
       downloadCta: "Download the game",
     },
     verify: {
@@ -543,7 +543,7 @@ export const dict: Record<Lang, Dict> = {
       tag: "Plan",
       title: "Roadmap",
       phases: [
-        { n: "Q3 2026", t: "Foundation", d: "$DOFFA launch on mainnet (100M, mint/freeze revoked), the DOFFA Crazy 8 game, a 1,000,000 $DOFFA Reward Vault.", done: true },
+        { n: "Q3 2026", t: "Foundation", d: "$DOFFA launch on mainnet (100M, mint/freeze revoked), the DOFFA Bean Duel game, a 1,000,000 $DOFFA Reward Vault.", done: true },
         { n: "Q4 2026", t: "Growth", d: "Raydium liquidity pool, holder privileges unlocked." },
         { n: "Q1–Q2 2027", t: "Ecosystem", d: "Coffee shop partnerships, loyalty program, retention monetization." },
         { n: "Q3 2027+", t: "Expansion", d: "Multi-venue, DAO voting, CEX listing." },
@@ -555,7 +555,7 @@ export const dict: Record<Lang, Dict> = {
       items: [
         { q: "Is this a meme coin?", a: "No. Behind the token is a real mountain coffee bar and a live play economy. $DOFFA is earned in the game, not airdropped for hype." },
         { q: "What are Beans?", a: "Beans are the internal game energy. Earned through taps and matches in the game; not for sale and not a token." },
-        { q: "How do I get $DOFFA?", a: "Win DOFFA Crazy 8 matches and press “Claim reward” — $DOFFA from the Reward Vault is pinned to your Solana wallet." },
+        { q: "How do I get $DOFFA?", a: "Win DOFFA Bean Duel matches and press “Claim reward” — $DOFFA from the Reward Vault is pinned to your Solana wallet." },
         { q: "Where are my tokens stored?", a: "Only in your own wallet (Phantom / Solflare). The site and the game never hold your funds." },
         { q: "Is this an investment?", a: "No. We promise no profit and give no financial advice. Join for the project, the game and the coffee." },
       ],
@@ -624,12 +624,12 @@ export const dict: Record<Lang, Dict> = {
     },
     flow: {
       tag: "كيف يعمل",
-      title: "Tap → الحبوب → لعبة → $DOFFA",
+      title: "Tap → الحبوب → مبارزة → $DOFFA",
       sub: "سلسلة مكافآت بسيطة وصادقة يمكن لأي شخص التحقق منها.",
       steps: [
         { icon: "👆", t: "اضغط واجمع الحبوب", d: "اضغط داخل لعبة DOFFA واكسب الحبوب — طاقة اللعب الداخلية." },
         { icon: "☕", t: "اجمع الحبوب", d: "الحبوب طاقة النظام. لا تُباع وليست عملة — تُكتسب فقط." },
-        { icon: "🃏", t: "العب DOFFA Crazy 8", d: "أنفق الحبوب على جولات لعبة الورق DOFFA Crazy 8." },
+        { icon: "⚔️", t: "ادخل المبارزة", d: "الحبوب تذكرة دخولك إلى مبارزة DOFFA Bean Duel القصيرة: شخصيتان، ردّ فعل ومهارات." },
         { icon: "🏆", t: "انتصر", d: "الانتصارات تمنح المكافأة الحقيقية — $DOFFA من خزينة المكافآت المحدودة." },
         { icon: "💰", t: "استلم مكافأتك", d: "زر «استلام المكافأة» يثبّت $DOFFA على محفظة سولانا الخاصة بك." },
       ],
@@ -640,8 +640,8 @@ export const dict: Record<Lang, Dict> = {
       vaultSupplyLabel: "الإصدار الكلي",
       vaultShareLabel: "حصة الإصدار",
       claimTitle: "استلام المكافأة",
-      claimNote: "فزت في DOFFA Crazy 8؟ اضغط «استلام المكافأة» في اللعبة — يُثبَّت $DOFFA على محفظتك كطلب سحب إلى سولانا.",
-      playCta: "العب DOFFA Crazy 8",
+      claimNote: "فزت في DOFFA Bean Duel؟ اضغط «استلام المكافأة» في اللعبة — يُثبَّت $DOFFA على محفظتك كطلب سحب إلى سولانا.",
+      playCta: "العب DOFFA Bean Duel",
       downloadCta: "حمّل اللعبة",
     },
     verify: {
@@ -763,7 +763,7 @@ export const dict: Record<Lang, Dict> = {
       tag: "الخطة",
       title: "خارطة الطريق",
       phases: [
-        { n: "Q3 2026", t: "التأسيس", d: "إطلاق $DOFFA على الشبكة الرئيسية (100M، صلاحيات mint/freeze ملغاة)، لعبة DOFFA Crazy 8، خزينة مكافآت بمقدار 1,000,000 $DOFFA.", done: true },
+        { n: "Q3 2026", t: "التأسيس", d: "إطلاق $DOFFA على الشبكة الرئيسية (100M، صلاحيات mint/freeze ملغاة)، لعبة DOFFA Bean Duel، خزينة مكافآت بمقدار 1,000,000 $DOFFA.", done: true },
         { n: "Q4 2026", t: "النمو", d: "مجمع سيولة على Raydium، امتيازات للحائزين." },
         { n: "Q1–Q2 2027", t: "النظام البيئي", d: "شراكات مع مقاهٍ، برنامج ولاء، تحقيق الدخل." },
         { n: "Q3 2027+", t: "التوسّع", d: "منصات متعددة، تصويت DAO، إدراج في CEX." },
@@ -775,7 +775,7 @@ export const dict: Record<Lang, Dict> = {
       items: [
         { q: "هل هذه عملة ميم؟", a: "لا. خلف العملة مقهى جبلي حقيقي واقتصاد لعب حي. $DOFFA تُكسب في اللعبة ولا تُوزَّع للضجة." },
         { q: "ما هي الحبوب؟", a: "الحبوب طاقة اللعب الداخلية. تُكسب عبر الضغطات والجولات داخل اللعبة؛ لا تُباع وليست عملة." },
-        { q: "كيف أحصل على $DOFFA؟", a: "انتصر في DOFFA Crazy 8 واضغط «استلام المكافأة» — $DOFFA من الخزينة تُثبَّت على محفظتك." },
+        { q: "كيف أحصل على $DOFFA؟", a: "انتصر في DOFFA Bean Duel واضغط «استلام المكافأة» — $DOFFA من الخزينة تُثبَّت على محفظتك." },
         { q: "أين تُحفظ عملاتي؟", a: "فقط في محفظتك الخاصة (Phantom / Solflare). الموقع واللعبة لا يحتفظان بأموالك." },
         { q: "هل هذا استثمار؟", a: "لا. لا نعد بأي ربح ولا نقدم نصائح مالية. شارك من أجل المشروع واللعبة والقهوة." },
       ],
@@ -843,12 +843,12 @@ export const dict: Record<Lang, Dict> = {
     },
     flow: {
       tag: "Nasıl çalışır",
-      title: "Tap → Çekirdek → Oyun → $DOFFA",
+      title: "Tap → Çekirdek → Düello → $DOFFA",
       sub: "Herkesin doğrulayabileceği basit ve dürüst bir ödül zinciri.",
       steps: [
         { icon: "👆", t: "Dokun — Çekirdek biriktir", d: "DOFFA oyununda dokun ve Çekirdek kazan — içsel oyun enerjisi." },
         { icon: "☕", t: "Çekirdek biriktir", d: "Çekirdek ekosistem enerjisidir. Satılmaz ve token değildir — yalnızca kazanılır." },
-        { icon: "🃏", t: "DOFFA Crazy 8 oyna", d: "Çekirdek’ı marka kart oyunu DOFFA Crazy 8 turlarına harca." },
+        { icon: "⚔️", t: "Düelloya gir", d: "Çekirdek, kısa DOFFA Bean Duel düellosuna giriş biletindir: iki karakter, refleks ve yetenekler." },
         { icon: "🏆", t: "Kazan", d: "Zaferler gerçek ödülü getirir — sınırlı Reward Vault’tan $DOFFA." },
         { icon: "💰", t: "Ödülünü al", d: "“Ödülü al” düğmesi $DOFFA’yı Solana cüzdanına sabitler." },
       ],
@@ -859,8 +859,8 @@ export const dict: Record<Lang, Dict> = {
       vaultSupplyLabel: "Toplam arz",
       vaultShareLabel: "Arz payı",
       claimTitle: "Ödülünü al",
-      claimNote: "DOFFA Crazy 8’de mi kazandın? Oyunda “Ödülü al”a bas — $DOFFA, Solana’ya ödeme talebi olarak cüzdanına sabitlenir.",
-      playCta: "DOFFA Crazy 8 oyna",
+      claimNote: "DOFFA Bean Duel’de mi kazandın? Oyunda “Ödülü al”a bas — $DOFFA, Solana’ya ödeme talebi olarak cüzdanına sabitlenir.",
+      playCta: "DOFFA Bean Duel oyna",
       downloadCta: "Oyunu indir",
     },
     verify: {
@@ -982,7 +982,7 @@ export const dict: Record<Lang, Dict> = {
       tag: "Plan",
       title: "Yol haritası",
       phases: [
-        { n: "Q3 2026", t: "Temel", d: "$DOFFA mainnet çıkışı (100M, mint/freeze iptal), DOFFA Crazy 8 oyunu, 1.000.000 $DOFFA’lık Reward Vault.", done: true },
+        { n: "Q3 2026", t: "Temel", d: "$DOFFA mainnet çıkışı (100M, mint/freeze iptal), DOFFA Bean Duel oyunu, 1.000.000 $DOFFA’lık Reward Vault.", done: true },
         { n: "Q4 2026", t: "Büyüme", d: "Raydium likidite havuzu, sahiplere ayrıcalıklar." },
         { n: "Q1–Q2 2027", t: "Ekosistem", d: "Kafe ortaklıkları, sadakat programı, elde tutma geliri." },
         { n: "Q3 2027+", t: "Genişleme", d: "Çoklu mekân, DAO oylaması, CEX listesi." },
@@ -994,7 +994,7 @@ export const dict: Record<Lang, Dict> = {
       items: [
         { q: "Bu bir meme coin mi?", a: "Hayır. Tokenin arkasında gerçek bir dağ kahvecisi ve canlı bir oyun ekonomisi var. $DOFFA oyunda kazanılır, hype için dağıtılmaz." },
         { q: "Çekirdek nedir?", a: "Çekirdek içsel oyun enerjisidir. Oyun içi dokunuşlar ve turlarla kazanılır; satılmaz ve token değildir." },
-        { q: "$DOFFA nasıl alınır?", a: "DOFFA Crazy 8 turlarını kazan ve “Ödülü al”a bas — Reward Vault’tan $DOFFA cüzdanına sabitlenir." },
+        { q: "$DOFFA nasıl alınır?", a: "DOFFA Bean Duel turlarını kazan ve “Ödülü al”a bas — Reward Vault’tan $DOFFA cüzdanına sabitlenir." },
         { q: "Tokenlerim nerede saklanır?", a: "Yalnızca kendi cüzdanında (Phantom / Solflare). Site ve oyun fonlarını tutmaz." },
         { q: "Bu bir yatırım mı?", a: "Hayır. Kazanç vaat etmiyoruz, finansal tavsiye vermiyoruz. Proje, oyun ve kahve için katıl." },
       ],
@@ -1062,12 +1062,12 @@ export const dict: Record<Lang, Dict> = {
     },
     flow: {
       tag: "Cómo funciona",
-      title: "Tap → Granos → Juego → $DOFFA",
+      title: "Tap → Granos → Duelo → $DOFFA",
       sub: "Una cadena de recompensas simple y honesta que cualquiera puede verificar.",
       steps: [
         { icon: "👆", t: "Toca y acumula Granos", d: "Toca dentro del juego DOFFA y gana Granos — la energía interna del juego." },
         { icon: "☕", t: "Acumula Granos", d: "Granos es la energía del ecosistema. No se vende y no es un token: solo se gana." },
-        { icon: "🃏", t: "Juega DOFFA Crazy 8", d: "Gasta Granos en partidas del juego de cartas DOFFA Crazy 8." },
+        { icon: "⚔️", t: "Entra al duelo", d: "Los Granos son tu boleto de entrada a un breve DOFFA Bean Duel: dos personajes, reflejos y habilidades." },
         { icon: "🏆", t: "Gana", d: "Las victorias otorgan la recompensa real: $DOFFA del Reward Vault limitado." },
         { icon: "💰", t: "Reclama tu recompensa", d: "El botón «Reclamar recompensa» fija $DOFFA a tu billetera Solana." },
       ],
@@ -1078,8 +1078,8 @@ export const dict: Record<Lang, Dict> = {
       vaultSupplyLabel: "Emisión total",
       vaultShareLabel: "Parte de la emisión",
       claimTitle: "Reclama tu recompensa",
-      claimNote: "¿Ganaste en DOFFA Crazy 8? Pulsa «Reclamar recompensa» en el juego: $DOFFA se fija a tu billetera como solicitud de pago a Solana.",
-      playCta: "Jugar DOFFA Crazy 8",
+      claimNote: "¿Ganaste en DOFFA Bean Duel? Pulsa «Reclamar recompensa» en el juego: $DOFFA se fija a tu billetera como solicitud de pago a Solana.",
+      playCta: "Jugar DOFFA Bean Duel",
       downloadCta: "Descargar el juego",
     },
     verify: {
@@ -1201,7 +1201,7 @@ export const dict: Record<Lang, Dict> = {
       tag: "Plan",
       title: "Hoja de ruta",
       phases: [
-        { n: "Q3 2026", t: "Fundación", d: "Lanzamiento de $DOFFA en mainnet (100M, mint/freeze revocados), el juego DOFFA Crazy 8, Reward Vault de 1.000.000 $DOFFA.", done: true },
+        { n: "Q3 2026", t: "Fundación", d: "Lanzamiento de $DOFFA en mainnet (100M, mint/freeze revocados), el juego DOFFA Bean Duel, Reward Vault de 1.000.000 $DOFFA.", done: true },
         { n: "Q4 2026", t: "Crecimiento", d: "Pool de liquidez en Raydium, privilegios para holders." },
         { n: "Q1–Q2 2027", t: "Ecosistema", d: "Asociaciones con cafeterías, programa de fidelidad, monetización de retención." },
         { n: "Q3 2027+", t: "Expansión", d: "Múltiples locales, votación DAO, listado en CEX." },
@@ -1213,7 +1213,7 @@ export const dict: Record<Lang, Dict> = {
       items: [
         { q: "¿Es una meme coin?", a: "No. Detrás del token hay una cafetería de montaña real y una economía de juego viva. $DOFFA se gana jugando, no se regala por hype." },
         { q: "¿Qué son los Granos?", a: "Granos es la energía interna del juego. Se gana con toques y partidas dentro del juego; no se vende y no es un token." },
-        { q: "¿Cómo consigo $DOFFA?", a: "Gana partidas de DOFFA Crazy 8 y pulsa «Reclamar recompensa»: $DOFFA del Reward Vault se fija a tu billetera Solana." },
+        { q: "¿Cómo consigo $DOFFA?", a: "Gana partidas de DOFFA Bean Duel y pulsa «Reclamar recompensa»: $DOFFA del Reward Vault se fija a tu billetera Solana." },
         { q: "¿Dónde se guardan mis tokens?", a: "Solo en tu propia billetera (Phantom / Solflare). El sitio y el juego nunca custodian tus fondos." },
         { q: "¿Es una inversión?", a: "No. No prometemos ganancias ni damos consejos financieros. Participa por el proyecto, el juego y el café." },
       ],
@@ -1281,12 +1281,12 @@ export const dict: Record<Lang, Dict> = {
     },
     flow: {
       tag: "Comment ça marche",
-      title: "Tap → Grains → Jeu → $DOFFA",
+      title: "Tap → Grains → Duel → $DOFFA",
       sub: "Une chaîne de récompenses simple et honnête que chacun peut vérifier.",
       steps: [
         { icon: "👆", t: "Tape et accumule des Grains", d: "Tape dans le jeu DOFFA et gagne des Grains — l’énergie interne du jeu." },
         { icon: "☕", t: "Accumule des Grains", d: "Les Grains sont l’énergie de l’écosystème. Pas à vendre, pas un jeton : ils se gagnent." },
-        { icon: "🃏", t: "Joue à DOFFA Crazy 8", d: "Dépense tes Grains dans des parties du jeu de cartes DOFFA Crazy 8." },
+        { icon: "⚔️", t: "Entre dans le duel", d: "Les Grains sont ton ticket d’entrée pour un court DOFFA Bean Duel : deux personnages, réflexes et compétences." },
         { icon: "🏆", t: "Gagne", d: "Les victoires rapportent la vraie récompense — du $DOFFA du Reward Vault limité." },
         { icon: "💰", t: "Réclame ta récompense", d: "Le bouton « Réclamer la récompense » attache le $DOFFA à ton portefeuille Solana." },
       ],
@@ -1297,8 +1297,8 @@ export const dict: Record<Lang, Dict> = {
       vaultSupplyLabel: "Émission totale",
       vaultShareLabel: "Part de l’émission",
       claimTitle: "Réclame ta récompense",
-      claimNote: "Gagné à DOFFA Crazy 8 ? Appuie sur « Réclamer la récompense » dans le jeu : le $DOFFA est attaché à ton portefeuille comme demande de paiement vers Solana.",
-      playCta: "Jouer à DOFFA Crazy 8",
+      claimNote: "Gagné à DOFFA Bean Duel ? Appuie sur « Réclamer la récompense » dans le jeu : le $DOFFA est attaché à ton portefeuille comme demande de paiement vers Solana.",
+      playCta: "Jouer à DOFFA Bean Duel",
       downloadCta: "Télécharger le jeu",
     },
     verify: {
@@ -1420,7 +1420,7 @@ export const dict: Record<Lang, Dict> = {
       tag: "Plan",
       title: "Feuille de route",
       phases: [
-        { n: "Q3 2026", t: "Fondation", d: "Lancement du $DOFFA sur le mainnet (100M, mint/freeze révoqués), le jeu DOFFA Crazy 8, un Reward Vault de 1 000 000 $DOFFA.", done: true },
+        { n: "Q3 2026", t: "Fondation", d: "Lancement du $DOFFA sur le mainnet (100M, mint/freeze révoqués), le jeu DOFFA Bean Duel, un Reward Vault de 1 000 000 $DOFFA.", done: true },
         { n: "Q4 2026", t: "Croissance", d: "Pool de liquidité sur Raydium, avantages pour les détenteurs." },
         { n: "Q1–Q2 2027", t: "Écosystème", d: "Partenariats avec des cafés, programme de fidélité, monétisation de la rétention." },
         { n: "Q3 2027+", t: "Expansion", d: "Multi-établissements, vote DAO, listing sur CEX." },
@@ -1432,7 +1432,7 @@ export const dict: Record<Lang, Dict> = {
       items: [
         { q: "C’est un meme coin ?", a: "Non. Derrière le jeton, un vrai café de montagne et une économie de jeu vivante. Le $DOFFA se gagne en jouant, pas en hype." },
         { q: "Que sont les Grains ?", a: "Les Grains sont l’énergie interne du jeu. Gagnés en tapant et en jouant des parties ; pas à vendre, pas un jeton." },
-        { q: "Comment obtenir du $DOFFA ?", a: "Gagne des parties de DOFFA Crazy 8 et appuie sur « Réclamer la récompense » : le $DOFFA du Reward Vault est attaché à ton portefeuille Solana." },
+        { q: "Comment obtenir du $DOFFA ?", a: "Gagne des parties de DOFFA Bean Duel et appuie sur « Réclamer la récompense » : le $DOFFA du Reward Vault est attaché à ton portefeuille Solana." },
         { q: "Où sont conservés mes jetons ?", a: "Uniquement dans ton propre portefeuille (Phantom / Solflare). Le site et le jeu ne détiennent jamais tes fonds." },
         { q: "C’est un investissement ?", a: "Non. Nous ne promettons aucun profit et ne donnons aucun conseil financier. Participe pour le projet, le jeu et le café." },
       ],
@@ -1500,12 +1500,12 @@ export const dict: Record<Lang, Dict> = {
     },
     flow: {
       tag: "So funktioniert es",
-      title: "Tap → Bohnen → Spiel → $DOFFA",
+      title: "Tap → Bohnen → Duell → $DOFFA",
       sub: "Eine einfache, ehrliche Belohnungskette, die jeder überprüfen kann.",
       steps: [
         { icon: "👆", t: "Tippen — Bohnen sammeln", d: "Tippe im DOFFA-Spiel und verdiene Bohnen — die interne Spielenergie." },
         { icon: "☕", t: "Bohnen sammeln", d: "Bohnen sind die Energie des Ökosystems. Nicht käuflich, kein Token — nur verdienbar." },
-        { icon: "🃏", t: "DOFFA Crazy 8 spielen", d: "Setze Bohnen für Partien im Marken-Kartenspiel DOFFA Crazy 8 ein." },
+        { icon: "⚔️", t: "Ins Duell einsteigen", d: "Bohnen sind dein Eintrittsticket für ein kurzes DOFFA Bean Duel: zwei Charaktere, Reflexe und Fähigkeiten." },
         { icon: "🏆", t: "Gewinnen", d: "Siege bringen die echte Belohnung — $DOFFA aus dem begrenzten Reward Vault." },
         { icon: "💰", t: "Belohnung abholen", d: "Der Button „Belohnung abholen“ heftet $DOFFA an deine Solana-Wallet." },
       ],
@@ -1516,8 +1516,8 @@ export const dict: Record<Lang, Dict> = {
       vaultSupplyLabel: "Gesamtemission",
       vaultShareLabel: "Anteil der Emission",
       claimTitle: "Belohnung abholen",
-      claimNote: "Bei DOFFA Crazy 8 gewonnen? Drücke im Spiel „Belohnung abholen“ — $DOFFA wird als Auszahlungsantrag an Solana deiner Wallet zugeordnet.",
-      playCta: "DOFFA Crazy 8 spielen",
+      claimNote: "Bei DOFFA Bean Duel gewonnen? Drücke im Spiel „Belohnung abholen“ — $DOFFA wird als Auszahlungsantrag an Solana deiner Wallet zugeordnet.",
+      playCta: "DOFFA Bean Duel spielen",
       downloadCta: "Spiel herunterladen",
     },
     verify: {
@@ -1639,7 +1639,7 @@ export const dict: Record<Lang, Dict> = {
       tag: "Plan",
       title: "Roadmap",
       phases: [
-        { n: "Q3 2026", t: "Gründung", d: "$DOFFA-Start auf dem Mainnet (100M, mint/freeze widerrufen), das Spiel DOFFA Crazy 8, ein Reward Vault mit 1.000.000 $DOFFA.", done: true },
+        { n: "Q3 2026", t: "Gründung", d: "$DOFFA-Start auf dem Mainnet (100M, mint/freeze widerrufen), das Spiel DOFFA Bean Duel, ein Reward Vault mit 1.000.000 $DOFFA.", done: true },
         { n: "Q4 2026", t: "Wachstum", d: "Raydium-Liquiditätspool, Inhaber-Privilegien." },
         { n: "Q1–Q2 2027", t: "Ökosystem", d: "Kaffeebar-Partnerschaften, Treueprogramm, Kundenbindungseinnahmen." },
         { n: "Q3 2027+", t: "Expansion", d: "Mehrere Standorte, DAO-Abstimmung, CEX-Listing." },
@@ -1651,7 +1651,7 @@ export const dict: Record<Lang, Dict> = {
       items: [
         { q: "Ist das ein Meme-Coin?", a: "Nein. Hinter dem Token stehen eine echte Bergkaffeebar und eine lebendige Spiel-Ökonomie. $DOFFA wird im Spiel verdient, nicht für Hype verteilt." },
         { q: "Was sind Bohnen?", a: "Bohnen sind die interne Spielenergie. Verdient durch Tippen und Partien im Spiel; nicht käuflich, kein Token." },
-        { q: "Wie bekomme ich $DOFFA?", a: "Gewinne DOFFA-Crazy-8-Partien und drücke „Belohnung abholen“ — $DOFFA aus dem Reward Vault wird deiner Solana-Wallet zugeordnet." },
+        { q: "Wie bekomme ich $DOFFA?", a: "Gewinne DOFFA-Bean-Duel-Partien und drücke „Belohnung abholen“ — $DOFFA aus dem Reward Vault wird deiner Solana-Wallet zugeordnet." },
         { q: "Wo werden meine Token verwahrt?", a: "Nur in deiner eigenen Wallet (Phantom / Solflare). Website und Spiel verwahren nie deine Mittel." },
         { q: "Ist das eine Investition?", a: "Nein. Wir versprechen keinen Gewinn und geben keine Finanzberatung. Mach mit für Projekt, Spiel und Kaffee." },
       ],
@@ -1719,12 +1719,12 @@ export const dict: Record<Lang, Dict> = {
     },
     flow: {
       tag: "运作方式",
-      title: "Tap → 咖啡豆 → 游戏 → $DOFFA",
+      title: "Tap → 咖啡豆 → 对决 → $DOFFA",
       sub: "一条简单诚实、人人可验证的奖励链。",
       steps: [
         { icon: "👆", t: "点击，攒 咖啡豆", d: "在 DOFFA 游戏里点击，赚取 咖啡豆——内部游戏能量。" },
         { icon: "☕", t: "积攒 咖啡豆", d: "咖啡豆 是生态能量。不出售、不是代币——只能靠玩赚取。" },
-        { icon: "🃏", t: "玩 DOFFA Crazy 8", d: "用 咖啡豆 参加品牌纸牌游戏 DOFFA Crazy 8 的对局。" },
+        { icon: "⚔️", t: "进入对决", d: "咖啡豆 是进入短局 DOFFA Bean Duel 的入场券：两个角色，比拼反应与技能。" },
         { icon: "🏆", t: "获胜", d: "胜利带来真正的奖励——来自限量 Reward Vault 的 $DOFFA。" },
         { icon: "💰", t: "领取奖励", d: "点击「领取奖励」，$DOFFA 将绑定到你的 Solana 钱包。" },
       ],
@@ -1735,8 +1735,8 @@ export const dict: Record<Lang, Dict> = {
       vaultSupplyLabel: "总发行量",
       vaultShareLabel: "发行占比",
       claimTitle: "领取奖励",
-      claimNote: "在 DOFFA Crazy 8 中获胜了？在游戏里点「领取奖励」——$DOFFA 将作为向 Solana 的支付申请绑定到你的钱包。",
-      playCta: "玩 DOFFA Crazy 8",
+      claimNote: "在 DOFFA Bean Duel 中获胜了？在游戏里点「领取奖励」——$DOFFA 将作为向 Solana 的支付申请绑定到你的钱包。",
+      playCta: "玩 DOFFA Bean Duel",
       downloadCta: "下载游戏",
     },
     verify: {
@@ -1858,7 +1858,7 @@ export const dict: Record<Lang, Dict> = {
       tag: "计划",
       title: "路线图",
       phases: [
-        { n: "Q3 2026", t: "基础", d: "$DOFFA 主网发行（1 亿枚，mint/freeze 已注销）、DOFFA Crazy 8 游戏、100 万 $DOFFA 的 Reward Vault。", done: true },
+        { n: "Q3 2026", t: "基础", d: "$DOFFA 主网发行（1 亿枚，mint/freeze 已注销）、DOFFA Bean Duel 游戏、100 万 $DOFFA 的 Reward Vault。", done: true },
         { n: "Q4 2026", t: "增长", d: "Raydium流动性池、持有者特权开放。" },
         { n: "Q1–Q2 2027", t: "生态", d: "咖啡馆合作、积分忠诚度计划、留存变现。" },
         { n: "Q3 2027+", t: "扩张", d: "多场景应用、DAO投票、CEX上市。" },
@@ -1870,7 +1870,7 @@ export const dict: Record<Lang, Dict> = {
       items: [
         { q: "这是 meme 币吗？", a: "不是。代币背后是真实的山间咖啡馆和活跃的游戏经济。$DOFFA 靠游戏赚取，不为炒作空投。" },
         { q: "咖啡豆 是什么？", a: "咖啡豆 是内部游戏能量。通过游戏内点击和对局赚取；不出售、不是代币。" },
-        { q: "如何获得 $DOFFA？", a: "赢下 DOFFA Crazy 8 对局并点击「领取奖励」——Reward Vault 中的 $DOFFA 将绑定到你的 Solana 钱包。" },
+        { q: "如何获得 $DOFFA？", a: "赢下 DOFFA Bean Duel 对局并点击「领取奖励」——Reward Vault 中的 $DOFFA 将绑定到你的 Solana 钱包。" },
         { q: "我的代币存放在哪里？", a: "只存放在你自己的钱包（Phantom / Solflare）。网站和游戏绝不保管你的资金。" },
         { q: "这是投资吗？", a: "不是。我们不承诺收益，也不提供理财建议。请为项目、游戏和咖啡而参与。" },
       ],
@@ -1938,12 +1938,12 @@ export const dict: Record<Lang, Dict> = {
     },
     flow: {
       tag: "यह कैसे काम करता है",
-      title: "Tap → बीन्स → गेम → $DOFFA",
+      title: "Tap → बीन्स → द्वंद्व → $DOFFA",
       sub: "एक सरल, ईमानदार इनाम-श्रृंखला जिसे कोई भी सत्यापित कर सकता है।",
       steps: [
         { icon: "👆", t: "टैप करो — बीन्स जमा करो", d: "DOFFA गेम में टैप करो और बीन्स कमाओ — आंतरिक गेम ऊर्जा।" },
         { icon: "☕", t: "बीन्स जमा करो", d: "बीन्स इकोसिस्टम की ऊर्जा है। बिकती नहीं, टोकन नहीं — सिर्फ़ कमाई जाती है।" },
-        { icon: "🃏", t: "DOFFA Crazy 8 खेलो", d: "ब्रांड कार्ड गेम DOFFA Crazy 8 की बाज़ियों पर बीन्स खर्च करो।" },
+        { icon: "⚔️", t: "द्वंद्व में उतरो", d: "बीन्स छोटे DOFFA Bean Duel में प्रवेश का टिकट हैं: दो किरदार, रिफ्लेक्स और क्षमताएँ।" },
         { icon: "🏆", t: "जीतो", d: "जीत असली इनाम देती है — सीमित Reward Vault से $DOFFA।" },
         { icon: "💰", t: "इनाम लो", d: "«इनाम लें» बटन $DOFFA को तुम्हारे Solana वॉलेट से जोड़ देता है।" },
       ],
@@ -1954,8 +1954,8 @@ export const dict: Record<Lang, Dict> = {
       vaultSupplyLabel: "कुल आपूर्ति",
       vaultShareLabel: "आपूर्ति का हिस्सा",
       claimTitle: "इनाम लें",
-      claimNote: "DOFFA Crazy 8 में जीते? गेम में «इनाम लें» दबाओ — $DOFFA Solana भुगतान-अनुरोध के रूप में तुम्हारे वॉलेट से जुड़ जाता है।",
-      playCta: "DOFFA Crazy 8 खेलें",
+      claimNote: "DOFFA Bean Duel में जीते? गेम में «इनाम लें» दबाओ — $DOFFA Solana भुगतान-अनुरोध के रूप में तुम्हारे वॉलेट से जुड़ जाता है।",
+      playCta: "DOFFA Bean Duel खेलें",
       downloadCta: "गेम डाउनलोड करें",
     },
     verify: {
@@ -2077,7 +2077,7 @@ export const dict: Record<Lang, Dict> = {
       tag: "योजना",
       title: "रोडमैप",
       phases: [
-        { n: "Q3 2026", t: "नींव", d: "मेननेट पर $DOFFA लॉन्च (100M, mint/freeze निरस्त), DOFFA Crazy 8 गेम, 1,000,000 $DOFFA का Reward Vault।", done: true },
+        { n: "Q3 2026", t: "नींव", d: "मेननेट पर $DOFFA लॉन्च (100M, mint/freeze निरस्त), DOFFA Bean Duel गेम, 1,000,000 $DOFFA का Reward Vault।", done: true },
         { n: "Q4 2026", t: "विकास", d: "Raydium लिक्विडिटी पूल, होल्डर सुविधाएँ।" },
         { n: "Q1–Q2 2027", t: "पारिस्थितिकी तंत्र", d: "कैफ़े साझेदारी, लॉयल्टी प्रोग्राम, रिटेंशन मुद्रीकरण।" },
         { n: "Q3 2027+", t: "विस्तार", d: "मल्टी-वेन्यू, DAO वोटिंग, CEX लिस्टिंग।" },
@@ -2089,7 +2089,7 @@ export const dict: Record<Lang, Dict> = {
       items: [
         { q: "क्या यह मीम कॉइन है?", a: "नहीं। टोकन के पीछे असली पहाड़ी कॉफ़ी बार और जीवंत गेम इकॉनमी है। $DOFFA गेम में कमाया जाता है, हाइप पर बाँटा नहीं जाता।" },
         { q: "बीन्स क्या है?", a: "बीन्स आंतरिक गेम ऊर्जा है। गेम के अंदर टैप और बाज़ियों से कमाई जाती है; बिकती नहीं, टोकन नहीं।" },
-        { q: "$DOFFA कैसे पाएँ?", a: "DOFFA Crazy 8 की बाज़ियाँ जीतो और «इनाम लें» दबाओ — Reward Vault का $DOFFA तुम्हारे Solana वॉलेट से जुड़ जाता है।" },
+        { q: "$DOFFA कैसे पाएँ?", a: "DOFFA Bean Duel की बाज़ियाँ जीतो और «इनाम लें» दबाओ — Reward Vault का $DOFFA तुम्हारे Solana वॉलेट से जुड़ जाता है।" },
         { q: "मेरे टोकन कहाँ रहते हैं?", a: "सिर्फ़ तुम्हारे अपने वॉलेट (Phantom / Solflare) में। साइट और गेम कभी तुम्हारे फ़ंड नहीं रखते।" },
         { q: "क्या यह निवेश है?", a: "नहीं। हम मुनाफ़े का वादा नहीं करते और वित्तीय सलाह नहीं देते। प्रोजेक्ट, गेम और कॉफ़ी के लिए जुड़ो।" },
       ],
@@ -2157,12 +2157,12 @@ export const dict: Record<Lang, Dict> = {
     },
     flow: {
       tag: "Como funciona",
-      title: "Tap → Grãos → Jogo → $DOFFA",
+      title: "Tap → Grãos → Duelo → $DOFFA",
       sub: "Uma cadeia de recompensas simples e honesta que qualquer um pode verificar.",
       steps: [
         { icon: "👆", t: "Toque e acumule Grãos", d: "Toque dentro do jogo DOFFA e ganhe Grãos — a energia interna do jogo." },
         { icon: "☕", t: "Acumule Grãos", d: "Grãos é a energia do ecossistema. Não se vende e não é token — só se ganha." },
-        { icon: "🃏", t: "Jogue DOFFA Crazy 8", d: "Gaste Grãos em partidas do jogo de cartas DOFFA Crazy 8." },
+        { icon: "⚔️", t: "Entre no duelo", d: "Os Grãos são seu ingresso para um curto DOFFA Bean Duel: dois personagens, reflexos e habilidades." },
         { icon: "🏆", t: "Vença", d: "Vitórias dão a recompensa real — $DOFFA do Reward Vault limitado." },
         { icon: "💰", t: "Resgate a recompensa", d: "O botão «Resgatar recompensa» vincula $DOFFA à sua carteira Solana." },
       ],
@@ -2173,8 +2173,8 @@ export const dict: Record<Lang, Dict> = {
       vaultSupplyLabel: "Emissão total",
       vaultShareLabel: "Parcela da emissão",
       claimTitle: "Resgate a recompensa",
-      claimNote: "Venceu no DOFFA Crazy 8? Toque em «Resgatar recompensa» no jogo — o $DOFFA fica vinculado à sua carteira como pedido de pagamento na Solana.",
-      playCta: "Jogar DOFFA Crazy 8",
+      claimNote: "Venceu no DOFFA Bean Duel? Toque em «Resgatar recompensa» no jogo — o $DOFFA fica vinculado à sua carteira como pedido de pagamento na Solana.",
+      playCta: "Jogar DOFFA Bean Duel",
       downloadCta: "Baixar o jogo",
     },
     verify: {
@@ -2296,7 +2296,7 @@ export const dict: Record<Lang, Dict> = {
       tag: "Plano",
       title: "Roteiro",
       phases: [
-        { n: "Q3 2026", t: "Fundação", d: "Lançamento do $DOFFA na mainnet (100M, mint/freeze revogados), o jogo DOFFA Crazy 8, Reward Vault de 1.000.000 $DOFFA.", done: true },
+        { n: "Q3 2026", t: "Fundação", d: "Lançamento do $DOFFA na mainnet (100M, mint/freeze revogados), o jogo DOFFA Bean Duel, Reward Vault de 1.000.000 $DOFFA.", done: true },
         { n: "Q4 2026", t: "Crescimento", d: "Pool de liquidez na Raydium, privilégios para holders." },
         { n: "Q1–Q2 2027", t: "Ecossistema", d: "Parcerias com cafeterias, programa de fidelidade, monetização de retenção." },
         { n: "Q3 2027+", t: "Expansão", d: "Multi-unidade, votação DAO, listagem em CEX." },
@@ -2308,7 +2308,7 @@ export const dict: Record<Lang, Dict> = {
       items: [
         { q: "É uma meme coin?", a: "Não. Por trás do token há uma cafeteria de montanha real e uma economia de jogo viva. $DOFFA se ganha jogando, não é distribuído por hype." },
         { q: "O que são Grãos?", a: "Grãos é a energia interna do jogo. Ganha-se tocando e jogando partidas dentro do jogo; não se vende e não é token." },
-        { q: "Como consigo $DOFFA?", a: "Vença partidas de DOFFA Crazy 8 e toque em «Resgatar recompensa» — o $DOFFA do Reward Vault fica vinculado à sua carteira Solana." },
+        { q: "Como consigo $DOFFA?", a: "Vença partidas de DOFFA Bean Duel e toque em «Resgatar recompensa» — o $DOFFA do Reward Vault fica vinculado à sua carteira Solana." },
         { q: "Onde ficam meus tokens?", a: "Só na sua própria carteira (Phantom / Solflare). O site e o jogo nunca guardam seus fundos." },
         { q: "É um investimento?", a: "Não. Não prometemos lucro nem damos conselhos financeiros. Participe pelo projeto, pelo jogo e pelo café." },
       ],
@@ -2376,12 +2376,12 @@ export const dict: Record<Lang, Dict> = {
     },
     flow: {
       tag: "Come funziona",
-      title: "Tap → Chicchi → Gioco → $DOFFA",
+      title: "Tap → Chicchi → Duello → $DOFFA",
       sub: "Una catena di ricompense semplice e onesta che chiunque può verificare.",
       steps: [
         { icon: "👆", t: "Tocca e accumula Chicchi", d: "Tocca dentro il gioco DOFFA e guadagna Chicchi — l’energia interna di gioco." },
         { icon: "☕", t: "Accumula Chicchi", d: "I Chicchi sono l’energia dell’ecosistema. Non in vendita e non un token: si guadagnano soltanto." },
-        { icon: "🃏", t: "Gioca a DOFFA Crazy 8", d: "Spendi i Chicchi nelle partite del gioco di carte DOFFA Crazy 8." },
+        { icon: "⚔️", t: "Entra nel duello", d: "I Chicchi sono il tuo biglietto d’ingresso a un breve DOFFA Bean Duel: due personaggi, riflessi e abilità." },
         { icon: "🏆", t: "Vinci", d: "Le vittorie danno la ricompensa vera — $DOFFA dal Reward Vault limitato." },
         { icon: "💰", t: "Ritira la ricompensa", d: "Il pulsante «Ritira la ricompensa» collega $DOFFA al tuo wallet Solana." },
       ],
@@ -2392,8 +2392,8 @@ export const dict: Record<Lang, Dict> = {
       vaultSupplyLabel: "Emissione totale",
       vaultShareLabel: "Quota dell’emissione",
       claimTitle: "Ritira la ricompensa",
-      claimNote: "Hai vinto a DOFFA Crazy 8? Premi «Ritira la ricompensa» nel gioco: il $DOFFA viene collegato al tuo wallet come richiesta di pagamento su Solana.",
-      playCta: "Gioca a DOFFA Crazy 8",
+      claimNote: "Hai vinto a DOFFA Bean Duel? Premi «Ritira la ricompensa» nel gioco: il $DOFFA viene collegato al tuo wallet come richiesta di pagamento su Solana.",
+      playCta: "Gioca a DOFFA Bean Duel",
       downloadCta: "Scarica il gioco",
     },
     verify: {
@@ -2515,7 +2515,7 @@ export const dict: Record<Lang, Dict> = {
       tag: "Piano",
       title: "Roadmap",
       phases: [
-        { n: "Q3 2026", t: "Fondazione", d: "Lancio di $DOFFA su mainnet (100M, mint/freeze revocati), il gioco DOFFA Crazy 8, un Reward Vault da 1.000.000 $DOFFA.", done: true },
+        { n: "Q3 2026", t: "Fondazione", d: "Lancio di $DOFFA su mainnet (100M, mint/freeze revocati), il gioco DOFFA Bean Duel, un Reward Vault da 1.000.000 $DOFFA.", done: true },
         { n: "Q4 2026", t: "Crescita", d: "Pool di liquidità su Raydium, privilegi per i holder." },
         { n: "Q1–Q2 2027", t: "Ecosistema", d: "Partnership con caffetterie, programma fedeltà, monetizzazione della fidelizzazione." },
         { n: "Q3 2027+", t: "Espansione", d: "Multi-location, votazione DAO, listing su CEX." },
@@ -2527,7 +2527,7 @@ export const dict: Record<Lang, Dict> = {
       items: [
         { q: "È una meme coin?", a: "No. Dietro il token ci sono una vera caffetteria di montagna e un’economia di gioco viva. Il $DOFFA si guadagna giocando, non si regala per hype." },
         { q: "Cosa sono i Chicchi?", a: "I Chicchi sono l’energia interna di gioco. Si guadagnano toccando e giocando partite dentro il gioco; non in vendita e non token." },
-        { q: "Come ottengo $DOFFA?", a: "Vinci le partite di DOFFA Crazy 8 e premi «Ritira la ricompensa»: il $DOFFA del Reward Vault viene collegato al tuo wallet Solana." },
+        { q: "Come ottengo $DOFFA?", a: "Vinci le partite di DOFFA Bean Duel e premi «Ritira la ricompensa»: il $DOFFA del Reward Vault viene collegato al tuo wallet Solana." },
         { q: "Dove sono conservati i miei token?", a: "Solo nel tuo wallet personale (Phantom / Solflare). Il sito e il gioco non custodiscono mai i tuoi fondi." },
         { q: "È un investimento?", a: "No. Non promettiamo profitti e non diamo consigli finanziari. Partecipa per il progetto, il gioco e il caffè." },
       ],
@@ -2595,12 +2595,12 @@ export const dict: Record<Lang, Dict> = {
     },
     flow: {
       tag: "仕組み",
-      title: "Tap → ビーンズ → ゲーム → $DOFFA",
+      title: "Tap → ビーンズ → 対戦 → $DOFFA",
       sub: "誰でも検証できる、シンプルで誠実な報酬の流れ。",
       steps: [
         { icon: "👆", t: "タップして ビーンズ を貯める", d: "DOFFA ゲーム内でタップして ビーンズ を稼ぐ——内部ゲームエネルギー。" },
         { icon: "☕", t: "ビーンズ を貯める", d: "ビーンズ はエコシステムのエネルギー。販売されずトークンでもない——稼ぐだけ。" },
-        { icon: "🃏", t: "DOFFA Crazy 8 で遊ぶ", d: "ビーンズ を使ってブランドカードゲーム DOFFA Crazy 8 の対戦へ。" },
+        { icon: "⚔️", t: "対戦に入る", d: "ビーンズ は短い DOFFA Bean Duel への入場チケット。2 キャラクターが反応と能力で競います。" },
         { icon: "🏆", t: "勝つ", d: "勝利には本物の報酬——限定 Reward Vault からの $DOFFA。" },
         { icon: "💰", t: "報酬を受け取る", d: "「報酬を受け取る」ボタンで $DOFFA が Solana ウォレットに紐づきます。" },
       ],
@@ -2611,8 +2611,8 @@ export const dict: Record<Lang, Dict> = {
       vaultSupplyLabel: "総発行量",
       vaultShareLabel: "発行量に占める割合",
       claimTitle: "報酬を受け取る",
-      claimNote: "DOFFA Crazy 8 で勝った？ ゲーム内で「報酬を受け取る」を押すと、$DOFFA が Solana への支払い申請としてウォレットに紐づきます。",
-      playCta: "DOFFA Crazy 8 で遊ぶ",
+      claimNote: "DOFFA Bean Duel で勝った？ ゲーム内で「報酬を受け取る」を押すと、$DOFFA が Solana への支払い申請としてウォレットに紐づきます。",
+      playCta: "DOFFA Bean Duel で遊ぶ",
       downloadCta: "ゲームをダウンロード",
     },
     verify: {
@@ -2734,7 +2734,7 @@ export const dict: Record<Lang, Dict> = {
       tag: "計画",
       title: "ロードマップ",
       phases: [
-        { n: "Q3 2026", t: "基盤", d: "メインネットでの $DOFFA 発行（1億枚、mint/freeze は放棄済み）、DOFFA Crazy 8、100万 $DOFFA の Reward Vault。", done: true },
+        { n: "Q3 2026", t: "基盤", d: "メインネットでの $DOFFA 発行（1億枚、mint/freeze は放棄済み）、DOFFA Bean Duel、100万 $DOFFA の Reward Vault。", done: true },
         { n: "Q4 2026", t: "成長", d: "Raydium流動性プール、ホルダー特典解禁。" },
         { n: "Q1–Q2 2027", t: "エコシステム", d: "カフェとの提携、ロイヤルティプログラム、リテンション収益化。" },
         { n: "Q3 2027+", t: "拡大", d: "複数店舗展開、DAO投票、CEX上場。" },
@@ -2746,7 +2746,7 @@ export const dict: Record<Lang, Dict> = {
       items: [
         { q: "これはミームコイン？", a: "いいえ。トークンの背後には実在の山のカフェと生きたゲーム経済があります。$DOFFA はゲームで稼ぐもので、話題づくりの配布ではありません。" },
         { q: "ビーンズ とは？", a: "ビーンズ は内部ゲームエネルギー。ゲーム内のタップと対戦で稼ぎます。販売されずトークンでもありません。" },
-        { q: "$DOFFA の入手方法は？", a: "DOFFA Crazy 8 の対戦に勝ち「報酬を受け取る」を押すと、Reward Vault の $DOFFA があなたの Solana ウォレットに紐づきます。" },
+        { q: "$DOFFA の入手方法は？", a: "DOFFA Bean Duel の対戦に勝ち「報酬を受け取る」を押すと、Reward Vault の $DOFFA があなたの Solana ウォレットに紐づきます。" },
         { q: "トークンはどこに保管される？", a: "あなた自身のウォレット（Phantom / Solflare）だけです。サイトもゲームも資金を預かりません。" },
         { q: "これは投資？", a: "いいえ。利益は約束せず、金融アドバイスも行いません。プロジェクトとゲームとコーヒーのために参加してください。" },
       ],

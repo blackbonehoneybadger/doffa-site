@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { dict, LANGS, TOKEN, CONTACT, GALLERY, VIDEOS, type Lang } from "./content";
+import { ECOSYSTEM } from "./config/ecosystem";
 import { REAL, solscanToken, solscanTokenOf, solscanHolders, fetchBalance, connectWalletById, disconnectWalletById } from "./solana";
 import { SmoothScroll, CursorGlow, MouseParallax, TiltCard, Magnetic, ScrollProgressBar } from "./cinematic";
 import { ThemeToggle } from "./theme-toggle";
@@ -20,8 +21,17 @@ const DEFAULT_HERO_VIDEO = "/brand/hero.mp4";
 
 // Reward Vault — выделенный запас $DOFFA на игровые награды (1% эмиссии).
 const REWARD_VAULT = 1_000_000;
-// Игра DOFFA Crazy 8 (веб-версия).
-const GAME_URL = "https://zapisnoy-kozel.vercel.app";
+// Публичная игра — DOFFA Bean Duel. Ссылка на веб-версию берётся из
+// централизованной конфигурации (env NEXT_PUBLIC_GAME_WEB_URL). Пока не задана —
+// не показываем фальшивую ссылку, кнопка ведёт на /game со статусом.
+const GAME_URL = ECOSYSTEM.game.webUrl;
+
+// Локализованная подпись для вкладки «Прозрачность» (fallback — английский).
+const TRANSPARENCY_LABEL: Partial<Record<Lang, string>> = {
+  ru: "Прозрачность", en: "Transparency", ar: "الشفافية", tr: "Şeffaflık",
+  es: "Transparencia", fr: "Transparence", de: "Transparenz", zh: "透明度",
+  hi: "पारदर्शिता", pt: "Transparência", it: "Trasparenza", ja: "透明性",
+};
 
 /* ---------- helpers ---------- */
 
@@ -219,6 +229,12 @@ export default function Home() {
                 </button>
               ),
             )}
+            <Link href="/game" className="text-xs text-cream/70 transition hover:text-gold xl:text-sm">
+              Bean Duel
+            </Link>
+            <Link href="/transparency" className="text-xs text-cream/70 transition hover:text-gold xl:text-sm">
+              {TRANSPARENCY_LABEL[lang] ?? "Transparency"}
+            </Link>
             <Link
               href="/download"
               className="rounded-full border border-gold/40 bg-gold/10 px-3 py-1 text-xs font-semibold text-gold transition hover:bg-gold/20 xl:text-sm"
@@ -367,6 +383,20 @@ export default function Home() {
                 ),
               )}
               <Link
+                href="/game"
+                onClick={() => setMenuOpen(false)}
+                className="rounded-lg px-3 py-2 text-sm text-cream/75 transition hover:bg-white/5 hover:text-gold"
+              >
+                Bean Duel
+              </Link>
+              <Link
+                href="/transparency"
+                onClick={() => setMenuOpen(false)}
+                className="rounded-lg px-3 py-2 text-sm text-cream/75 transition hover:bg-white/5 hover:text-gold"
+              >
+                {TRANSPARENCY_LABEL[lang] ?? "Transparency"}
+              </Link>
+              <Link
                 href="/download"
                 onClick={() => setMenuOpen(false)}
                 className="rounded-lg px-3 py-2 text-sm font-semibold text-gold hover:bg-gold/10"
@@ -473,12 +503,12 @@ export default function Home() {
         <div className="marquee-track">
           {[0, 1].map((i) => (
             <span key={i} className="display inline-flex shrink-0 items-center gap-10 px-10 text-sm uppercase tracking-[0.3em] text-cream/40">
-              <span>1 чашка = 1 токен</span><span className="text-teal">·</span>
+              <span>Tap · Duel · Claim</span><span className="text-teal">·</span>
               <span>Since 2021</span><span className="text-teal">·</span>
               <span>Solana SPL</span><span className="text-teal">·</span>
-              <span>Deflationary</span><span className="text-teal">·</span>
+              <span>DOFFA Bean Duel</span><span className="text-teal">·</span>
               <span>Halal spirit</span><span className="text-teal">·</span>
-              <span>DOFFA</span><span className="text-teal">·</span>
+              <span>DOFFA Games</span><span className="text-teal">·</span>
             </span>
           ))}
         </div>
@@ -662,21 +692,30 @@ export default function Home() {
                     <p className="mx-auto mt-3 max-w-2xl text-sm text-cream/70">{t.flow.claimNote}</p>
                     <div className="mt-7 flex flex-wrap items-center justify-center gap-4">
                       <Magnetic>
-                        <a
-                          href={GAME_URL}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold to-copper px-7 py-3 font-bold text-ink shadow-lg shadow-gold/10 transition hover:brightness-110"
-                        >
-                          🃏 {t.flow.playCta}
-                        </a>
+                        {GAME_URL ? (
+                          <a
+                            href={GAME_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold to-copper px-7 py-3 font-bold text-ink shadow-lg shadow-gold/10 transition hover:brightness-110"
+                          >
+                            ⚔️ {t.flow.playCta}
+                          </a>
+                        ) : (
+                          <Link
+                            href="/game"
+                            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold to-copper px-7 py-3 font-bold text-ink shadow-lg shadow-gold/10 transition hover:brightness-110"
+                          >
+                            ⚔️ {t.flow.playCta}
+                          </Link>
+                        )}
                       </Magnetic>
                       <Magnetic>
                         <Link
-                          href="/download"
+                          href="/game"
                           className="rounded-full border border-cream/30 px-7 py-3 font-semibold text-cream transition hover:border-gold hover:text-gold"
                         >
-                          {t.flow.downloadCta}
+                          {ECOSYSTEM.primaryGameName}
                         </Link>
                       </Magnetic>
                     </div>
