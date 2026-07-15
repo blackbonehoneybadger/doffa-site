@@ -60,7 +60,7 @@ function StatsPanel() {
   }, []);
 
   const fmt = (n: number | null | undefined) =>
-    n === null || n === undefined ? "—" : n.toLocaleString("ru-RU");
+    n === null || n === undefined || Number.isNaN(n) ? "—" : n.toLocaleString("ru-RU");
 
   // Пока грузится — «…»; при сбое запроса — «—»; при успехе — значение.
   const placeholder = failed ? "—" : "…";
