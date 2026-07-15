@@ -24,6 +24,75 @@ const envStr = (v: string | undefined) => {
   const s = v?.trim();
   return s ? s : null;
 };
+const flag = (v: string | undefined) => (v ?? "").trim() === "true";
+
+// Публичное название площадки.
+export const MARKETPLACE = {
+  name: "DOFFA Merch",
+  subtitle: "DOFFA Marketplace",
+  /** Валюта по умолчанию для отображения цен (ISO 4217). */
+  currency: envStr(process.env.NEXT_PUBLIC_DEFAULT_CURRENCY) ?? "RUB",
+  contactUrl: envStr(process.env.NEXT_PUBLIC_MERCH_CONTACT_URL),
+} as const;
+
+// Feature flags. ВАЖНО: production-функции без реальной интеграции по умолчанию
+// ВЫКЛЮЧЕНЫ. Mock-оплату НЕ выдаём за рабочую. Публичные флаги — только для UI-гейтинга;
+// сервер обязан перепроверять права и наличие интеграции самостоятельно.
+export const MERCH_FLAGS = {
+  merchEnabled: flag(process.env.NEXT_PUBLIC_MERCH_ENABLED) || true, // раздел /merch виден всегда
+  catalogEnabled: flag(process.env.NEXT_PUBLIC_MERCH_CATALOG_ENABLED),
+  sellerPortalEnabled: flag(process.env.NEXT_PUBLIC_MERCH_SELLER_PORTAL_ENABLED),
+  customLeatherEnabled: flag(process.env.NEXT_PUBLIC_MERCH_CUSTOM_LEATHER_ENABLED) || true, // форма уже есть (honest)
+  fiatPaymentsEnabled: flag(process.env.NEXT_PUBLIC_MERCH_FIAT_PAYMENTS_ENABLED),
+  doffaPaymentsEnabled: flag(process.env.NEXT_PUBLIC_DOFFA_PAYMENTS_ENABLED),
+} as const;
+
+/** Публичные параметры оплаты в DOFFA (никаких секретов и приватных ключей). */
+export const DOFFA_PAYMENT_PUBLIC = {
+  /** Официальный mint из env или дефолт. */
+  mint: envStr(process.env.NEXT_PUBLIC_DOFFA_MINT) ?? "57aAfCuXx7uuc8g8P9kTxR65TKQtZsFDJeKhdD5xu6uo",
+  decimals: 6,
+  /** Котировка цены в DOFFA действует ограниченное время. */
+  quoteTtlMinutes: 10,
+  enabled: flag(process.env.NEXT_PUBLIC_DOFFA_PAYMENTS_ENABLED),
+} as const;
+
+/** Статусы товара продавца (публично не показываем hidden/moderation). */
+export type ProductStatus =
+  | "in_stock" | "made_to_order" | "preorder" | "out_of_stock" | "hidden" | "moderation";
+export const PRODUCT_STATUS_LABEL: Record<ProductStatus, string> = {
+  in_stock: "В наличии", made_to_order: "Под заказ", preorder: "Предзаказ",
+  out_of_stock: "Нет в наличии", hidden: "Скрыт", moderation: "На модерации",
+};
+export const PUBLIC_PRODUCT_STATUSES: ProductStatus[] = ["in_stock", "made_to_order", "preorder", "out_of_stock"];
+
+/** Статусы продавца (публично — только approved). */
+export type SellerStatus = "applied" | "under_review" | "approved" | "suspended" | "rejected";
+export const SELLER_STATUS_LABEL: Record<SellerStatus, string> = {
+  applied: "Заявка подана", under_review: "На проверке", approved: "Одобрен",
+  suspended: "Приостановлен", rejected: "Отклонён",
+};
+
+/** Статусы кастомной заявки на кожаное изделие. */
+export type CustomRequestStatus =
+  | "new" | "reviewing" | "needs_details" | "quoted" | "approved"
+  | "in_production" | "shipped" | "completed" | "cancelled";
+export const CUSTOM_REQUEST_STATUS_LABEL: Record<CustomRequestStatus, string> = {
+  new: "Новая", reviewing: "Рассматривается", needs_details: "Нужны детали",
+  quoted: "Рассчитана", approved: "Согласована", in_production: "В производстве",
+  shipped: "Отправлена", completed: "Завершена", cancelled: "Отменена",
+};
+
+/** Статусы заказа. */
+export type OrderStatus =
+  | "pending_payment" | "paid" | "processing" | "shipped"
+  | "delivered" | "cancelled" | "refunded" | "disputed";
+
+/** Разрешённые форматы загрузки (кастомный заказ / заявка продавца). */
+export const UPLOAD_ALLOWED_MIME = [
+  "image/jpeg", "image/png", "application/pdf", "image/svg+xml",
+] as const;
+export const UPLOAD_MAX_BYTES = 8 * 1024 * 1024; // 8 МБ на файл
 
 export const MERCH = {
   /** Онлайн-приём заявок через форму + БД. По умолчанию выключен — форма честно
@@ -124,3 +193,28 @@ export const MERCH = {
 
 /** Строка «рассчитывается индивидуально» — используем вместо любых выдуманных цен. */
 export const PRICE_ON_REQUEST = "Цена рассчитывается индивидуально";
+
+/** FAQ маркетплейса (хаб /merch). */
+export const MARKETPLACE_FAQ: { q: string; a: string }[] = [
+  { q: "Что продаётся в разделе «Мерч»?", a: "Готовые фирменные товары DOFFA и проверенных продавцов, а также индивидуальные изделия из кожи. Еды и внутриигровых предметов здесь нет." },
+  { q: "Можно ли оплатить в DOFFA?", a: "Да, если продавец разрешил этот способ оплаты для выбранного товара." },
+  { q: "Обязательно ли платить в DOFFA?", a: "Нет. DOFFA является дополнительным способом оплаты." },
+  { q: "Как рассчитывается цена в DOFFA?", a: "По актуальной котировке с ограниченным временем действия." },
+  { q: "Можно ли заказать собственный дизайн?", a: "Да. Можно отправить логотип, монограмму, имя, надпись или референс." },
+  { q: "Кто может разместить товар?", a: "Только продавец, прошедший проверку и одобрение." },
+  { q: "Кто отвечает за качество?", a: "Ответственность и условия зависят от конкретного продавца и правил площадки." },
+  { q: "Можно ли вернуть персонализированное изделие?", a: "Условия зависят от причины обращения, применимого законодательства и правил индивидуальных заказов." },
+];
+
+/** Публичный статус реализации функций маркетплейса (Live/Testing/Planned). */
+export const MERCH_FEATURE_STATUS = {
+  customLeatherForm: "testing",   // форма честная, БД по флагу
+  catalog: "planned",
+  productPages: "planned",
+  sellerPortal: "planned",
+  adminModeration: "planned",
+  cart: "planned",
+  checkout: "planned",
+  fiatPayments: "planned",
+  doffaPayments: "planned",
+} as const;
