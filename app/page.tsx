@@ -184,13 +184,13 @@ export default function Home() {
       {/* ---------- NAV ---------- */}
       <header className="theme-pin-dark fixed inset-x-0 top-0 z-50 border-b border-white/5 bg-ink/70 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-5 sm:py-3">
-          <a href="#top" className="flex items-center gap-2.5 sm:gap-3">
+          <a href="#top" className="flex shrink-0 items-center gap-2.5 sm:gap-3">
             <Image src="/brand/doffa-logo.jpeg" alt="DOFFA" width={36} height={36} className="rounded-full ring-1 ring-gold/40 sm:w-[40px] sm:h-[40px]" />
             <span className="display text-base font-extrabold tracking-tight text-cream-soft sm:text-lg">
               DOFFA<span className="text-teal">.</span>
             </span>
           </a>
-          <nav className="hidden items-center gap-4 xl:gap-5 lg:flex">
+          <nav className="hidden flex-1 items-center justify-center gap-3 whitespace-nowrap px-4 xl:gap-4 lg:flex">
             {tabs.map((t) => (
               <button
                 key={t.id}
@@ -215,7 +215,7 @@ export default function Home() {
               {t.tabs.profile}
             </Link>
           </nav>
-          <div className="flex items-center gap-3 sm:gap-2">
+          <div className="flex shrink-0 items-center gap-3 sm:gap-2">
             {/* Wallet connect button */}
             <div className="relative hidden sm:block">
               {wallet ? (
