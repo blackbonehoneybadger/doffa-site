@@ -123,6 +123,17 @@ export default function Home() {
       .catch(() => {});
   }, []);
 
+  // Один «маячок» посещения за сессию браузера — для счётчика в админке.
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem("doffa_tracked")) return;
+      sessionStorage.setItem("doffa_tracked", "1");
+      fetch("/api/track", { method: "POST" }).catch(() => {});
+    } catch {
+      // sessionStorage может быть недоступен (приватный режим) — не критично
+    }
+  }, []);
+
 
 
 

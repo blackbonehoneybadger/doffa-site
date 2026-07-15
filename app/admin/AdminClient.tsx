@@ -5,20 +5,74 @@ import { upload } from "@vercel/blob/client";
 import type { HeroVideo } from "../lib/videoStore";
 
 const MAX_VIDEOS = 10;
-const MAX_FILE_MB = 200;
+const MAX_FILE_MB = 40; // синхронизировано с лимитом сервера в upload-token
 
 export default function AdminClient({ initialAuthed }: { initialAuthed: boolean }) {
   const [authed, setAuthed] = useState(initialAuthed);
 
   return (
     <main className="mx-auto min-h-screen max-w-2xl px-5 py-16">
-      <h1 className="display text-3xl font-extrabold text-cream-soft">DOFFA · Видео на главной</h1>
+      <h1 className="display text-3xl font-extrabold text-cream-soft">DOFFA · Панель администратора</h1>
       <p className="mt-2 text-sm text-cream/60">
-        Загружай видео для главной страницы сайта. Каждый день сайт автоматически показывает
-        следующее по кругу — когда доходит до последнего, начинает сначала.
+        Сводка по сайту и токену, плюс загрузка видео для главной страницы. Видео сайт каждый
+        день автоматически показывает по кругу — дойдя до последнего, начинает сначала.
       </p>
-      <div className="mt-8">{authed ? <UploadPanel onLoggedOut={() => setAuthed(false)} /> : <LoginForm onSuccess={() => setAuthed(true)} />}</div>
+      <div className="mt-8">
+        {authed ? (
+          <>
+            <StatsPanel />
+            <UploadPanel onLoggedOut={() => setAuthed(false)} />
+          </>
+        ) : (
+          <LoginForm onSuccess={() => setAuthed(true)} />
+        )}
+      </div>
     </main>
+  );
+}
+
+type Stats = {
+  visits: number;
+  circulating: number | null;
+  burned: number | null;
+  initialSupply: number;
+};
+
+function StatsPanel() {
+  const [stats, setStats] = useState<Stats | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/admin/stats")
+      .then((r) => r.json())
+      .then((d) => {
+        if (!cancelled && d.ok) setStats(d);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const fmt = (n: number | null | undefined) =>
+    n === null || n === undefined ? "—" : n.toLocaleString("ru-RU");
+
+  const cards = [
+    { label: "Посетителей", value: stats ? stats.visits.toLocaleString("ru-RU") : "…", sub: "всего заходов на сайт" },
+    { label: "В обороте", value: stats ? fmt(stats.circulating) : "…", sub: "$DOFFA на mainnet" },
+    { label: "Сожжено", value: stats ? fmt(stats.burned) : "…", sub: "$DOFFA (выпуск − оборот)" },
+  ];
+
+  return (
+    <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
+      {cards.map((c) => (
+        <div key={c.label} className="card rounded-2xl p-5">
+          <p className="text-[11px] uppercase tracking-wider text-cream/40">{c.label}</p>
+          <p className="mt-1.5 font-mono text-2xl font-bold text-gold">{c.value}</p>
+          <p className="mt-1 text-[11px] text-cream/40">{c.sub}</p>
+        </div>
+      ))}
+    </div>
   );
 }
 
