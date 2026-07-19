@@ -51,7 +51,7 @@ export const CONTACT = {
 // Видео кофейни — показываются в верхней части сайта, сразу после hero.
 export const VIDEOS: { src: string; alt: string }[] = [
   { src: "/brand/icedlatte.mp4", alt: "Налив айс-латте" },
-  { src: "/brand/cat.mp4", alt: "Кот кофейни DOFFA" },
+  { src: "/brand/doffa-clip.mp4", alt: "Атмосфера кофейни DOFFA" },
 ];
 
 // Фото кофейни для секции «Галерея» (лежат в public/brand/).
