@@ -190,7 +190,7 @@ export const dict: Record<Lang, Dict> = {
       steps: [
         { icon: "👆", t: "Тапай — копи Зёрна", d: "Тапай в игре DOFFA и зарабатывай Зёрна — внутреннюю игровую энергию." },
         { icon: "☕", t: "Копи Зёрна", d: "Зёрна — энергия экосистемы. Она не продаётся и не является токеном — только зарабатывается." },
-        { icon: "🃏", t: "Играй в DOFFA Crazy 8", d: "Трать Зёрна на партии в фирменную карточную игру DOFFA Crazy 8." },
+        { icon: "🎮", t: "Играй в DOFFA Defense", d: "Трать Зёрна на забеги в фирменную action-игру: зачищай комнаты, побеждай боссов, проходи главы." },
         { icon: "🏆", t: "Побеждай", d: "За победу начисляется настоящая награда — $DOFFA из ограниченного Reward Vault." },
         { icon: "💰", t: "Забирай награду", d: "Кнопка «Забрать награду» закрепляет $DOFFA за твоим Solana-кошельком." },
       ],
@@ -201,8 +201,8 @@ export const dict: Record<Lang, Dict> = {
       vaultSupplyLabel: "Общий выпуск",
       vaultShareLabel: "Доля эмиссии",
       claimTitle: "Забрать награду",
-      claimNote: "Выиграл в DOFFA Crazy 8? Нажми «Забрать награду» в игре — $DOFFA закрепляется за твоим кошельком как заявка на вывод в сеть Solana.",
-      playCta: "Играть в DOFFA Crazy 8",
+      claimNote: "Прошёл главу в DOFFA Defense? Нажми «Забрать награду» в игре — $DOFFA закрепляется за твоим кошельком как заявка на вывод в сеть Solana.",
+      playCta: "Играть в DOFFA Defense",
       downloadCta: "Скачать игру",
     },
     verify: {
@@ -336,7 +336,7 @@ export const dict: Record<Lang, Dict> = {
       items: [
         { q: "Это мем-койн?", a: "Нет. За токеном стоит реальная кофейня в горах и живая игровая экосистема. $DOFFA зарабатывается в игре, а не раздаётся за хайп." },
         { q: "Что такое Зёрна?", a: "Зёрна — внутренняя игровая энергия. Она начисляется за тапы и партии в игре, не продаётся и токеном не является." },
-        { q: "Как получить $DOFFA?", a: "Побеждай в DOFFA Crazy 8 и нажимай «Забрать награду» — $DOFFA из Reward Vault закрепляется за твоим Solana-кошельком." },
+        { q: "Как получить $DOFFA?", a: "Проходи главы в DOFFA Defense и нажимай «Забрать награду» — $DOFFA из Reward Vault закрепляется за твоим Solana-кошельком." },
         { q: "Где хранятся мои токены?", a: "Только в вашем личном кошельке (Phantom / Solflare). Сайт и игра не хранят средства и не имеют к ним доступа." },
         { q: "Это инвестиция?", a: "Нет. Мы не обещаем доход и не даём финансовых советов. Участвуйте только из интереса к проекту, игре и кофейне." },
       ],
@@ -409,7 +409,7 @@ export const dict: Record<Lang, Dict> = {
       steps: [
         { icon: "👆", t: "Tap — earn Beans", d: "Tap in the DOFFA game and earn Beans — the internal game energy." },
         { icon: "☕", t: "Stack Beans", d: "Beans are ecosystem energy. Not for sale and not a token — they can only be earned." },
-        { icon: "🃏", t: "Play DOFFA Crazy 8", d: "Spend Beans on matches in DOFFA Crazy 8, the brand card game." },
+        { icon: "🎮", t: "Play DOFFA Defense", d: "Spend Beans on runs in the brand action game: clear rooms, defeat bosses, complete chapters." },
         { icon: "🏆", t: "Win", d: "Victories earn the real reward — $DOFFA from the limited Reward Vault." },
         { icon: "💰", t: "Claim your reward", d: "The “Claim reward” button pins $DOFFA to your Solana wallet." },
       ],
@@ -420,8 +420,8 @@ export const dict: Record<Lang, Dict> = {
       vaultSupplyLabel: "Total supply",
       vaultShareLabel: "Share of supply",
       claimTitle: "Claim your reward",
-      claimNote: "Won a DOFFA Crazy 8 match? Hit “Claim reward” in the game — $DOFFA is pinned to your wallet as a payout request to Solana.",
-      playCta: "Play DOFFA Crazy 8",
+      claimNote: "Completed a chapter in DOFFA Defense? Hit “Claim reward” in the game — $DOFFA is pinned to your wallet as a payout request to Solana.",
+      playCta: "Play DOFFA Defense",
       downloadCta: "Download the game",
     },
     verify: {
@@ -555,7 +555,7 @@ export const dict: Record<Lang, Dict> = {
       items: [
         { q: "Is this a meme coin?", a: "No. Behind the token is a real mountain coffee bar and a live play economy. $DOFFA is earned in the game, not airdropped for hype." },
         { q: "What are Beans?", a: "Beans are the internal game energy. Earned through taps and matches in the game; not for sale and not a token." },
-        { q: "How do I get $DOFFA?", a: "Win DOFFA Crazy 8 matches and press “Claim reward” — $DOFFA from the Reward Vault is pinned to your Solana wallet." },
+        { q: "How do I get $DOFFA?", a: "Complete chapters in DOFFA Defense and press “Claim reward” — $DOFFA from the Reward Vault is pinned to your Solana wallet." },
         { q: "Where are my tokens stored?", a: "Only in your own wallet (Phantom / Solflare). The site and the game never hold your funds." },
         { q: "Is this an investment?", a: "No. We promise no profit and give no financial advice. Join for the project, the game and the coffee." },
       ],
@@ -629,7 +629,7 @@ export const dict: Record<Lang, Dict> = {
       steps: [
         { icon: "👆", t: "اضغط واجمع الحبوب", d: "اضغط داخل لعبة DOFFA واكسب الحبوب — طاقة اللعب الداخلية." },
         { icon: "☕", t: "اجمع الحبوب", d: "الحبوب طاقة النظام. لا تُباع وليست عملة — تُكتسب فقط." },
-        { icon: "🃏", t: "العب DOFFA Crazy 8", d: "أنفق الحبوب على جولات لعبة الورق DOFFA Crazy 8." },
+        { icon: "🎮", t: "العب DOFFA Defense", d: "أنفق الحبوب على جولات في لعبة الأكشن الخاصة بالعلامة: طهّر الغرف، اهزم الزعماء، وأكمل الفصول." },
         { icon: "🏆", t: "انتصر", d: "الانتصارات تمنح المكافأة الحقيقية — $DOFFA من خزينة المكافآت المحدودة." },
         { icon: "💰", t: "استلم مكافأتك", d: "زر «استلام المكافأة» يثبّت $DOFFA على محفظة سولانا الخاصة بك." },
       ],
@@ -640,8 +640,8 @@ export const dict: Record<Lang, Dict> = {
       vaultSupplyLabel: "الإصدار الكلي",
       vaultShareLabel: "حصة الإصدار",
       claimTitle: "استلام المكافأة",
-      claimNote: "فزت في DOFFA Crazy 8؟ اضغط «استلام المكافأة» في اللعبة — يُثبَّت $DOFFA على محفظتك كطلب سحب إلى سولانا.",
-      playCta: "العب DOFFA Crazy 8",
+      claimNote: "أكملت فصلاً في DOFFA Defense؟ اضغط «استلام المكافأة» في اللعبة — يُثبَّت $DOFFA على محفظتك كطلب سحب إلى سولانا.",
+      playCta: "العب DOFFA Defense",
       downloadCta: "حمّل اللعبة",
     },
     verify: {
@@ -775,7 +775,7 @@ export const dict: Record<Lang, Dict> = {
       items: [
         { q: "هل هذه عملة ميم؟", a: "لا. خلف العملة مقهى جبلي حقيقي واقتصاد لعب حي. $DOFFA تُكسب في اللعبة ولا تُوزَّع للضجة." },
         { q: "ما هي الحبوب؟", a: "الحبوب طاقة اللعب الداخلية. تُكسب عبر الضغطات والجولات داخل اللعبة؛ لا تُباع وليست عملة." },
-        { q: "كيف أحصل على $DOFFA؟", a: "انتصر في DOFFA Crazy 8 واضغط «استلام المكافأة» — $DOFFA من الخزينة تُثبَّت على محفظتك." },
+        { q: "كيف أحصل على $DOFFA؟", a: "أكمل الفصول في DOFFA Defense واضغط «استلام المكافأة» — $DOFFA من الخزينة تُثبَّت على محفظتك." },
         { q: "أين تُحفظ عملاتي؟", a: "فقط في محفظتك الخاصة (Phantom / Solflare). الموقع واللعبة لا يحتفظان بأموالك." },
         { q: "هل هذا استثمار؟", a: "لا. لا نعد بأي ربح ولا نقدم نصائح مالية. شارك من أجل المشروع واللعبة والقهوة." },
       ],
@@ -848,7 +848,7 @@ export const dict: Record<Lang, Dict> = {
       steps: [
         { icon: "👆", t: "Dokun — Çekirdek biriktir", d: "DOFFA oyununda dokun ve Çekirdek kazan — içsel oyun enerjisi." },
         { icon: "☕", t: "Çekirdek biriktir", d: "Çekirdek ekosistem enerjisidir. Satılmaz ve token değildir — yalnızca kazanılır." },
-        { icon: "🃏", t: "DOFFA Crazy 8 oyna", d: "Çekirdek’ı marka kart oyunu DOFFA Crazy 8 turlarına harca." },
+        { icon: "🎮", t: "DOFFA Defense oyna", d: "Çekirdek’ı marka aksiyon oyunundaki koşulara harca: odaları temizle, boss’ları yen, bölümleri bitir." },
         { icon: "🏆", t: "Kazan", d: "Zaferler gerçek ödülü getirir — sınırlı Reward Vault’tan $DOFFA." },
         { icon: "💰", t: "Ödülünü al", d: "“Ödülü al” düğmesi $DOFFA’yı Solana cüzdanına sabitler." },
       ],
@@ -859,8 +859,8 @@ export const dict: Record<Lang, Dict> = {
       vaultSupplyLabel: "Toplam arz",
       vaultShareLabel: "Arz payı",
       claimTitle: "Ödülünü al",
-      claimNote: "DOFFA Crazy 8’de mi kazandın? Oyunda “Ödülü al”a bas — $DOFFA, Solana’ya ödeme talebi olarak cüzdanına sabitlenir.",
-      playCta: "DOFFA Crazy 8 oyna",
+      claimNote: "DOFFA Defense’te bir bölüm mü bitirdin? Oyunda “Ödülü al”a bas — $DOFFA, Solana’ya ödeme talebi olarak cüzdanına sabitlenir.",
+      playCta: "DOFFA Defense oyna",
       downloadCta: "Oyunu indir",
     },
     verify: {
@@ -994,7 +994,7 @@ export const dict: Record<Lang, Dict> = {
       items: [
         { q: "Bu bir meme coin mi?", a: "Hayır. Tokenin arkasında gerçek bir dağ kahvecisi ve canlı bir oyun ekonomisi var. $DOFFA oyunda kazanılır, hype için dağıtılmaz." },
         { q: "Çekirdek nedir?", a: "Çekirdek içsel oyun enerjisidir. Oyun içi dokunuşlar ve turlarla kazanılır; satılmaz ve token değildir." },
-        { q: "$DOFFA nasıl alınır?", a: "DOFFA Crazy 8 turlarını kazan ve “Ödülü al”a bas — Reward Vault’tan $DOFFA cüzdanına sabitlenir." },
+        { q: "$DOFFA nasıl alınır?", a: "DOFFA Defense bölümlerini bitir ve “Ödülü al”a bas — Reward Vault’tan $DOFFA cüzdanına sabitlenir." },
         { q: "Tokenlerim nerede saklanır?", a: "Yalnızca kendi cüzdanında (Phantom / Solflare). Site ve oyun fonlarını tutmaz." },
         { q: "Bu bir yatırım mı?", a: "Hayır. Kazanç vaat etmiyoruz, finansal tavsiye vermiyoruz. Proje, oyun ve kahve için katıl." },
       ],
@@ -1067,7 +1067,7 @@ export const dict: Record<Lang, Dict> = {
       steps: [
         { icon: "👆", t: "Toca y acumula Granos", d: "Toca dentro del juego DOFFA y gana Granos — la energía interna del juego." },
         { icon: "☕", t: "Acumula Granos", d: "Granos es la energía del ecosistema. No se vende y no es un token: solo se gana." },
-        { icon: "🃏", t: "Juega DOFFA Crazy 8", d: "Gasta Granos en partidas del juego de cartas DOFFA Crazy 8." },
+        { icon: "🎮", t: "Juega DOFFA Defense", d: "Gasta Granos en partidas del juego de acción de la marca: limpia salas, vence a los jefes y completa capítulos." },
         { icon: "🏆", t: "Gana", d: "Las victorias otorgan la recompensa real: $DOFFA del Reward Vault limitado." },
         { icon: "💰", t: "Reclama tu recompensa", d: "El botón «Reclamar recompensa» fija $DOFFA a tu billetera Solana." },
       ],
@@ -1078,8 +1078,8 @@ export const dict: Record<Lang, Dict> = {
       vaultSupplyLabel: "Emisión total",
       vaultShareLabel: "Parte de la emisión",
       claimTitle: "Reclama tu recompensa",
-      claimNote: "¿Ganaste en DOFFA Crazy 8? Pulsa «Reclamar recompensa» en el juego: $DOFFA se fija a tu billetera como solicitud de pago a Solana.",
-      playCta: "Jugar DOFFA Crazy 8",
+      claimNote: "¿Completaste un capítulo en DOFFA Defense? Pulsa «Reclamar recompensa» en el juego: $DOFFA se fija a tu billetera como solicitud de pago a Solana.",
+      playCta: "Jugar DOFFA Defense",
       downloadCta: "Descargar el juego",
     },
     verify: {
@@ -1213,7 +1213,7 @@ export const dict: Record<Lang, Dict> = {
       items: [
         { q: "¿Es una meme coin?", a: "No. Detrás del token hay una cafetería de montaña real y una economía de juego viva. $DOFFA se gana jugando, no se regala por hype." },
         { q: "¿Qué son los Granos?", a: "Granos es la energía interna del juego. Se gana con toques y partidas dentro del juego; no se vende y no es un token." },
-        { q: "¿Cómo consigo $DOFFA?", a: "Gana partidas de DOFFA Crazy 8 y pulsa «Reclamar recompensa»: $DOFFA del Reward Vault se fija a tu billetera Solana." },
+        { q: "¿Cómo consigo $DOFFA?", a: "Completa capítulos en DOFFA Defense y pulsa «Reclamar recompensa»: $DOFFA del Reward Vault se fija a tu billetera Solana." },
         { q: "¿Dónde se guardan mis tokens?", a: "Solo en tu propia billetera (Phantom / Solflare). El sitio y el juego nunca custodian tus fondos." },
         { q: "¿Es una inversión?", a: "No. No prometemos ganancias ni damos consejos financieros. Participa por el proyecto, el juego y el café." },
       ],
@@ -1286,7 +1286,7 @@ export const dict: Record<Lang, Dict> = {
       steps: [
         { icon: "👆", t: "Tape et accumule des Grains", d: "Tape dans le jeu DOFFA et gagne des Grains — l’énergie interne du jeu." },
         { icon: "☕", t: "Accumule des Grains", d: "Les Grains sont l’énergie de l’écosystème. Pas à vendre, pas un jeton : ils se gagnent." },
-        { icon: "🃏", t: "Joue à DOFFA Crazy 8", d: "Dépense tes Grains dans des parties du jeu de cartes DOFFA Crazy 8." },
+        { icon: "🎮", t: "Joue à DOFFA Defense", d: "Dépense tes Grains dans des parties du jeu d’action de la marque : nettoie les salles, bats les boss, termine les chapitres." },
         { icon: "🏆", t: "Gagne", d: "Les victoires rapportent la vraie récompense — du $DOFFA du Reward Vault limité." },
         { icon: "💰", t: "Réclame ta récompense", d: "Le bouton « Réclamer la récompense » attache le $DOFFA à ton portefeuille Solana." },
       ],
@@ -1297,8 +1297,8 @@ export const dict: Record<Lang, Dict> = {
       vaultSupplyLabel: "Émission totale",
       vaultShareLabel: "Part de l’émission",
       claimTitle: "Réclame ta récompense",
-      claimNote: "Gagné à DOFFA Crazy 8 ? Appuie sur « Réclamer la récompense » dans le jeu : le $DOFFA est attaché à ton portefeuille comme demande de paiement vers Solana.",
-      playCta: "Jouer à DOFFA Crazy 8",
+      claimNote: "Terminé un chapitre de DOFFA Defense ? Appuie sur « Réclamer la récompense » dans le jeu : le $DOFFA est attaché à ton portefeuille comme demande de paiement vers Solana.",
+      playCta: "Jouer à DOFFA Defense",
       downloadCta: "Télécharger le jeu",
     },
     verify: {
@@ -1432,7 +1432,7 @@ export const dict: Record<Lang, Dict> = {
       items: [
         { q: "C’est un meme coin ?", a: "Non. Derrière le jeton, un vrai café de montagne et une économie de jeu vivante. Le $DOFFA se gagne en jouant, pas en hype." },
         { q: "Que sont les Grains ?", a: "Les Grains sont l’énergie interne du jeu. Gagnés en tapant et en jouant des parties ; pas à vendre, pas un jeton." },
-        { q: "Comment obtenir du $DOFFA ?", a: "Gagne des parties de DOFFA Crazy 8 et appuie sur « Réclamer la récompense » : le $DOFFA du Reward Vault est attaché à ton portefeuille Solana." },
+        { q: "Comment obtenir du $DOFFA ?", a: "Termine des chapitres de DOFFA Defense et appuie sur « Réclamer la récompense » : le $DOFFA du Reward Vault est attaché à ton portefeuille Solana." },
         { q: "Où sont conservés mes jetons ?", a: "Uniquement dans ton propre portefeuille (Phantom / Solflare). Le site et le jeu ne détiennent jamais tes fonds." },
         { q: "C’est un investissement ?", a: "Non. Nous ne promettons aucun profit et ne donnons aucun conseil financier. Participe pour le projet, le jeu et le café." },
       ],
@@ -1505,7 +1505,7 @@ export const dict: Record<Lang, Dict> = {
       steps: [
         { icon: "👆", t: "Tippen — Bohnen sammeln", d: "Tippe im DOFFA-Spiel und verdiene Bohnen — die interne Spielenergie." },
         { icon: "☕", t: "Bohnen sammeln", d: "Bohnen sind die Energie des Ökosystems. Nicht käuflich, kein Token — nur verdienbar." },
-        { icon: "🃏", t: "DOFFA Crazy 8 spielen", d: "Setze Bohnen für Partien im Marken-Kartenspiel DOFFA Crazy 8 ein." },
+        { icon: "🎮", t: "DOFFA Defense spielen", d: "Setze Bohnen für Runs im Marken-Actionspiel ein: räume Zimmer frei, besiege Bosse und schließe Kapitel ab." },
         { icon: "🏆", t: "Gewinnen", d: "Siege bringen die echte Belohnung — $DOFFA aus dem begrenzten Reward Vault." },
         { icon: "💰", t: "Belohnung abholen", d: "Der Button „Belohnung abholen“ heftet $DOFFA an deine Solana-Wallet." },
       ],
@@ -1516,8 +1516,8 @@ export const dict: Record<Lang, Dict> = {
       vaultSupplyLabel: "Gesamtemission",
       vaultShareLabel: "Anteil der Emission",
       claimTitle: "Belohnung abholen",
-      claimNote: "Bei DOFFA Crazy 8 gewonnen? Drücke im Spiel „Belohnung abholen“ — $DOFFA wird als Auszahlungsantrag an Solana deiner Wallet zugeordnet.",
-      playCta: "DOFFA Crazy 8 spielen",
+      claimNote: "Ein Kapitel in DOFFA Defense abgeschlossen? Drücke im Spiel „Belohnung abholen“ — $DOFFA wird als Auszahlungsantrag an Solana deiner Wallet zugeordnet.",
+      playCta: "DOFFA Defense spielen",
       downloadCta: "Spiel herunterladen",
     },
     verify: {
@@ -1651,7 +1651,7 @@ export const dict: Record<Lang, Dict> = {
       items: [
         { q: "Ist das ein Meme-Coin?", a: "Nein. Hinter dem Token stehen eine echte Bergkaffeebar und eine lebendige Spiel-Ökonomie. $DOFFA wird im Spiel verdient, nicht für Hype verteilt." },
         { q: "Was sind Bohnen?", a: "Bohnen sind die interne Spielenergie. Verdient durch Tippen und Partien im Spiel; nicht käuflich, kein Token." },
-        { q: "Wie bekomme ich $DOFFA?", a: "Gewinne DOFFA-Crazy-8-Partien und drücke „Belohnung abholen“ — $DOFFA aus dem Reward Vault wird deiner Solana-Wallet zugeordnet." },
+        { q: "Wie bekomme ich $DOFFA?", a: "Schließe Kapitel in DOFFA Defense ab und drücke „Belohnung abholen“ — $DOFFA aus dem Reward Vault wird deiner Solana-Wallet zugeordnet." },
         { q: "Wo werden meine Token verwahrt?", a: "Nur in deiner eigenen Wallet (Phantom / Solflare). Website und Spiel verwahren nie deine Mittel." },
         { q: "Ist das eine Investition?", a: "Nein. Wir versprechen keinen Gewinn und geben keine Finanzberatung. Mach mit für Projekt, Spiel und Kaffee." },
       ],
@@ -1724,7 +1724,7 @@ export const dict: Record<Lang, Dict> = {
       steps: [
         { icon: "👆", t: "点击，攒 咖啡豆", d: "在 DOFFA 游戏里点击，赚取 咖啡豆——内部游戏能量。" },
         { icon: "☕", t: "积攒 咖啡豆", d: "咖啡豆 是生态能量。不出售、不是代币——只能靠玩赚取。" },
-        { icon: "🃏", t: "玩 DOFFA Crazy 8", d: "用 咖啡豆 参加品牌纸牌游戏 DOFFA Crazy 8 的对局。" },
+        { icon: "🎮", t: "玩 DOFFA Defense", d: "用 咖啡豆 开启品牌动作游戏 DOFFA Defense 的冒险：清理房间、击败 Boss、通关章节。" },
         { icon: "🏆", t: "获胜", d: "胜利带来真正的奖励——来自限量 Reward Vault 的 $DOFFA。" },
         { icon: "💰", t: "领取奖励", d: "点击「领取奖励」，$DOFFA 将绑定到你的 Solana 钱包。" },
       ],
@@ -1735,8 +1735,8 @@ export const dict: Record<Lang, Dict> = {
       vaultSupplyLabel: "总发行量",
       vaultShareLabel: "发行占比",
       claimTitle: "领取奖励",
-      claimNote: "在 DOFFA Crazy 8 中获胜了？在游戏里点「领取奖励」——$DOFFA 将作为向 Solana 的支付申请绑定到你的钱包。",
-      playCta: "玩 DOFFA Crazy 8",
+      claimNote: "在 DOFFA Defense 中通关章节了？在游戏里点「领取奖励」——$DOFFA 将作为向 Solana 的支付申请绑定到你的钱包。",
+      playCta: "玩 DOFFA Defense",
       downloadCta: "下载游戏",
     },
     verify: {
@@ -1870,7 +1870,7 @@ export const dict: Record<Lang, Dict> = {
       items: [
         { q: "这是 meme 币吗？", a: "不是。代币背后是真实的山间咖啡馆和活跃的游戏经济。$DOFFA 靠游戏赚取，不为炒作空投。" },
         { q: "咖啡豆 是什么？", a: "咖啡豆 是内部游戏能量。通过游戏内点击和对局赚取；不出售、不是代币。" },
-        { q: "如何获得 $DOFFA？", a: "赢下 DOFFA Crazy 8 对局并点击「领取奖励」——Reward Vault 中的 $DOFFA 将绑定到你的 Solana 钱包。" },
+        { q: "如何获得 $DOFFA？", a: "通关 DOFFA Defense 章节并点击「领取奖励」——Reward Vault 中的 $DOFFA 将绑定到你的 Solana 钱包。" },
         { q: "我的代币存放在哪里？", a: "只存放在你自己的钱包（Phantom / Solflare）。网站和游戏绝不保管你的资金。" },
         { q: "这是投资吗？", a: "不是。我们不承诺收益，也不提供理财建议。请为项目、游戏和咖啡而参与。" },
       ],
@@ -1943,7 +1943,7 @@ export const dict: Record<Lang, Dict> = {
       steps: [
         { icon: "👆", t: "टैप करो — बीन्स जमा करो", d: "DOFFA गेम में टैप करो और बीन्स कमाओ — आंतरिक गेम ऊर्जा।" },
         { icon: "☕", t: "बीन्स जमा करो", d: "बीन्स इकोसिस्टम की ऊर्जा है। बिकती नहीं, टोकन नहीं — सिर्फ़ कमाई जाती है।" },
-        { icon: "🃏", t: "DOFFA Crazy 8 खेलो", d: "ब्रांड कार्ड गेम DOFFA Crazy 8 की बाज़ियों पर बीन्स खर्च करो।" },
+        { icon: "🎮", t: "DOFFA Defense खेलो", d: "ब्रांड एक्शन गेम DOFFA Defense के रन पर बीन्स खर्च करो: कमरे साफ़ करो, बॉस हराओ, अध्याय पूरे करो।" },
         { icon: "🏆", t: "जीतो", d: "जीत असली इनाम देती है — सीमित Reward Vault से $DOFFA।" },
         { icon: "💰", t: "इनाम लो", d: "«इनाम लें» बटन $DOFFA को तुम्हारे Solana वॉलेट से जोड़ देता है।" },
       ],
@@ -1954,8 +1954,8 @@ export const dict: Record<Lang, Dict> = {
       vaultSupplyLabel: "कुल आपूर्ति",
       vaultShareLabel: "आपूर्ति का हिस्सा",
       claimTitle: "इनाम लें",
-      claimNote: "DOFFA Crazy 8 में जीते? गेम में «इनाम लें» दबाओ — $DOFFA Solana भुगतान-अनुरोध के रूप में तुम्हारे वॉलेट से जुड़ जाता है।",
-      playCta: "DOFFA Crazy 8 खेलें",
+      claimNote: "DOFFA Defense में अध्याय पूरा किया? गेम में «इनाम लें» दबाओ — $DOFFA Solana भुगतान-अनुरोध के रूप में तुम्हारे वॉलेट से जुड़ जाता है।",
+      playCta: "DOFFA Defense खेलें",
       downloadCta: "गेम डाउनलोड करें",
     },
     verify: {
@@ -2089,7 +2089,7 @@ export const dict: Record<Lang, Dict> = {
       items: [
         { q: "क्या यह मीम कॉइन है?", a: "नहीं। टोकन के पीछे असली पहाड़ी कॉफ़ी बार और जीवंत गेम इकॉनमी है। $DOFFA गेम में कमाया जाता है, हाइप पर बाँटा नहीं जाता।" },
         { q: "बीन्स क्या है?", a: "बीन्स आंतरिक गेम ऊर्जा है। गेम के अंदर टैप और बाज़ियों से कमाई जाती है; बिकती नहीं, टोकन नहीं।" },
-        { q: "$DOFFA कैसे पाएँ?", a: "DOFFA Crazy 8 की बाज़ियाँ जीतो और «इनाम लें» दबाओ — Reward Vault का $DOFFA तुम्हारे Solana वॉलेट से जुड़ जाता है।" },
+        { q: "$DOFFA कैसे पाएँ?", a: "DOFFA Defense के अध्याय पूरे करो और «इनाम लें» दबाओ — Reward Vault का $DOFFA तुम्हारे Solana वॉलेट से जुड़ जाता है।" },
         { q: "मेरे टोकन कहाँ रहते हैं?", a: "सिर्फ़ तुम्हारे अपने वॉलेट (Phantom / Solflare) में। साइट और गेम कभी तुम्हारे फ़ंड नहीं रखते।" },
         { q: "क्या यह निवेश है?", a: "नहीं। हम मुनाफ़े का वादा नहीं करते और वित्तीय सलाह नहीं देते। प्रोजेक्ट, गेम और कॉफ़ी के लिए जुड़ो।" },
       ],
@@ -2162,7 +2162,7 @@ export const dict: Record<Lang, Dict> = {
       steps: [
         { icon: "👆", t: "Toque e acumule Grãos", d: "Toque dentro do jogo DOFFA e ganhe Grãos — a energia interna do jogo." },
         { icon: "☕", t: "Acumule Grãos", d: "Grãos é a energia do ecossistema. Não se vende e não é token — só se ganha." },
-        { icon: "🃏", t: "Jogue DOFFA Crazy 8", d: "Gaste Grãos em partidas do jogo de cartas DOFFA Crazy 8." },
+        { icon: "🎮", t: "Jogue DOFFA Defense", d: "Gaste Grãos em partidas do jogo de ação da marca: limpe salas, derrote chefes e complete capítulos." },
         { icon: "🏆", t: "Vença", d: "Vitórias dão a recompensa real — $DOFFA do Reward Vault limitado." },
         { icon: "💰", t: "Resgate a recompensa", d: "O botão «Resgatar recompensa» vincula $DOFFA à sua carteira Solana." },
       ],
@@ -2173,8 +2173,8 @@ export const dict: Record<Lang, Dict> = {
       vaultSupplyLabel: "Emissão total",
       vaultShareLabel: "Parcela da emissão",
       claimTitle: "Resgate a recompensa",
-      claimNote: "Venceu no DOFFA Crazy 8? Toque em «Resgatar recompensa» no jogo — o $DOFFA fica vinculado à sua carteira como pedido de pagamento na Solana.",
-      playCta: "Jogar DOFFA Crazy 8",
+      claimNote: "Completou um capítulo no DOFFA Defense? Toque em «Resgatar recompensa» no jogo — o $DOFFA fica vinculado à sua carteira como pedido de pagamento na Solana.",
+      playCta: "Jogar DOFFA Defense",
       downloadCta: "Baixar o jogo",
     },
     verify: {
@@ -2308,7 +2308,7 @@ export const dict: Record<Lang, Dict> = {
       items: [
         { q: "É uma meme coin?", a: "Não. Por trás do token há uma cafeteria de montanha real e uma economia de jogo viva. $DOFFA se ganha jogando, não é distribuído por hype." },
         { q: "O que são Grãos?", a: "Grãos é a energia interna do jogo. Ganha-se tocando e jogando partidas dentro do jogo; não se vende e não é token." },
-        { q: "Como consigo $DOFFA?", a: "Vença partidas de DOFFA Crazy 8 e toque em «Resgatar recompensa» — o $DOFFA do Reward Vault fica vinculado à sua carteira Solana." },
+        { q: "Como consigo $DOFFA?", a: "Complete capítulos no DOFFA Defense e toque em «Resgatar recompensa» — o $DOFFA do Reward Vault fica vinculado à sua carteira Solana." },
         { q: "Onde ficam meus tokens?", a: "Só na sua própria carteira (Phantom / Solflare). O site e o jogo nunca guardam seus fundos." },
         { q: "É um investimento?", a: "Não. Não prometemos lucro nem damos conselhos financeiros. Participe pelo projeto, pelo jogo e pelo café." },
       ],
@@ -2381,7 +2381,7 @@ export const dict: Record<Lang, Dict> = {
       steps: [
         { icon: "👆", t: "Tocca e accumula Chicchi", d: "Tocca dentro il gioco DOFFA e guadagna Chicchi — l’energia interna di gioco." },
         { icon: "☕", t: "Accumula Chicchi", d: "I Chicchi sono l’energia dell’ecosistema. Non in vendita e non un token: si guadagnano soltanto." },
-        { icon: "🃏", t: "Gioca a DOFFA Crazy 8", d: "Spendi i Chicchi nelle partite del gioco di carte DOFFA Crazy 8." },
+        { icon: "🎮", t: "Gioca a DOFFA Defense", d: "Spendi i Chicchi nelle partite del gioco d’azione del brand: ripulisci le stanze, sconfiggi i boss e completa i capitoli." },
         { icon: "🏆", t: "Vinci", d: "Le vittorie danno la ricompensa vera — $DOFFA dal Reward Vault limitato." },
         { icon: "💰", t: "Ritira la ricompensa", d: "Il pulsante «Ritira la ricompensa» collega $DOFFA al tuo wallet Solana." },
       ],
@@ -2392,8 +2392,8 @@ export const dict: Record<Lang, Dict> = {
       vaultSupplyLabel: "Emissione totale",
       vaultShareLabel: "Quota dell’emissione",
       claimTitle: "Ritira la ricompensa",
-      claimNote: "Hai vinto a DOFFA Crazy 8? Premi «Ritira la ricompensa» nel gioco: il $DOFFA viene collegato al tuo wallet come richiesta di pagamento su Solana.",
-      playCta: "Gioca a DOFFA Crazy 8",
+      claimNote: "Hai completato un capitolo di DOFFA Defense? Premi «Ritira la ricompensa» nel gioco: il $DOFFA viene collegato al tuo wallet come richiesta di pagamento su Solana.",
+      playCta: "Gioca a DOFFA Defense",
       downloadCta: "Scarica il gioco",
     },
     verify: {
@@ -2527,7 +2527,7 @@ export const dict: Record<Lang, Dict> = {
       items: [
         { q: "È una meme coin?", a: "No. Dietro il token ci sono una vera caffetteria di montagna e un’economia di gioco viva. Il $DOFFA si guadagna giocando, non si regala per hype." },
         { q: "Cosa sono i Chicchi?", a: "I Chicchi sono l’energia interna di gioco. Si guadagnano toccando e giocando partite dentro il gioco; non in vendita e non token." },
-        { q: "Come ottengo $DOFFA?", a: "Vinci le partite di DOFFA Crazy 8 e premi «Ritira la ricompensa»: il $DOFFA del Reward Vault viene collegato al tuo wallet Solana." },
+        { q: "Come ottengo $DOFFA?", a: "Completa i capitoli di DOFFA Defense e premi «Ritira la ricompensa»: il $DOFFA del Reward Vault viene collegato al tuo wallet Solana." },
         { q: "Dove sono conservati i miei token?", a: "Solo nel tuo wallet personale (Phantom / Solflare). Il sito e il gioco non custodiscono mai i tuoi fondi." },
         { q: "È un investimento?", a: "No. Non promettiamo profitti e non diamo consigli finanziari. Partecipa per il progetto, il gioco e il caffè." },
       ],
@@ -2600,7 +2600,7 @@ export const dict: Record<Lang, Dict> = {
       steps: [
         { icon: "👆", t: "タップして ビーンズ を貯める", d: "DOFFA ゲーム内でタップして ビーンズ を稼ぐ——内部ゲームエネルギー。" },
         { icon: "☕", t: "ビーンズ を貯める", d: "ビーンズ はエコシステムのエネルギー。販売されずトークンでもない——稼ぐだけ。" },
-        { icon: "🃏", t: "DOFFA Crazy 8 で遊ぶ", d: "ビーンズ を使ってブランドカードゲーム DOFFA Crazy 8 の対戦へ。" },
+        { icon: "🎮", t: "DOFFA Defense で遊ぶ", d: "ビーンズ を使ってブランドアクションゲーム DOFFA Defense のランへ。部屋をクリアし、ボスを倒し、章を制覇しよう。" },
         { icon: "🏆", t: "勝つ", d: "勝利には本物の報酬——限定 Reward Vault からの $DOFFA。" },
         { icon: "💰", t: "報酬を受け取る", d: "「報酬を受け取る」ボタンで $DOFFA が Solana ウォレットに紐づきます。" },
       ],
@@ -2611,8 +2611,8 @@ export const dict: Record<Lang, Dict> = {
       vaultSupplyLabel: "総発行量",
       vaultShareLabel: "発行量に占める割合",
       claimTitle: "報酬を受け取る",
-      claimNote: "DOFFA Crazy 8 で勝った？ ゲーム内で「報酬を受け取る」を押すと、$DOFFA が Solana への支払い申請としてウォレットに紐づきます。",
-      playCta: "DOFFA Crazy 8 で遊ぶ",
+      claimNote: "DOFFA Defense で章をクリアした？ ゲーム内で「報酬を受け取る」を押すと、$DOFFA が Solana への支払い申請としてウォレットに紐づきます。",
+      playCta: "DOFFA Defense で遊ぶ",
       downloadCta: "ゲームをダウンロード",
     },
     verify: {
@@ -2746,7 +2746,7 @@ export const dict: Record<Lang, Dict> = {
       items: [
         { q: "これはミームコイン？", a: "いいえ。トークンの背後には実在の山のカフェと生きたゲーム経済があります。$DOFFA はゲームで稼ぐもので、話題づくりの配布ではありません。" },
         { q: "ビーンズ とは？", a: "ビーンズ は内部ゲームエネルギー。ゲーム内のタップと対戦で稼ぎます。販売されずトークンでもありません。" },
-        { q: "$DOFFA の入手方法は？", a: "DOFFA Crazy 8 の対戦に勝ち「報酬を受け取る」を押すと、Reward Vault の $DOFFA があなたの Solana ウォレットに紐づきます。" },
+        { q: "$DOFFA の入手方法は？", a: "DOFFA Defense の章をクリアして「報酬を受け取る」を押すと、Reward Vault の $DOFFA があなたの Solana ウォレットに紐づきます。" },
         { q: "トークンはどこに保管される？", a: "あなた自身のウォレット（Phantom / Solflare）だけです。サイトもゲームも資金を預かりません。" },
         { q: "これは投資？", a: "いいえ。利益は約束せず、金融アドバイスも行いません。プロジェクトとゲームとコーヒーのために参加してください。" },
       ],

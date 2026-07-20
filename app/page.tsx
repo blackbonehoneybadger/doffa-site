@@ -20,7 +20,7 @@ const DEFAULT_HERO_VIDEO = "/brand/hero.mp4";
 
 // Reward Vault — выделенный запас $DOFFA на игровые награды (1% эмиссии).
 const REWARD_VAULT = 1_000_000;
-// Игра DOFFA Crazy 8 (веб-версия).
+// Игра DOFFA Defense (веб-версия).
 const GAME_URL = "https://zapisnoy-kozel.vercel.app";
 
 /* ---------- helpers ---------- */

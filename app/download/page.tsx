@@ -2,15 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Скачать · DOFFA Crazy 8",
+  title: "Скачать · DOFFA Defense",
   description:
-    "Играй в DOFFA Crazy 8 в браузере, установи PWA или скачай APK. Зарабатывай зёрна и получай $DOFFA на Solana-кошелёк.",
+    "Играй в DOFFA Defense в браузере или установи PWA. Зарабатывай зёрна и получай $DOFFA на Solana-кошелёк.",
 };
 
 const GAME_URL = "https://zapisnoy-kozel.vercel.app";
-const APK_URL = "https://github.com/blackbonehoneybadger/zapisnoy-kozel/releases";
 
-// Страница «Скачать»: игра DOFFA Crazy 8. Статическая, вне клиентского
+// Страница «Скачать»: игра DOFFA Defense. Статическая, вне клиентского
 // словаря — RU-основной текст с EN-подстрочником, стиль сайта.
 export default function DownloadPage() {
   return (
@@ -23,21 +22,22 @@ export default function DownloadPage() {
         Скачать
         <br />
         <span className="bg-gradient-to-r from-gold via-amber to-copper bg-clip-text text-transparent">
-          DOFFA Crazy 8
+          DOFFA Defense
         </span>
       </h1>
       <p className="mt-6 max-w-2xl text-lg leading-relaxed text-cream/75">
-        Фирменная карточная игра экосистемы DOFFA. Зарабатывай зёрна, побеждай и
-        забирай награду в $DOFFA на свой Solana-кошелёк.
+        Фирменная action-игра экосистемы DOFFA: зачищай комнаты, побеждай
+        боссов и проходи главы. Зарабатывай зёрна и забирай награду в $DOFFA
+        на свой Solana-кошелёк.
       </p>
       <p className="mt-1 text-sm text-cream/40">
-        The DOFFA ecosystem card game — earn beans, win, claim $DOFFA to your Solana wallet.
+        The DOFFA ecosystem action game — clear rooms, beat bosses, complete chapters, and claim $DOFFA to your Solana wallet.
       </p>
 
       <div className="mt-12 grid gap-6 sm:grid-cols-2">
         {/* Веб-версия / PWA */}
         <div className="card flex flex-col rounded-3xl p-8">
-          <span className="text-3xl">🃏</span>
+          <span className="text-3xl">🎮</span>
           <h2 className="display mt-4 text-2xl font-bold text-cream-soft">Играть в браузере</h2>
           <p className="mt-2 flex-1 text-sm leading-relaxed text-cream/65">
             Открой игру на телефоне или компьютере — без установки. Добавь на
@@ -53,21 +53,22 @@ export default function DownloadPage() {
           </a>
         </div>
 
-        {/* Android APK */}
+        {/* Android */}
         <div className="card flex flex-col rounded-3xl p-8">
           <span className="text-3xl">🤖</span>
-          <h2 className="display mt-4 text-2xl font-bold text-cream-soft">Android APK</h2>
+          <h2 className="display mt-4 text-2xl font-bold text-cream-soft">Android</h2>
           <p className="mt-2 flex-1 text-sm leading-relaxed text-cream/65">
-            Нативное приложение для Android. Скачай последний APK из релизов на
-            GitHub — приложение обновляется само при каждом деплое.
+            Нативное Android-приложение DOFFA Defense пока в разработке. А
+            сейчас просто открой игру в браузере телефона и добавь её на экран
+            «Домой» — она работает как приложение (PWA).
           </p>
           <a
-            href={APK_URL}
+            href={GAME_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-6 inline-flex w-fit items-center gap-2 rounded-full border border-cream/30 px-7 py-3 font-semibold text-cream transition hover:border-gold hover:text-gold"
           >
-            Скачать APK ↗
+            Играть в браузере ↗
           </a>
         </div>
       </div>
