@@ -17,7 +17,7 @@ import { Assistant } from "./assistant";
 const Hero3D = dynamic(() => import("./hero3d").then((m) => m.Hero3D), { ssr: false });
 
 // Дефолтный ролик в hero, пока владелец кофейни не загрузил свои через /admin.
-const DEFAULT_HERO_VIDEO = "/brand/hero.mp4";
+const DEFAULT_HERO_VIDEO = "/brand/doffa-clip.mp4";
 
 // Reward Vault — выделенный запас $DOFFA на игровые награды (1% эмиссии).
 const REWARD_VAULT = 1_000_000;
@@ -444,7 +444,7 @@ export default function Home() {
         <MouseParallax strength={-10} className="pointer-events-none absolute -right-32 bottom-0 h-80 w-80">
           <div className="glow-pulse h-80 w-80 rounded-full bg-teal/15 blur-[110px]" style={{ animationDelay: "2s" }} />
         </MouseParallax>
-        <Hero3D className="absolute right-6 top-24 hidden h-40 w-40 sm:block sm:h-52 sm:w-52" />
+        <Hero3D className="absolute right-3 top-20 h-32 w-32 sm:right-6 sm:top-24 sm:h-52 sm:w-52" />
         {/* эффект пара */}
         <div className="steam" />
         <div className="steam s2" />

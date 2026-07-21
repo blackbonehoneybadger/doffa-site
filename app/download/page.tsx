@@ -5,7 +5,7 @@ import { ECOSYSTEM } from "../config/ecosystem";
 export const metadata: Metadata = {
   title: "Скачать · DOFFA Games — Bean Duel",
   description:
-    "Играй в DOFFA Bean Duel в браузере или на Android. Собирай зёрна, входи в короткие дуэли и забирай подтверждённые награды $DOFFA на Solana-кошелёк.",
+    "Играй в DOFFA Bean Duel в браузере или на Android. Собирай зёрна, проходи забеги с волнами врагов и забирай подтверждённые награды $DOFFA на Solana-кошелёк.",
   alternates: { canonical: "/download" },
 };
 
@@ -32,11 +32,11 @@ export default function DownloadPage() {
       </h1>
       <p className="mt-6 max-w-2xl text-lg leading-relaxed text-cream/75">
         Главная игра — <b className="text-cream-soft">{ECOSYSTEM.primaryGameName}</b>. Собирай
-        зёрна во встроенной тапалке, входи в короткие дуэли и забирай подтверждённые
+        зёрна во встроенной тапалке, проходи забеги с волнами врагов и забирай подтверждённые
         награды в $DOFFA на свой Solana-кошелёк.
       </p>
       <p className="mt-1 text-sm text-cream/40">
-        {ECOSYSTEM.productName} — collect Beans, enter short {ECOSYSTEM.primaryGameName} matches,
+        {ECOSYSTEM.productName} — collect Beans, clear {ECOSYSTEM.primaryGameName} runs,
         claim verified $DOFFA rewards to your Solana wallet.
       </p>
 
@@ -96,7 +96,7 @@ export default function DownloadPage() {
       </div>
 
       <p className="mt-8 text-center text-xs text-cream/40">
-        Награда $DOFFA поступает из Reward Vault после подтверждённой победы, а не за простой тап
+        Награда $DOFFA поступает из Reward Vault после подтверждённого прохождения забега, а не за простой тап
         или тренировочный режим. Ссылки и APK публикуются только после проверки.
       </p>
 
