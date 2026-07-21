@@ -17,6 +17,15 @@ export const metadata: Metadata = {
 
 const GAME = ECOSYSTEM.primaryGameName;
 
+// Арты игры (сгенерированы в фирменной палитре). Пока хостятся на CDN
+// Higgsfield; после добавления файлов в public/brand/game/ пути заменить.
+const ART = {
+  keyart: "https://d8j0ntlcm91z4.cloudfront.net/user_2wpHpzXpvrW7bw4za2Omx4tlMCc/hf_20260721_160205_cba50725-fd73-42e1-ab09-58afd6d4ec1c.png",
+  mascot: "https://d8j0ntlcm91z4.cloudfront.net/user_2wpHpzXpvrW7bw4za2Omx4tlMCc/hf_20260721_160153_8295c183-6f1f-4215-8c67-0fcc76f68103.png",
+  arena: "https://d8j0ntlcm91z4.cloudfront.net/user_2wpHpzXpvrW7bw4za2Omx4tlMCc/hf_20260721_160228_62089209-64c3-48b4-82d4-f50f8840ff06.png",
+  enemies: "https://d8j0ntlcm91z4.cloudfront.net/user_2wpHpzXpvrW7bw4za2Omx4tlMCc/hf_20260721_160243_0697ba74-848a-4854-89d4-39c1408335a3.png",
+};
+
 // Бейдж честного статуса функции. Не выдаём Planned за Live.
 function StatusBadge({ status }: { status: FeatureStatus }) {
   const tone =
@@ -108,6 +117,12 @@ export default function GamePage() {
         </Link>
       </div>
 
+      {/* KEY ART */}
+      <div className="mt-10 overflow-hidden rounded-3xl ring-1 ring-gold/20">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={ART.keyart} alt={`${GAME} — арт: маскот-чашка отбивается от волн врагов на арене`} className="w-full" loading="lazy" />
+      </div>
+
       {/* МЕХАНИКА */}
       <section className="mt-20">
         <Kicker>Механика</Kicker>
@@ -120,6 +135,10 @@ export default function GamePage() {
             </li>
           ))}
         </ul>
+        <div className="mt-6 overflow-hidden rounded-3xl ring-1 ring-white/10">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={ART.arena} alt="Арена забега: деревянный помост кофейни с мешками зёрен и горами на фоне" className="w-full" loading="lazy" />
+        </div>
       </section>
 
       {/* СПОСОБНОСТИ */}
@@ -166,10 +185,24 @@ export default function GamePage() {
             </p>
           </div>
           <div className="flex items-center justify-center">
-            <div className="relative flex h-44 w-44 items-center justify-center rounded-full bg-gradient-to-br from-espresso-deep/60 to-ink/60 ring-1 ring-gold/20">
-              <span className="text-7xl" aria-hidden>🦵☕</span>
+            <div className="relative h-56 w-56 overflow-hidden rounded-3xl ring-1 ring-gold/25 sm:h-64 sm:w-64">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={ART.mascot} alt="Маскот DOFFA — чашка с ножками в кедах метает кофейное зерно" className="h-full w-full object-cover" loading="lazy" />
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ПРОТИВНИКИ */}
+      <section className="mt-20">
+        <Kicker>Противники</Kicker>
+        <h2 className="display mt-4 text-3xl font-bold text-cream-soft sm:text-4xl">Кто встретится в забеге</h2>
+        <p className="mt-3 max-w-2xl text-sm text-cream/60">
+          Сахарные кубики, злые стаканчики и пережаренные зёрна — концепт-превью противников.
+        </p>
+        <div className="mt-6 overflow-hidden rounded-3xl ring-1 ring-white/10">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={ART.enemies} alt="Концепт врагов: сахарный кубик, злой бумажный стаканчик и пережаренное зерно" className="w-full" loading="lazy" />
         </div>
       </section>
 
