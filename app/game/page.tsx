@@ -5,7 +5,7 @@ import { ECOSYSTEM, STATUS_LABEL_RU, type FeatureStatus } from "../config/ecosys
 export const metadata: Metadata = {
   title: "DOFFA Bean Duel — DOFFA Games",
   description:
-    "DOFFA Bean Duel — динамичный соло-забег в стиле Archero. Собирай зёрна, проходи волны врагов движением, уклонением и способностями и забирай подтверждённые награды $DOFFA. Без ставок.",
+    "DOFFA Bean Duel — динамичный соло-забег. Собирай зёрна, проходи волны врагов движением, уклонением и способностями и забирай подтверждённые награды $DOFFA. Без ставок.",
   alternates: { canonical: "/game" },
   openGraph: {
     title: "DOFFA Bean Duel — DOFFA Games",
@@ -53,7 +53,7 @@ const ABILITIES: { icon: string; name: string; desc: string; status: FeatureStat
 
 const MECHANICS: string[] = [
   "Соло-забег: волны врагов сменяют друг друга, забег короткий.",
-  "Персонаж атакует автоматически, когда стоит на месте — ты управляешь движением и уклонением (механика в стиле Archero).",
+  "Персонаж атакует автоматически, когда стоит на месте — ты управляешь движением и уклонением.",
   "Между волнами выбираешь усиление — каждый забег складывается по-своему.",
   "Зёрна используются только как входной билет и списываются системой после входа.",
   "За подтверждённое прохождение забега можно получить DOFFA из общего фонда наград (Reward Vault).",
@@ -82,7 +82,7 @@ export default function GamePage() {
         <span className="bg-gradient-to-r from-gold via-amber to-copper bg-clip-text text-transparent">{GAME}</span>
       </h1>
       <p className="mt-6 max-w-2xl text-lg leading-relaxed text-cream/75">
-        Динамичный соло-забег в стиле Archero: волны врагов, движение, уклонение и
+        Динамичный соло-забег: волны врагов, движение, уклонение и
         способности фирменного персонажа DOFFA — <b className="text-cream-soft">без ставок</b>.
       </p>
       <div className="mt-8 flex flex-wrap items-center gap-4">

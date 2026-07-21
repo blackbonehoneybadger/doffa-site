@@ -229,9 +229,6 @@ export default function Home() {
                 </button>
               ),
             )}
-            <Link href="/game" className="text-xs text-cream/70 transition hover:text-gold xl:text-sm">
-              Bean Duel
-            </Link>
             <Link href="/transparency" className="text-xs text-cream/70 transition hover:text-gold xl:text-sm">
               {TRANSPARENCY_LABEL[lang] ?? "Transparency"}
             </Link>
@@ -361,7 +358,7 @@ export default function Home() {
                     key={t.id}
                     href="/merch"
                     onClick={() => setMenuOpen(false)}
-                    className="rounded-lg px-3 py-2 text-sm text-cream/75 transition hover:bg-white/5 hover:text-gold"
+                    className="block rounded-lg px-3 py-2 text-left text-sm text-cream/75 transition hover:bg-white/5 hover:text-gold"
                   >
                     {t.label}
                   </Link>
@@ -372,7 +369,7 @@ export default function Home() {
                       setActiveTab(t.id);
                       setMenuOpen(false);
                     }}
-                    className={`rounded-lg px-3 py-2 text-sm transition ${
+                    className={`rounded-lg px-3 py-2 text-left text-sm transition ${
                       activeTab === t.id
                         ? "bg-gold/20 font-semibold text-gold"
                         : "text-cream/75 hover:bg-white/5 hover:text-gold"
@@ -383,30 +380,23 @@ export default function Home() {
                 ),
               )}
               <Link
-                href="/game"
-                onClick={() => setMenuOpen(false)}
-                className="rounded-lg px-3 py-2 text-sm text-cream/75 transition hover:bg-white/5 hover:text-gold"
-              >
-                Bean Duel
-              </Link>
-              <Link
                 href="/transparency"
                 onClick={() => setMenuOpen(false)}
-                className="rounded-lg px-3 py-2 text-sm text-cream/75 transition hover:bg-white/5 hover:text-gold"
+                className="block rounded-lg px-3 py-2 text-left text-sm text-cream/75 transition hover:bg-white/5 hover:text-gold"
               >
                 {TRANSPARENCY_LABEL[lang] ?? "Transparency"}
               </Link>
               <Link
                 href="/download"
                 onClick={() => setMenuOpen(false)}
-                className="rounded-lg px-3 py-2 text-sm font-semibold text-gold hover:bg-gold/10"
+                className="block rounded-lg px-3 py-2 text-left text-sm font-semibold text-gold hover:bg-gold/10"
               >
                 {t.tabs.download} ↓
               </Link>
               <Link
                 href="/profile"
                 onClick={() => setMenuOpen(false)}
-                className="rounded-lg px-3 py-2 text-sm text-cream/75 hover:bg-white/5 hover:text-gold"
+                className="block rounded-lg px-3 py-2 text-left text-sm text-cream/75 hover:bg-white/5 hover:text-gold"
               >
                 {t.tabs.profile}
               </Link>
