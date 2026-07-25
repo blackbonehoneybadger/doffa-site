@@ -124,6 +124,7 @@ export function Hero3D({ className = "" }: { className?: string }) {
     let frameId = 0;
     let renderer: InstanceType<ThreeModule["WebGLRenderer"]> | null = null;
     let scrollTween: ReturnType<GsapModule["to"]> | null = null;
+    let resizeObserver: ResizeObserver | null = null;
     const disposables: { dispose: () => void }[] = [];
 
     (async () => {
@@ -145,6 +146,15 @@ export function Hero3D({ className = "" }: { className?: string }) {
       renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
       renderer.setSize(size, size);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      // Размер контейнера задан в vw, поэтому пересчитываем канвас при ресайзе
+      // и повороте телефона — иначе бутылка осталась бы размытой или обрезанной.
+      resizeObserver = new ResizeObserver(([entry]) => {
+        const next = Math.round(entry.contentRect.width);
+        if (!renderer || next <= 0) return;
+        renderer.setSize(next, next);
+      });
+      resizeObserver.observe(container);
       renderer.domElement.style.display = "block";
       container.appendChild(renderer.domElement);
 
@@ -167,7 +177,9 @@ export function Hero3D({ className = "" }: { className?: string }) {
       const glassGeo = new THREE.LatheGeometry(pts, 48);
       const glassMat = new THREE.MeshStandardMaterial({
         color: 0xdfeae6, roughness: 0.12, metalness: 0.0,
-        transparent: true, opacity: 0.28, depthWrite: false,
+        // 0.44, а не 0.28: тонкое горлышко (радиус 0.17) при большем размере
+        // почти пропадало на тёмном видео, и крышка выглядела висящей отдельно.
+        transparent: true, opacity: 0.44, depthWrite: false,
       });
       const glass = new THREE.Mesh(glassGeo, glassMat);
       glass.renderOrder = 2;
@@ -201,20 +213,30 @@ export function Hero3D({ className = "" }: { className?: string }) {
       bottle.add(cap);
       disposables.push(capGeo, capMat);
 
-      // Центрируем и масштабируем бутылку.
-      const SCALE = 0.62;
+      // Центрируем и масштабируем бутылку. SCALE подобран так, чтобы бутылка
+      // занимала почти всю высоту кадра (полная высота с крышкой — 2.55 в
+      // локальных единицах, половина кадра камеры на z=0 — 1.408): 0.95 даёт
+      // максимум без обрезки верха и низа.
+      const SCALE = 0.95;
       bottle.scale.setScalar(SCALE);
       bottle.position.y = -1.2 * SCALE;
       scene.add(bottle);
 
       // Текст-кольцо вокруг бутылки.
       const ringTex = makeRingTexture(THREE);
-      const ringGeo = new THREE.CylinderGeometry(0.62, 0.62, 0.22, 64, 1, true);
+      // Радиус кольца растёт вслед за бутылкой (её радиус теперь 0.52 × SCALE),
+      // иначе текст прошёл бы сквозь стекло.
+      const ringGeo = new THREE.CylinderGeometry(0.78, 0.78, 0.3, 64, 1, true);
       const ringMat = new THREE.MeshBasicMaterial({
-        map: ringTex, transparent: true, side: THREE.DoubleSide, depthWrite: false,
+        // FrontSide, а не DoubleSide: при depthWrite:false дальняя стенка
+        // цилиндра рисовалась поверх ближней зеркально — на крупной бутылке
+        // буквы наезжали друг на друга. Видна только ближняя половина кольца.
+        map: ringTex, transparent: true, side: THREE.FrontSide, depthWrite: false,
       });
       const ring = new THREE.Mesh(ringGeo, ringMat);
-      ring.position.y = -0.15;
+      // Ниже этикетки: та занимает world -0.67…0.10, кольцо на -0.90 не режет
+      // «COLD BREW» и не сваливается за дно бутылки (world -1.14).
+      ring.position.y = -0.9;
       scene.add(ring);
       disposables.push(ringGeo, ringMat, ringTex);
 
@@ -243,6 +265,7 @@ export function Hero3D({ className = "" }: { className?: string }) {
     return () => {
       cancelled = true;
       cancelAnimationFrame(frameId);
+      resizeObserver?.disconnect();
       scrollTween?.scrollTrigger?.kill();
       scrollTween?.kill();
       for (const d of disposables) d.dispose();

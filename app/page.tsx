@@ -434,7 +434,11 @@ export default function Home() {
         <MouseParallax strength={-10} className="pointer-events-none absolute -right-32 bottom-0 h-80 w-80">
           <div className="glow-pulse h-80 w-80 rounded-full bg-teal/15 blur-[110px]" style={{ animationDelay: "2s" }} />
         </MouseParallax>
-        <Hero3D className="absolute right-3 top-20 h-32 w-32 sm:right-6 sm:top-24 sm:h-52 sm:w-52" />
+        {/* Бутылка сильно крупнее: канвас квадратный, сама бутылка занимает
+            центральную треть его ширины — поэтому отрицательный right уводит за
+            край только пустое поле канваса, а не саму бутылку. Текст hero идёт
+            дальше по DOM и остаётся поверх. */}
+        <Hero3D className="absolute right-0 top-2 h-[64vw] w-[64vw] sm:-right-6 sm:top-20 sm:h-[28rem] sm:w-[28rem] lg:-right-8 lg:top-16 lg:h-[40rem] lg:w-[40rem]" />
         {/* эффект пара */}
         <div className="steam" />
         <div className="steam s2" />
