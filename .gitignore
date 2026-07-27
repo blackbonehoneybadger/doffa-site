@@ -32,6 +32,11 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# Шаблоны без значений — их коммитить нужно, иначе инструкция «скопируй
+# .env.example в .env» отсылает к файлу, которого нет в репозитории.
+# Настоящие секреты живут в .env / .env.local и остаются игнорируемыми.
+!.env.example
+!**/.env.example
 
 # vercel
 .vercel
