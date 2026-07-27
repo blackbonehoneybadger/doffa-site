@@ -22,8 +22,18 @@ const WeatherChip = dynamic(() => import("./WeatherChip").then((m) => m.WeatherC
 // Дефолтный ролик в hero, пока владелец кофейни не загрузил свои через /admin.
 const DEFAULT_HERO_VIDEO = "/brand/doffa-clip.mp4";
 
-// Reward Vault — выделенный запас $DOFFA на игровые награды (1% эмиссии).
-const REWARD_VAULT = 1_000_000;
+// Reward Vault — назначенный запас $DOFFA на игровые награды. Берётся из
+// централизованной конфигурации, а не из отдельной константы: прежний фонд
+// утерян, и хардкод «1 000 000» здесь показывал бы несуществующий запас.
+// 0 означает «фонд не назначен» — тогда вместо цифр ставим прочерк.
+const REWARD_VAULT = ECOSYSTEM.rewardVault.initial;
+
+/** Доля фонда в эмиссии. «—», пока фонд не назначен. */
+function vaultSharePct(loc: string): string {
+  if (REWARD_VAULT <= 0) return "—";
+  const pct = (REWARD_VAULT / ECOSYSTEM.token.totalSupply) * 100;
+  return `${pct.toLocaleString(loc, { maximumFractionDigits: 2 })}%`;
+}
 // Публичная игра — DOFFA Bean Duel. Ссылка на веб-версию берётся из
 // централизованной конфигурации (env NEXT_PUBLIC_GAME_WEB_URL). Пока не задана —
 // не показываем фальшивую ссылку, кнопка ведёт на /game со статусом.
@@ -666,9 +676,17 @@ export default function Home() {
                       </span>
                     </div>
                     <div className="mt-6 grid gap-5 sm:grid-cols-3">
-                      <Stat label={t.flow.vaultAmountLabel} value={REWARD_VAULT.toLocaleString(loc)} unit={TOKEN.symbol} accent />
+                      {/* Прочерк, пока фонд не назначен: показать здесь сумму
+                          прежнего фонда значило бы обещать выплаты из кошелька,
+                          доступ к которому утерян. Пояснение — в vaultNote ниже. */}
+                      <Stat
+                        label={t.flow.vaultAmountLabel}
+                        value={REWARD_VAULT > 0 ? REWARD_VAULT.toLocaleString(loc) : "—"}
+                        unit={REWARD_VAULT > 0 ? TOKEN.symbol : undefined}
+                        accent
+                      />
                       <Stat label={t.flow.vaultSupplyLabel} value={REAL.initialSupply.toLocaleString(loc)} unit={TOKEN.symbol} />
-                      <Stat label={t.flow.vaultShareLabel} value="1%" />
+                      <Stat label={t.flow.vaultShareLabel} value={vaultSharePct(loc)} />
                     </div>
                     <p className="mt-6 text-center text-xs leading-relaxed text-cream/50">{t.flow.vaultNote}</p>
                     <div className="mt-3 text-center">

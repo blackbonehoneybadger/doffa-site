@@ -74,6 +74,12 @@ export default async function TransparencyPage() {
   const vaultStatus: FeatureStatus =
     vaultBalance !== null ? "live" : ECOSYSTEM.status.rewardVault;
 
+  // И для DEX-пула. Котировка у токена появляется только при наличии пула
+  // ликвидности, поэтому полученная цена — доказательство, что пул создан.
+  // Ставить статус вручную не нужно: сайт узнает об этом сам.
+  const dexStatus: FeatureStatus =
+    prices.doffaUsd !== null ? "live" : ECOSYSTEM.status.dex;
+
   const authoritiesRevoked =
     authorities !== null &&
     authorities.mintAuthority === null &&
@@ -267,7 +273,7 @@ export default async function TransparencyPage() {
             { label: "Выплата наград (claims)", status: rewardsStatus },
             { label: "Reward Vault (публичный адрес)", status: vaultStatus },
             { label: "Сжигание (on-chain burn)", status: burnStatus },
-            { label: "DEX-пул DOFFA/SOL", status: ECOSYSTEM.status.dex },
+            { label: "DEX-пул DOFFA/SOL", status: dexStatus },
             { label: "Android APK", status: ECOSYSTEM.status.android },
           ].map((r) => (
             <div key={r.label} className="flex items-center justify-between bg-white/[0.02] px-5 py-3">
@@ -361,7 +367,7 @@ export default async function TransparencyPage() {
           ) : (
             <p className="mt-2 text-sm leading-relaxed text-cream/70">
               У $DOFFA пока нет рыночной цены: пул ликвидности на DEX не создан
-              (статус — «{STATUS_LABEL_RU[ECOSYSTEM.status.dex]}»). Как только пул
+              (статус — «{STATUS_LABEL_RU[dexStatus]}»). Как только пул
               появится, котировка будет подтягиваться сюда автоматически.
             </p>
           )}
