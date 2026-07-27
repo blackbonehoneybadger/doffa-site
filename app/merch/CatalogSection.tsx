@@ -8,11 +8,23 @@ import {
   type CatalogFilters,
 } from "../lib/merch/catalog";
 import { formatPrice } from "../lib/merch/format";
+import { convertMinor, getRates, type Rates } from "../lib/external/fx";
 import { PRODUCT_STATUS_LABEL, type ProductStatus } from "../config/merch";
 
 const field =
   "mt-1 w-full rounded-lg border border-white/12 bg-ink/40 px-3 py-2 text-sm text-cream outline-none transition focus:border-gold/50";
 const labelCls = "block text-[11px] font-semibold uppercase tracking-wider text-cream/45";
+
+// Приблизительный эквивалент цены в другой валюте. Настоящая цена — та, что
+// указал продавец; эта строка справочная, поэтому со знаком «≈» и мелким
+// шрифтом. Нет курса — нет строки.
+function ApproxPrice({ cents, currency, rates }: { cents: number; currency: string; rates: Rates | null }) {
+  if (!rates) return null;
+  const target = currency.toUpperCase() === "USD" ? "EUR" : "USD";
+  const converted = convertMinor(cents, currency, target, rates);
+  if (converted === null) return null;
+  return <span className="text-[11px] text-cream/40">≈ {formatPrice(converted, target)}</span>;
+}
 
 function StatusPill({ status }: { status: string }) {
   const s = status as ProductStatus;
@@ -31,10 +43,13 @@ export default async function CatalogSection({
   searchParams: Record<string, string | string[] | undefined>;
 }) {
   const filters: CatalogFilters = { ...parseCatalogSearchParams(searchParams), perPage: PERPAGE };
-  const [{ items, total, dbAvailable }, categories, sellers] = await Promise.all([
+  const [{ items, total, dbAvailable }, categories, sellers, rates] = await Promise.all([
     listPublishedProducts(filters),
     listActiveCategories(),
     listApprovedSellers(),
+    // Курсы — вспомогательная величина: getRates() сам вернёт null, если
+    // источник недоступен, и тогда эквивалент просто не показывается.
+    getRates(),
   ]);
 
   const page = filters.page ?? 1;
@@ -157,7 +172,10 @@ export default async function CatalogSection({
                   </div>
                   {p.short_desc && <p className="mt-1.5 flex-1 text-sm leading-relaxed text-cream/60 line-clamp-2">{p.short_desc}</p>}
                   <div className="mt-3 flex items-center justify-between">
-                    <span className="display text-lg font-extrabold text-cream-soft">{formatPrice(p.price_cents, p.currency)}</span>
+                    <span className="flex items-baseline gap-1.5">
+                      <span className="display text-lg font-extrabold text-cream-soft">{formatPrice(p.price_cents, p.currency)}</span>
+                      <ApproxPrice cents={p.price_cents} currency={p.currency} rates={rates} />
+                    </span>
                     {p.accepts_doffa && <span className="rounded-full border border-gold/30 bg-gold/10 px-2 py-0.5 text-[10px] font-semibold text-gold">DOFFA</span>}
                   </div>
                   <span className="mt-1 text-[11px] text-cream/40">{p.shop_name}</span>

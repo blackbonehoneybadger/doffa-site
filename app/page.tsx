@@ -16,6 +16,9 @@ import { Assistant } from "./assistant";
 // браузере и только когда компонент реально понадобится (см. hero3d.tsx).
 const Hero3D = dynamic(() => import("./hero3d").then((m) => m.Hero3D), { ssr: false });
 
+// Погода в ауле: сама решает, показываться ли (нет данных — не рисуется).
+const WeatherChip = dynamic(() => import("./WeatherChip").then((m) => m.WeatherChip), { ssr: false });
+
 // Дефолтный ролик в hero, пока владелец кофейни не загрузил свои через /admin.
 const DEFAULT_HERO_VIDEO = "/brand/doffa-clip.mp4";
 
@@ -464,6 +467,8 @@ export default function Home() {
               <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1.5">
                 🕖 07:00–22:00
               </span>
+              {/* Появляется, только когда заданы координаты кофейни и Open-Meteo ответил. */}
+              <WeatherChip />
             </div>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Magnetic>

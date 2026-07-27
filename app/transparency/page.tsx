@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ECOSYSTEM, STATUS_LABEL_RU, type FeatureStatus } from "../config/ecosystem";
+import { getTokenPrices, formatUsd } from "../lib/external/price";
 
 export const metadata: Metadata = {
   title: "Прозрачность — Reward Vault и сжигание · DOFFA Games",
@@ -33,7 +34,8 @@ function StatusBadge({ status }: { status: FeatureStatus }) {
   );
 }
 
-export default function TransparencyPage() {
+export default async function TransparencyPage() {
+  const prices = await getTokenPrices();
   const mint = ECOSYSTEM.token.mint;
   const vault = ECOSYSTEM.rewardVault;
   const burnStatus = ECOSYSTEM.status.burn;
@@ -160,6 +162,32 @@ export default function TransparencyPage() {
           Открыть $DOFFA в Solscan ↗
         </a>
         <p className="mt-3 break-all text-[11px] text-cream/40">mint: {mint}</p>
+
+        {/* Рыночная котировка. У $DOFFA она появится только когда будет создан
+            пул ликвидности; до тех пор пишем об этом прямо, а не рисуем ноль
+            или прочерк, который можно принять за цену. */}
+        <div className="card mt-6 rounded-2xl p-5">
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-cream/45">
+            Рыночная цена
+          </p>
+          {prices.doffaUsd !== null ? (
+            <p className="display mt-2 text-2xl font-extrabold text-cream-soft">
+              {formatUsd(prices.doffaUsd)}{" "}
+              <span className="text-sm font-semibold text-cream/45">за $DOFFA</span>
+            </p>
+          ) : (
+            <p className="mt-2 text-sm leading-relaxed text-cream/70">
+              У $DOFFA пока нет рыночной цены: пул ликвидности на DEX не создан
+              (статус — «{STATUS_LABEL_RU[ECOSYSTEM.status.dex]}»). Как только пул
+              появится, котировка будет подтягиваться сюда автоматически.
+            </p>
+          )}
+          {prices.solUsd !== null && (
+            <p className="mt-3 text-[11px] text-cream/40">
+              Для ориентира, SOL: {formatUsd(prices.solUsd)} · источник Jupiter, обновление раз в 5 минут
+            </p>
+          )}
+        </div>
       </section>
 
       <div className="mt-16 flex flex-wrap justify-center gap-6 text-center">
