@@ -2,6 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ECOSYSTEM, STATUS_LABEL_RU, type FeatureStatus } from "../config/ecosystem";
 import { getTokenPrices, formatUsd } from "../lib/external/price";
+import {
+  burnedFromSupply,
+  getMintAuthorities,
+  getSupply,
+  getTokenBalance,
+} from "../lib/solana/chain";
+
+/** Заявленная первоначальная эмиссия $DOFFA — от неё считается объём сжигания. */
+const TOTAL_EMISSION = 100_000_000;
 
 export const metadata: Metadata = {
   title: "Прозрачность — Reward Vault и сжигание · DOFFA Games",
@@ -34,13 +43,42 @@ function StatusBadge({ status }: { status: FeatureStatus }) {
   );
 }
 
+/** Число токенов для показа: без дробной части, если она нулевая. */
+function amount(n: number): string {
+  return n.toLocaleString("ru-RU", { maximumFractionDigits: n % 1 === 0 ? 0 : 2 });
+}
+
 export default async function TransparencyPage() {
-  const prices = await getTokenPrices();
   const mint = ECOSYSTEM.token.mint;
   const vault = ECOSYSTEM.rewardVault;
-  const burnStatus = ECOSYSTEM.status.burn;
   const rewardsStatus = ECOSYSTEM.status.claims;
   const initial = vault.initial.toLocaleString("ru-RU");
+
+  // Реальные данные из сети. Каждая часть независима: недоступность одной не
+  // мешает показать остальные, а null означает «не показываем ничего».
+  const [prices, supply, authorities, vaultBalance] = await Promise.all([
+    getTokenPrices(),
+    getSupply(mint),
+    getMintAuthorities(mint),
+    vault.address ? getTokenBalance(vault.address, mint) : Promise.resolve(null),
+  ]);
+
+  // Сожжено = заявленная первоначальная эмиссия минус текущая по данным сети.
+  const burned = burnedFromSupply(TOTAL_EMISSION, supply);
+
+  // Статус сжигания больше не берётся из env вслепую: если сеть показывает
+  // сожжённые токены — это Live по факту, а не по настройке.
+  const burnStatus: FeatureStatus =
+    burned !== null && burned > 0 ? "live" : ECOSYSTEM.status.burn;
+
+  // То же для фонда: адрес опубликован и баланс реально прочитан — Live.
+  const vaultStatus: FeatureStatus =
+    vaultBalance !== null ? "live" : ECOSYSTEM.status.rewardVault;
+
+  const authoritiesRevoked =
+    authorities !== null &&
+    authorities.mintAuthority === null &&
+    authorities.freezeAuthority === null;
 
   return (
     <main className="mx-auto min-h-screen max-w-4xl px-5 pb-24 pt-28">
@@ -58,7 +96,7 @@ export default async function TransparencyPage() {
       <section className="mt-14">
         <div className="flex items-center gap-3">
           <h2 className="display text-3xl font-bold text-cream-soft sm:text-4xl">Reward Vault</h2>
-          <StatusBadge status={ECOSYSTEM.status.rewardVault} />
+          <StatusBadge status={vaultStatus} />
         </div>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <div className="card rounded-2xl p-6">
@@ -67,11 +105,16 @@ export default async function TransparencyPage() {
             <p className="mt-2 text-xs text-cream/50">Выделенный запас на игровые награды (1% эмиссии).</p>
           </div>
           <div className="card rounded-2xl p-6">
-            <p className="text-xs font-semibold uppercase tracking-wider text-cream/45">Текущий баланс · распределено · сожжено</p>
-            {vault.address ? (
+            <p className="text-xs font-semibold uppercase tracking-wider text-cream/45">Текущий баланс фонда</p>
+            {vaultBalance !== null ? (
               <>
-                <p className="mt-2 text-sm leading-relaxed text-cream/70">
-                  Проверяется on-chain. Баланс и движения фонда видны в Solscan.
+                {/* Цифра прочитана из сети прямо сейчас, а не записана в конфиг. */}
+                <p className="display mt-2 text-3xl font-extrabold text-cream-soft">
+                  {amount(vaultBalance)} $DOFFA
+                </p>
+                <p className="mt-2 text-xs text-cream/50">
+                  Прочитано из блокчейна. Роздано из фонда:{" "}
+                  <b className="text-cream/70">{amount(Math.max(0, vault.initial - vaultBalance))} $DOFFA</b>.
                 </p>
                 <a
                   href={`https://solscan.io/account/${vault.address}`}
@@ -79,9 +122,15 @@ export default async function TransparencyPage() {
                   rel="noopener noreferrer"
                   className="mt-4 inline-flex w-fit items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-5 py-2 text-sm font-semibold text-gold transition hover:bg-gold/20"
                 >
-                  Открыть кошелёк в Solscan ↗
+                  Проверить в Solscan ↗
                 </a>
               </>
+            ) : vault.address ? (
+              <p className="mt-2 text-sm leading-relaxed text-cream/60">
+                Адрес фонда опубликован, но прочитать баланс из сети сейчас не удалось.
+                Показывать вместо него какое-либо число мы не будем — проверить фонд
+                можно напрямую в Solscan.
+              </p>
             ) : (
               <p className="mt-2 text-sm leading-relaxed text-cream/60">
                 Публичный адрес фонда ещё не опубликован — статус{" "}
@@ -114,15 +163,32 @@ export default async function TransparencyPage() {
               <p className="text-xs font-semibold uppercase tracking-wider text-cream/45">Сжигание</p>
               <StatusBadge status={burnStatus} />
             </div>
-            <p className="mt-3 text-sm leading-relaxed text-cream/70">
-              Сжигание выполняется проектом отдельной on-chain-операцией. Сожжённые токены
-              не поступают игрокам или в пул.
-            </p>
-            {burnStatus !== "live" && (
-              <p className="mt-3 text-[11px] leading-relaxed text-cream/50">
-                Пока нет подтверждённых on-chain-транзакций сжигания, статус остаётся{" "}
-                «{STATUS_LABEL_RU[burnStatus]}». Мы не обещаем, что сжигание уже активно.
-              </p>
+            {/* Сожжено считается как разница заявленной эмиссии и текущей по
+                данным сети: у SPL-токена сжигание уменьшает supply, а выпустить
+                новые нельзя — право mint отозвано. */}
+            {burned !== null && burned > 0 ? (
+              <>
+                <p className="display mt-3 text-3xl font-extrabold text-copper">
+                  {amount(burned)} $DOFFA
+                </p>
+                <p className="mt-2 text-xs text-cream/55">
+                  Сожжено навсегда. Считается по эмиссии в сети: было{" "}
+                  {TOTAL_EMISSION.toLocaleString("ru-RU")}, сейчас {amount(supply!.total)}.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="mt-3 text-sm leading-relaxed text-cream/70">
+                  Сжигание выполняется проектом отдельной on-chain-операцией. Сожжённые
+                  токены не поступают игрокам или в пул.
+                </p>
+                <p className="mt-3 text-[11px] leading-relaxed text-cream/50">
+                  {supply
+                    ? `Эмиссия в сети сейчас ${amount(supply.total)} — она равна первоначальной, значит подтверждённых сжиганий пока нет.`
+                    : "Прочитать эмиссию из сети сейчас не удалось, поэтому объём сжигания не показываем."}{" "}
+                  Статус — «{STATUS_LABEL_RU[burnStatus]}». Мы не обещаем, что сжигание уже активно.
+                </p>
+              </>
             )}
           </div>
         </div>
@@ -134,7 +200,7 @@ export default async function TransparencyPage() {
         <div className="mt-6 divide-y divide-white/10 overflow-hidden rounded-2xl border border-white/10">
           {[
             { label: "Выплата наград (claims)", status: rewardsStatus },
-            { label: "Reward Vault (публичный адрес)", status: ECOSYSTEM.status.rewardVault },
+            { label: "Reward Vault (публичный адрес)", status: vaultStatus },
             { label: "Сжигание (on-chain burn)", status: burnStatus },
             { label: "DEX-пул DOFFA/SOL", status: ECOSYSTEM.status.dex },
             { label: "Android APK", status: ECOSYSTEM.status.android },
@@ -162,6 +228,58 @@ export default async function TransparencyPage() {
           Открыть $DOFFA в Solscan ↗
         </a>
         <p className="mt-3 break-all text-[11px] text-cream/40">mint: {mint}</p>
+
+        {/* Данные из сети: эмиссия и права на выпуск/заморозку. Раньше сайт
+            просто утверждал, что права отозваны, — теперь это подтверждается. */}
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <div className="card rounded-2xl p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-cream/45">
+              Эмиссия в сети
+            </p>
+            {supply ? (
+              <>
+                <p className="display mt-2 text-2xl font-extrabold text-cream-soft">
+                  {amount(supply.total)} $DOFFA
+                </p>
+                <p className="mt-2 text-[11px] text-cream/45">
+                  Прочитано из блокчейна, {supply.decimals} знаков после запятой.
+                </p>
+              </>
+            ) : (
+              <p className="mt-2 text-sm text-cream/60">
+                Сейчас не удалось прочитать эмиссию из сети.
+              </p>
+            )}
+          </div>
+          <div className="card rounded-2xl p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-cream/45">
+              Права на токен
+            </p>
+            {authorities === null ? (
+              <p className="mt-2 text-sm text-cream/60">
+                Сейчас не удалось проверить права через сеть.
+              </p>
+            ) : authoritiesRevoked ? (
+              <>
+                <p className="mt-2 text-sm font-semibold text-teal">
+                  Выпуск и заморозка отозваны
+                </p>
+                <p className="mt-2 text-[11px] leading-relaxed text-cream/45">
+                  Новые токены выпустить нельзя, заморозить чужие — тоже. Проверено
+                  в сети, а не заявлено на словах.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="mt-2 text-sm font-semibold text-amber">Права ещё не отозваны</p>
+                <p className="mt-2 break-all text-[11px] leading-relaxed text-cream/45">
+                  {authorities.mintAuthority && <>выпуск: {authorities.mintAuthority}<br /></>}
+                  {authorities.freezeAuthority && <>заморозка: {authorities.freezeAuthority}</>}
+                </p>
+              </>
+            )}
+          </div>
+        </div>
 
         {/* Рыночная котировка. У $DOFFA она появится только когда будет создан
             пул ликвидности; до тех пор пишем об этом прямо, а не рисуем ноль
