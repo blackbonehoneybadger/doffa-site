@@ -9,8 +9,6 @@ import {
   getTokenBalance,
 } from "../lib/solana/chain";
 
-/** Заявленная первоначальная эмиссия $DOFFA — от неё считается объём сжигания. */
-const TOTAL_EMISSION = 100_000_000;
 
 export const metadata: Metadata = {
   title: "Прозрачность — Reward Vault и сжигание · DOFFA Games",
@@ -51,6 +49,7 @@ function amount(n: number): string {
 export default async function TransparencyPage() {
   const mint = ECOSYSTEM.token.mint;
   const vault = ECOSYSTEM.rewardVault;
+  const unreachable = ECOSYSTEM.unreachable;
   const rewardsStatus = ECOSYSTEM.status.claims;
   const initial = vault.initial.toLocaleString("ru-RU");
 
@@ -64,7 +63,7 @@ export default async function TransparencyPage() {
   ]);
 
   // Сожжено = заявленная первоначальная эмиссия минус текущая по данным сети.
-  const burned = burnedFromSupply(TOTAL_EMISSION, supply);
+  const burned = burnedFromSupply(ECOSYSTEM.token.totalSupply, supply);
 
   // Статус сжигания больше не берётся из env вслепую: если сеть показывает
   // сожжённые токены — это Live по факту, а не по настройке.
@@ -87,9 +86,11 @@ export default async function TransparencyPage() {
         Прозрачность
       </h1>
       <p className="mt-6 max-w-2xl text-lg leading-relaxed text-cream/75">
-        Награды не создаются из воздуха. Они поступают из заранее выделенного{" "}
+        Награды не создаются из воздуха — они выплачиваются из выделенного{" "}
         <b className="text-cream-soft">Reward Vault</b>. Здесь мы показываем только реальные
-        данные и честные статусы — без придуманных адресов, балансов и транзакций.
+        данные и честные статусы — без придуманных адресов, балансов и транзакций. В том
+        числе неудобные: {unreachable.amount > 0 && "часть токенов утеряна, и мы пишем об этом ниже"}
+        {unreachable.amount === 0 && "если что-то не работает, мы говорим об этом прямо"}.
       </p>
 
       {/* REWARD VAULT */}
@@ -100,9 +101,22 @@ export default async function TransparencyPage() {
         </div>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <div className="card rounded-2xl p-6">
-            <p className="text-xs font-semibold uppercase tracking-wider text-cream/45">Первоначальный фонд</p>
-            <p className="display mt-2 text-3xl font-extrabold text-cream-soft">{initial} $DOFFA</p>
-            <p className="mt-2 text-xs text-cream/50">Выделенный запас на игровые награды (1% эмиссии).</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-cream/45">Назначенный фонд</p>
+            {vault.initial > 0 ? (
+              <>
+                <p className="display mt-2 text-3xl font-extrabold text-cream-soft">{initial} $DOFFA</p>
+                <p className="mt-2 text-xs text-cream/50">Выделенный запас на игровые награды.</p>
+              </>
+            ) : (
+              <>
+                <p className="display mt-2 text-3xl font-extrabold text-cream/45">Не назначен</p>
+                <p className="mt-2 text-xs leading-relaxed text-cream/50">
+                  Прежний фонд на {unreachable.amount.toLocaleString("ru-RU")} $DOFFA утерян
+                  (см. ниже). Новый запас на награды пока не выделен — как только это
+                  произойдёт, адрес и баланс появятся здесь.
+                </p>
+              </>
+            )}
           </div>
           <div className="card rounded-2xl p-6">
             <p className="text-xs font-semibold uppercase tracking-wider text-cream/45">Текущий баланс фонда</p>
@@ -113,8 +127,16 @@ export default async function TransparencyPage() {
                   {amount(vaultBalance)} $DOFFA
                 </p>
                 <p className="mt-2 text-xs text-cream/50">
-                  Прочитано из блокчейна. Роздано из фонда:{" "}
-                  <b className="text-cream/70">{amount(Math.max(0, vault.initial - vaultBalance))} $DOFFA</b>.
+                  Прочитано из блокчейна.
+                  {vault.initial > 0 && (
+                    <>
+                      {" "}Роздано из фонда:{" "}
+                      <b className="text-cream/70">
+                        {amount(Math.max(0, vault.initial - vaultBalance))} $DOFFA
+                      </b>
+                      .
+                    </>
+                  )}
                 </p>
                 <a
                   href={`https://solscan.io/account/${vault.address}`}
@@ -140,6 +162,49 @@ export default async function TransparencyPage() {
             )}
           </div>
         </div>
+
+        {/* Утерянные токены. Это не сжигание: эмиссия в сети не изменилась.
+            Умолчать об этом нельзя — сайт обещает награды, и обещать их из
+            недоступного кошелька было бы обманом. */}
+        {unreachable.amount > 0 && (
+          <div className="card mt-4 rounded-2xl border border-amber/25 p-6">
+            <div className="flex flex-wrap items-center gap-3">
+              <p className="text-xs font-semibold uppercase tracking-wider text-amber">
+                Недоступные токены
+              </p>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber/40 bg-amber/10 px-2.5 py-0.5 text-[11px] font-semibold text-amber">
+                <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                Утеряны навсегда
+              </span>
+            </div>
+            <p className="display mt-3 text-3xl font-extrabold text-cream-soft">
+              {unreachable.amount.toLocaleString("ru-RU")} $DOFFA
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-cream/70">
+              1 июля 2026 года эта сумма была переведена с кошелька проекта на отдельный
+              адрес, который задумывался как фонд наград. Доступ к нему утерян: приватного
+              ключа нет, вернуть токены невозможно.
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-cream/70">
+              Это <b className="text-cream-soft">не сжигание</b>: токены остаются в сети, и
+              эмиссия по-прежнему {ECOSYSTEM.token.totalSupply.toLocaleString("ru-RU")}. Но
+              выплатить или продать их нельзя, поэтому фактически доступный объём —{" "}
+              <b className="text-cream-soft">
+                {ECOSYSTEM.token.effectiveSupply.toLocaleString("ru-RU")} $DOFFA
+              </b>
+              . Мы пишем об этом прямо, а не убираем цифру из отчётности.
+            </p>
+            <a
+              href={`https://solscan.io/account/${unreachable.address}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-flex w-fit items-center gap-2 rounded-full border border-cream/25 px-5 py-2 text-sm font-semibold text-cream transition hover:border-amber hover:text-amber"
+            >
+              Проверить адрес в Solscan ↗
+            </a>
+            <p className="mt-3 break-all text-[11px] text-cream/40">{unreachable.address}</p>
+          </div>
+        )}
       </section>
 
       {/* РАСПРЕДЕЛЕНИЕ И СЖИГАНИЕ */}
@@ -173,7 +238,7 @@ export default async function TransparencyPage() {
                 </p>
                 <p className="mt-2 text-xs text-cream/55">
                   Сожжено навсегда. Считается по эмиссии в сети: было{" "}
-                  {TOTAL_EMISSION.toLocaleString("ru-RU")}, сейчас {amount(supply!.total)}.
+                  {ECOSYSTEM.token.totalSupply.toLocaleString("ru-RU")}, сейчас {amount(supply!.total)}.
                 </p>
               </>
             ) : (
