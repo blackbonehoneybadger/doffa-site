@@ -176,38 +176,53 @@ export default async function TransparencyPage() {
           <div className="card mt-4 rounded-2xl border border-amber/25 p-6">
             <div className="flex flex-wrap items-center gap-3">
               <p className="text-xs font-semibold uppercase tracking-wider text-amber">
-                Недоступные токены
+                Заблокированы навсегда · вне обращения
               </p>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-amber/40 bg-amber/10 px-2.5 py-0.5 text-[11px] font-semibold text-amber">
                 <span className="h-1.5 w-1.5 rounded-full bg-current" />
-                Утеряны навсегда
+                Доступ утерян
               </span>
             </div>
             <p className="display mt-3 text-3xl font-extrabold text-cream-soft">
               {unreachable.amount.toLocaleString("ru-RU")} $DOFFA
             </p>
             <p className="mt-3 text-sm leading-relaxed text-cream/70">
-              1 июля 2026 года эта сумма была переведена с кошелька проекта на отдельный
-              адрес, который задумывался как фонд наград. Доступ к нему утерян: приватного
-              ключа нет, вернуть токены невозможно.
+              Рассказываем прямо, потому что это видно в блокчейне. 1 июля 2026 года эта
+              сумма была переведена с кошелька проекта на отдельный адрес под будущий фонд
+              наград. Доступ к нему утерян — приватного ключа нет, и вернуть или потратить
+              эти токены не может никто, включая нас.
             </p>
             <p className="mt-3 text-sm leading-relaxed text-cream/70">
-              Это <b className="text-cream-soft">не сжигание</b>: токены остаются в сети, и
-              эмиссия по-прежнему {ECOSYSTEM.token.totalSupply.toLocaleString("ru-RU")}. Но
-              выплатить или продать их нельзя, поэтому фактически доступный объём —{" "}
+              Для держателей это как безвозвратное сжигание: {unreachable.amount.toLocaleString("ru-RU")}{" "}
+              $DOFFA никогда не попадут на рынок и не будут кому-то розданы. Формально в сети
+              эмиссия по-прежнему {ECOSYSTEM.token.totalSupply.toLocaleString("ru-RU")}, но в
+              реальном обращении —{" "}
               <b className="text-cream-soft">
                 {ECOSYSTEM.token.effectiveSupply.toLocaleString("ru-RU")} $DOFFA
               </b>
-              . Мы пишем об этом прямо, а не убираем цифру из отчётности.
+              . Все награды и все расчёты на сайте идут только от этого числа.
             </p>
-            <a
-              href={`https://solscan.io/account/${unreachable.address}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-4 inline-flex w-fit items-center gap-2 rounded-full border border-cream/25 px-5 py-2 text-sm font-semibold text-cream transition hover:border-amber hover:text-amber"
-            >
-              Проверить адрес в Solscan ↗
-            </a>
+            <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-cream/45">
+              Не верь на слово — проверь сам
+            </p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <a
+                href={`https://solscan.io/tx/${unreachable.txSignature}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-cream/25 px-4 py-2 text-sm font-semibold text-cream transition hover:border-amber hover:text-amber"
+              >
+                Та самая транзакция ↗
+              </a>
+              <a
+                href={`https://solscan.io/account/${unreachable.address}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-cream/25 px-4 py-2 text-sm font-semibold text-cream transition hover:border-amber hover:text-amber"
+              >
+                Кошелёк (баланс не меняется) ↗
+              </a>
+            </div>
             <p className="mt-3 break-all text-[11px] text-cream/40">{unreachable.address}</p>
           </div>
         )}

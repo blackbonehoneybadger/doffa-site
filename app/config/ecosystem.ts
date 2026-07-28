@@ -37,6 +37,10 @@ const TOTAL_SUPPLY = 100_000_000;
 // обещает награды, и обещать их из недоступного кошелька было бы обманом.
 const UNREACHABLE_ADDRESS = "Hk6X6qb32RD8N5DgMv17wiR8aj88v1h8BShSEHJGKcLV";
 const UNREACHABLE_AMOUNT = 1_000_000;
+// Подпись самой транзакции перевода 2026-07-01. Ссылка на неё — главное
+// доказательство: любой открывает и видит ровно то, что написано на сайте.
+const UNREACHABLE_TX =
+  "v8NitwxyDKsySiSUPc9evfRLt6Yh3Jj4pC5wJpamyDZ8cU484zdCosa9A4wRkfarmxZMf5xMsqmMsKipKdL9kYA";
 
 /** Неотрицательное число из env. Пусто → дефолт; 0 задать можно явно. */
 function amountEnv(v: string | undefined, fallback: number): number {
@@ -80,6 +84,8 @@ export const ECOSYSTEM = {
   unreachable: {
     address: envStr(process.env.NEXT_PUBLIC_UNREACHABLE_ADDRESS) ?? UNREACHABLE_ADDRESS,
     amount: amountEnv(process.env.NEXT_PUBLIC_UNREACHABLE_AMOUNT, UNREACHABLE_AMOUNT),
+    /** Транзакция перевода — прямое доказательство, ссылку даём на сайте. */
+    txSignature: envStr(process.env.NEXT_PUBLIC_UNREACHABLE_TX) ?? UNREACHABLE_TX,
   },
   rewardVault: {
     /**
