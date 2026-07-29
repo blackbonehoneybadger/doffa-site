@@ -3,7 +3,8 @@
 // встроенный в браузер провайдер.
 //
 // $DOFFA выпущен на mainnet: эмиссия 100 000 000, mint/freeze authority
-// отозваны навсегда. Токен — награда игровой экосистемы DOFFA Games (Bean Duel).
+// отозваны навсегда. Токен — награда игровой экосистемы DOFFA Games (DOFFA Heroes).
+// Название игры менялось: Crazy 8 → Bean Duel / Defense → DOFFA Heroes (2026-07-29).
 //
 // Переменные окружения Vercel (NEXT_PUBLIC_*):
 //   NEXT_PUBLIC_REAL_MINT   = адрес mint (обязательна)

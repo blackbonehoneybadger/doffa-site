@@ -1,11 +1,11 @@
-# Миграция публичного позиционирования игры → DOFFA Games / DOFFA Bean Duel
+# Миграция публичного позиционирования игры → DOFFA Games / DOFFA Heroes
 
 Дата: 2026-07-15
 
 Публичное игровое направление на сайте `doffa.coffee` переименовано:
 
 - **Игровое направление:** `DOFFA Games`
-- **Главная публичная игра:** `DOFFA Bean Duel`
+- **Главная публичная игра:** `DOFFA Heroes`
 
 Старая карточная игра **DOFFA Crazy 8** (репозиторий `zapisnoy-kozel`,
 «Записной Козёл») **не удалена из игрового кода**, но на официальном сайте больше
@@ -13,18 +13,30 @@
 
 Официальный mint $DOFFA: `57aAfCuXx7uuc8g8P9kTxR65TKQtZsFDJeKhdD5xu6uo`
 
+> **Финальное имя закреплено 2026-07-29: `DOFFA Heroes`.**
+> До этого игра успела побывать под тремя рабочими названиями, и в репозитории
+> какое-то время существовали две расходящиеся ветки нейминга: `DOFFA Bean Duel`
+> (эта ветка) и `DOFFA Defense` (коммит в `main` от 2026-07-20). Обе описывали
+> одну и ту же action-механику — забеги, волны врагов, боссы и главы, — поэтому
+> при слиянии сохранена механика, а название приведено к `DOFFA Heroes` во всех
+> 12 локалях, SEO, OG и конфигурации.
+>
+> В таблицах ниже колонка «Стало» описывает состояние на 2026-07-15 и местами
+> ещё говорит про «дуэль» — это исторический след промежуточного нейминга,
+> а не текущее состояние сайта. Актуальное имя всегда одно: `DOFFA Heroes`.
+
 ---
 
 ## Где упоминалась Crazy 8 (и что сделано)
 
 | Файл | Было | Стало |
 |---|---|---|
-| `app/content.ts` | «DOFFA Crazy 8», «карточная игра / card game» во всех 12 языках (flow, roadmap, FAQ, hero-title) | «DOFFA Bean Duel», формулировки про дуэль; шаг «Входи в дуэль», эмодзи 🃏→⚔️ |
-| `app/layout.tsx` | SEO/OG: «играй в DOFFA Crazy 8» | «DOFFA Games», «дуэли DOFFA Bean Duel» |
-| `app/page.tsx` | комментарий + `GAME_URL` = `zapisnoy-kozel.vercel.app` хардкод; кнопка 🃏; маркиза «1 чашка = 1 токен» | ссылка из `ECOSYSTEM.game.webUrl` (env), кнопка ⚔️ с гейтингом, маркиза «Tap · Duel · Claim / DOFFA Bean Duel / DOFFA Games» |
-| `app/download/page.tsx` | «Скачать DOFFA Crazy 8», «карточная игра», хардкод ссылок на старую игру/релизы | «Скачать DOFFA Games», Bean Duel, ссылки и APK-метаданные из конфигурации, честный статус «готовится» |
-| `app/solana.ts` | комментарий «награда игровой экосистемы DOFFA Crazy 8» | «DOFFA Games (Bean Duel)» |
-| `README.md` | «DOFFA Crazy 8 … карточная игра» | «DOFFA Games / DOFFA Bean Duel» |
+| `app/content.ts` | «DOFFA Crazy 8», «карточная игра / card game» во всех 12 языках (flow, roadmap, FAQ, hero-title) | «DOFFA Heroes», формулировки про дуэль; шаг «Входи в дуэль», эмодзи 🃏→⚔️ |
+| `app/layout.tsx` | SEO/OG: «играй в DOFFA Crazy 8» | «DOFFA Games», «дуэли DOFFA Heroes» |
+| `app/page.tsx` | комментарий + `GAME_URL` = `zapisnoy-kozel.vercel.app` хардкод; кнопка 🃏; маркиза «1 чашка = 1 токен» | ссылка из `ECOSYSTEM.game.webUrl` (env), кнопка ⚔️ с гейтингом, маркиза «Tap · Duel · Claim / DOFFA Heroes / DOFFA Games» |
+| `app/download/page.tsx` | «Скачать DOFFA Crazy 8», «карточная игра», хардкод ссылок на старую игру/релизы | «Скачать DOFFA Games», DOFFA Heroes, ссылки и APK-метаданные из конфигурации, честный статус «готовится» |
+| `app/solana.ts` | комментарий «награда игровой экосистемы DOFFA Crazy 8» | «DOFFA Games (DOFFA Heroes)» |
+| `README.md` | «DOFFA Crazy 8 … карточная игра» | «DOFFA Games / DOFFA Heroes» |
 
 ## Что удалено из публичного интерфейса
 
@@ -45,7 +57,7 @@
 
 ## Новые публичные маршруты
 
-- **`/game`** — DOFFA Bean Duel: механика, способности (preview со статусами),
+- **`/game`** — DOFFA Heroes: механика, способности (preview со статусами),
   тапалка/зёрна, 5 шагов, наградная модель (демо-интерфейс, не гарантированная сумма).
 - **`/transparency`** — Reward Vault и сжигание: только реальные данные и честные
   статусы, ссылки на Solscan; без придуманных адресов и цифр.
@@ -71,7 +83,7 @@
 | Сжигание (on-chain burn) | **Planned** |
 | DEX-пул DOFFA/SOL | **Planned** |
 | Android APK | **Planned** (пока `NEXT_PUBLIC_ANDROID_APK_URL` пуст) |
-| Веб-версия Bean Duel | зависит от `NEXT_PUBLIC_GAME_WEB_URL` |
+| Веб-версия DOFFA Heroes | зависит от `NEXT_PUBLIC_GAME_WEB_URL` |
 | Способности (Бросок зерна, Уклонение, Кофейный плеск, Щит) | **Planned** (продуктовый preview) |
 
 «Работает» (Live) показывается только когда функция реально подключена. Демонстрации
@@ -81,7 +93,7 @@
 
 ```
 NEXT_PUBLIC_GAMES_NAME=DOFFA Games
-NEXT_PUBLIC_PRIMARY_GAME_NAME=DOFFA Bean Duel
+NEXT_PUBLIC_PRIMARY_GAME_NAME=DOFFA Heroes
 NEXT_PUBLIC_DOFFA_MINT=57aAfCuXx7uuc8g8P9kTxR65TKQtZsFDJeKhdD5xu6uo
 NEXT_PUBLIC_REWARD_POOL_INITIAL=1000000
 NEXT_PUBLIC_REWARD_VAULT_ADDRESS=      # пусто → Reward Vault: Planned
@@ -100,7 +112,7 @@ NEXT_PUBLIC_SOLSCAN_TOKEN_URL=
 
 Приватные ключи и серверные токены в `NEXT_PUBLIC_*` **не хранятся**.
 
-## Обновление 2026-07-19: механика Bean Duel → соло-забег
+## Обновление 2026-07-19: механика DOFFA Heroes → соло-забег
 
 Игра переведена с PvP-дуэли на **соло-забег с волнами врагов**:
 автоатака при остановке, управление движением/уклонением, выбор усиления между
@@ -109,5 +121,5 @@ $DOFFA», шаги, claimNote, FAQ), `/game` (механика, способно
 «подтверждённое прохождение забега» вместо «победы»), `/download`. Токеномика не
 изменилась: зёрна — входной билет (не выводятся), награда $DOFFA — только из
 Reward Vault по правилам/лимитам/бюджету, распределение из конфигурации (80/20),
-никаких ставок. Название DOFFA Bean Duel сохранено (меняется через
+никаких ставок. Название DOFFA Heroes сохранено (меняется через
 NEXT_PUBLIC_PRIMARY_GAME_NAME).

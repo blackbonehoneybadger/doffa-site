@@ -66,7 +66,7 @@ const burnPercent = pct(process.env.NEXT_PUBLIC_BURN_PERCENT, 20);
 export const ECOSYSTEM = {
   // Публичное название игрового направления и главной игры.
   productName: envStr(process.env.NEXT_PUBLIC_GAMES_NAME) ?? "DOFFA Games",
-  primaryGameName: envStr(process.env.NEXT_PUBLIC_PRIMARY_GAME_NAME) ?? "DOFFA Bean Duel",
+  primaryGameName: envStr(process.env.NEXT_PUBLIC_PRIMARY_GAME_NAME) ?? "DOFFA Heroes",
   token: {
     symbol: "$DOFFA",
     mint,
@@ -111,7 +111,7 @@ export const ECOSYSTEM = {
     /** URL стороннего DEX-пула DOFFA/SOL. null — «Пул пока не запущен». */
     url: envStr(process.env.NEXT_PUBLIC_DEX_URL),
   },
-  // Наградная модель Bean Duel. Доли берутся из конфигурации, не из «воздуха».
+  // Наградная модель DOFFA Heroes. Доли берутся из конфигурации, не из «воздуха».
   reward: {
     playerPercent: playerRewardPercent,
     burnPercent,

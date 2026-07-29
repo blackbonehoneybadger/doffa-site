@@ -34,7 +34,7 @@ function vaultSharePct(loc: string): string {
   const pct = (REWARD_VAULT / ECOSYSTEM.token.totalSupply) * 100;
   return `${pct.toLocaleString(loc, { maximumFractionDigits: 2 })}%`;
 }
-// Публичная игра — DOFFA Bean Duel. Ссылка на веб-версию берётся из
+// Публичная игра — DOFFA Heroes. Ссылка на веб-версию берётся из
 // централизованной конфигурации (env NEXT_PUBLIC_GAME_WEB_URL). Пока не задана —
 // не показываем фальшивую ссылку, кнопка ведёт на /game со статусом.
 const GAME_URL = ECOSYSTEM.game.webUrl;
@@ -512,10 +512,10 @@ export default function Home() {
         <div className="marquee-track">
           {[0, 1].map((i) => (
             <span key={i} className="display inline-flex shrink-0 items-center gap-10 px-10 text-sm uppercase tracking-[0.3em] text-cream/40">
-              <span>Tap · Duel · Claim</span><span className="text-teal">·</span>
+              <span>Tap · Run · Claim</span><span className="text-teal">·</span>
               <span>Since 2021</span><span className="text-teal">·</span>
               <span>Solana SPL</span><span className="text-teal">·</span>
-              <span>DOFFA Bean Duel</span><span className="text-teal">·</span>
+              <span>DOFFA Heroes</span><span className="text-teal">·</span>
               <span>Halal spirit</span><span className="text-teal">·</span>
               <span>DOFFA Games</span><span className="text-teal">·</span>
             </span>

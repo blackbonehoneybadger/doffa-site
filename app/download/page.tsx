@@ -3,13 +3,13 @@ import Link from "next/link";
 import { ECOSYSTEM } from "../config/ecosystem";
 
 export const metadata: Metadata = {
-  title: "Скачать · DOFFA Games — Bean Duel",
+  title: "Скачать · DOFFA Heroes",
   description:
-    "Играй в DOFFA Bean Duel в браузере или на Android. Собирай зёрна, проходи забеги с волнами врагов и забирай подтверждённые награды $DOFFA на Solana-кошелёк.",
+    "Играй в DOFFA Heroes в браузере или на Android. Собирай зёрна, проходи забеги с волнами врагов и забирай подтверждённые награды $DOFFA на Solana-кошелёк.",
   alternates: { canonical: "/download" },
 };
 
-// Страница «Скачать»: DOFFA Games (главная игра — DOFFA Bean Duel). Статическая,
+// Страница «Скачать»: DOFFA Games (главная игра — DOFFA Heroes). Статическая,
 // вне клиентского словаря — RU-основной текст с EN-подстрочником, стиль сайта.
 // Ссылки и статусы — из централизованной конфигурации (ECOSYSTEM). Пока веб/APK
 // не подключены — честный статус «готовится», без фальшивых ссылок.

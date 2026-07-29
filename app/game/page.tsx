@@ -3,12 +3,12 @@ import Link from "next/link";
 import { ECOSYSTEM, STATUS_LABEL_RU, type FeatureStatus } from "../config/ecosystem";
 
 export const metadata: Metadata = {
-  title: "DOFFA Bean Duel — DOFFA Games",
+  title: "DOFFA Heroes — DOFFA Games",
   description:
-    "DOFFA Bean Duel — динамичный соло-забег. Собирай зёрна, проходи волны врагов движением, уклонением и способностями и забирай подтверждённые награды $DOFFA. Без ставок.",
+    "DOFFA Heroes — динамичный соло-забег. Собирай зёрна, проходи волны врагов движением, уклонением и способностями и забирай подтверждённые награды $DOFFA. Без ставок.",
   alternates: { canonical: "/game" },
   openGraph: {
-    title: "DOFFA Bean Duel — DOFFA Games",
+    title: "DOFFA Heroes — DOFFA Games",
     description:
       "Соло-забег на реакцию и навык: волны врагов, движение и способности. Зёрна — входной билет, награда $DOFFA — из Reward Vault после подтверждённого прохождения.",
     type: "website",

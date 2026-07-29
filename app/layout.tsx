@@ -18,12 +18,12 @@ const sans = Manrope({
 export const metadata: Metadata = {
   title: "DOFFA — Espresso Bar × DOFFA Games · Solana",
   description:
-    "COFFEE DOFFA — кофейня из Карачаево-Черкесии со своей игровой экономикой DOFFA Games: тапай и копи зёрна, входи в дуэли DOFFA Bean Duel и забирай подтверждённые награды $DOFFA на Solana. Честный, прозрачный, халяльный проект.",
+    "COFFEE DOFFA — кофейня из Карачаево-Черкесии со своей игровой экономикой DOFFA Games: тапай и копи зёрна, проходи главы в DOFFA Heroes и забирай подтверждённые награды $DOFFA на Solana. Честный, прозрачный, халяльный проект.",
   metadataBase: new URL("https://doffa.coffee"),
   openGraph: {
     title: "DOFFA — Espresso Bar × DOFFA Games",
     description:
-      "Собирай зёрна, входи в Bean Duel и забирай награды $DOFFA на Solana. Since 2021.",
+      "Собирай зёрна, входи в DOFFA Heroes и забирай награды $DOFFA на Solana. Since 2021.",
     type: "website",
     locale: "ru_RU",
     siteName: "DOFFA",
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "DOFFA — Espresso Bar × DOFFA Games",
-    description: "Собирай зёрна, входи в Bean Duel и забирай награды $DOFFA на Solana. Since 2021.",
+    description: "Собирай зёрна, входи в DOFFA Heroes и забирай награды $DOFFA на Solana. Since 2021.",
     images: ["/og.jpg"],
   },
 };

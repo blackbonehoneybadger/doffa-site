@@ -396,7 +396,7 @@ export default async function TransparencyPage() {
 
       <div className="mt-16 flex flex-wrap justify-center gap-6 text-center">
         <Link href="/game" className="text-sm font-semibold text-gold transition hover:text-amber">
-          ← DOFFA Bean Duel
+          ← DOFFA Heroes
         </Link>
         <Link href="/" className="text-sm font-semibold text-gold transition hover:text-amber">
           На главную doffa.coffee
