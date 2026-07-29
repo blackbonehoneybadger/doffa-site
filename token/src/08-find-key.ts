@@ -23,7 +23,8 @@ import { Keypair } from "@solana/web3.js";
 const KNOWN: Record<string, string> = {
   J3Gtgug3j2qdcTTYHWmjfVDuyFr9y6BANueQUjmofWD3: "ключ, которым выпускался токен (owner.json)",
   "6cAtKTM8ZPUgRgmzsgkRfZsq4jZTXymA7cLqjz9qYMFS": "казна проекта — 99 000 000 $DOFFA",
-  Hk6X6qb32RD8N5DgMv17wiR8aj88v1h8BShSEHJGKcLV: "★ ФОНД НАГРАД — 1 000 000 $DOFFA",
+  Hk6X6qb32RD8N5DgMv17wiR8aj88v1h8BShSEHJGKcLV:
+    "утерянный кошелёк — 1 000 000 $DOFFA, ключ признан утраченным 2026-07-29",
 };
 
 const SKIP_DIRS = new Set([
@@ -178,21 +179,23 @@ if (gitFound.length > 0) {
   }
 }
 
-const vault = "Hk6X6qb32RD8N5DgMv17wiR8aj88v1h8BShSEHJGKcLV";
-const vaultInFiles = unique.some((f) => f.address === vault);
-const vaultInGit = gitFound.some((g) => g.address === vault);
-if (vaultInFiles) {
-  console.log("\n🎉 Ключ от фонда наград НАЙДЕН в файле — путь указан выше. Никому его не отправляй.");
-} else if (vaultInGit) {
+// Утерянный кошелёк на 1 000 000 $DOFFA. Поиск по нему закрыт 2026-07-29:
+// проверены файлы, история git, все аккаунты Phantom и переменные Railway —
+// ключа нет нигде. Проверку оставляем на случай, если ключ всплывёт сам
+// (старый диск, забытая флешка), но заново искать его не нужно.
+const lost = "Hk6X6qb32RD8N5DgMv17wiR8aj88v1h8BShSEHJGKcLV";
+const lostFound =
+  unique.some((f) => f.address === lost) || gitFound.some((g) => g.address === lost);
+if (lostFound) {
   console.log(
-    "\n🎉 Ключ от фонда наград НАЙДЕН В ИСТОРИИ git (в рабочей папке его уже нет).\n" +
-      "   Восстанавливать его на диск здесь я не буду — сообщи мне, что он найден,\n" +
-      "   и мы аккуратно вытащим его, не публикуя содержимое.",
+    "\n🎉 НЕОЖИДАННО: ключ от утерянного кошелька Hk6X6qb… НАЙДЕН — путь указан выше.\n" +
+      "   Его считали утраченным. Никому его не отправляй и сообщи мне: это возвращает\n" +
+      "   проекту 1 000 000 $DOFFA.",
   );
 } else {
   console.log(
-    "\n❌ Ключа от фонда наград (Hk6X6qb…) не найдено ни в файлах, ни в истории git.\n" +
-      "   Проверь другие аккаунты в Phantom (переключатель аккаунтов) и другие кошельки\n" +
-      "   на той же seed-фразе.",
+    "\nℹ️  Ключ от кошелька Hk6X6qb… (1 000 000 $DOFFA) не найден — как и ожидалось.\n" +
+      "   Он признан утраченным 2026-07-29, проект работает с 99 000 000. Искать его\n" +
+      "   заново не нужно: подробности в docs/LOST_REWARD_VAULT.md.",
   );
 }
