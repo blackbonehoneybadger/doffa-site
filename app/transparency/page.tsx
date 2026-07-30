@@ -49,7 +49,7 @@ function amount(n: number): string {
 export default async function TransparencyPage() {
   const mint = ECOSYSTEM.token.mint;
   const vault = ECOSYSTEM.rewardVault;
-  const unreachable = ECOSYSTEM.unreachable;
+  const blackHole = ECOSYSTEM.blackHole;
   const rewardsStatus = ECOSYSTEM.status.claims;
   const initial = vault.initial.toLocaleString("ru-RU");
 
@@ -95,8 +95,8 @@ export default async function TransparencyPage() {
         Награды не создаются из воздуха — они выплачиваются из выделенного{" "}
         <b className="text-cream-soft">Reward Vault</b>. Здесь мы показываем только реальные
         данные и честные статусы — без придуманных адресов, балансов и транзакций. В том
-        числе неудобные: {unreachable.amount > 0 && "часть токенов утеряна, и мы пишем об этом ниже"}
-        {unreachable.amount === 0 && "если что-то не работает, мы говорим об этом прямо"}.
+        числе неудобные: {blackHole.amount > 0 && "часть токенов ушла в чёрную дыру, и мы пишем об этом ниже"}
+        {blackHole.amount === 0 && "если что-то не работает, мы говорим об этом прямо"}.
       </p>
 
       {/* REWARD VAULT */}
@@ -117,9 +117,9 @@ export default async function TransparencyPage() {
               <>
                 <p className="display mt-2 text-3xl font-extrabold text-cream/45">Не назначен</p>
                 <p className="mt-2 text-xs leading-relaxed text-cream/50">
-                  Прежний фонд на {unreachable.amount.toLocaleString("ru-RU")} $DOFFA утерян
-                  (см. ниже). Новый запас на награды пока не выделен — как только это
-                  произойдёт, адрес и баланс появятся здесь.
+                  Прежний фонд на {blackHole.amount.toLocaleString("ru-RU")} $DOFFA ушёл
+                  в чёрную дыру (см. ниже). Новый запас на награды пока не выделен — как
+                  только это произойдёт, адрес и баланс появятся здесь.
                 </p>
               </>
             )}
@@ -169,45 +169,72 @@ export default async function TransparencyPage() {
           </div>
         </div>
 
-        {/* Утерянные токены. Это не сжигание: эмиссия в сети не изменилась.
-            Умолчать об этом нельзя — сайт обещает награды, и обещать их из
-            недоступного кошелька было бы обманом. */}
-        {unreachable.amount > 0 && (
+        {/* Чёрная дыра $DOFFA. Два утверждения, которые НЕЛЬЗЯ усиливать:
+            (1) это не сжигание — supply в сети не изменился;
+            (2) адрес на кривой ed25519, ключ существует, но утерян — то есть
+                необратимость практическая, а не математическая.
+            Написать «сожжено» или «ключа не существует» было бы ложью, которую
+            легко поймать: и supply, и кривая проверяются публично. */}
+        {blackHole.amount > 0 && (
           <div className="card mt-4 rounded-2xl border border-amber/25 p-6">
             <div className="flex flex-wrap items-center gap-3">
               <p className="text-xs font-semibold uppercase tracking-wider text-amber">
-                Заблокированы навсегда · вне обращения
+                Чёрная дыра $DOFFA · вне обращения
               </p>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-amber/40 bg-amber/10 px-2.5 py-0.5 text-[11px] font-semibold text-amber">
                 <span className="h-1.5 w-1.5 rounded-full bg-current" />
-                Доступ утерян
+                Обратно не выходит
               </span>
             </div>
             <p className="display mt-3 text-3xl font-extrabold text-cream-soft">
-              {unreachable.amount.toLocaleString("ru-RU")} $DOFFA
+              {blackHole.amount.toLocaleString("ru-RU")} $DOFFA
             </p>
             <p className="mt-3 text-sm leading-relaxed text-cream/70">
-              Рассказываем прямо, потому что это видно в блокчейне. 1 июля 2026 года эта
-              сумма была переведена с кошелька проекта на отдельный адрес под будущий фонд
-              наград. Доступ к нему утерян — приватного ключа нет, и вернуть или потратить
-              эти токены не может никто, включая нас.
+              У проекта есть адрес, из которого токены не возвращаются, — чёрная дыра.
+              1 июля 2026 года на него ушёл {blackHole.amount.toLocaleString("ru-RU")} $DOFFA:
+              этот кошелёк создавался под фонд наград, но приватный ключ к нему был утерян.
+              Мы искали его в файлах, в истории репозитория, во всех аккаунтах Phantom и в
+              переменных сервера — нигде. 29 июля 2026 года ключ признан утраченным, а адрес
+              объявлен чёрной дырой: тратить оттуда не может никто, включая нас.
             </p>
             <p className="mt-3 text-sm leading-relaxed text-cream/70">
-              Для держателей это как безвозвратное сжигание: {unreachable.amount.toLocaleString("ru-RU")}{" "}
-              $DOFFA никогда не попадут на рынок и не будут кому-то розданы. Формально в сети
-              эмиссия по-прежнему {ECOSYSTEM.token.totalSupply.toLocaleString("ru-RU")}, но в
-              реальном обращении —{" "}
+              Для держателей результат тот же, что от сжигания:{" "}
+              {blackHole.amount.toLocaleString("ru-RU")} $DOFFA никогда не попадут на рынок и
+              никому не будут розданы. Эмиссия в сети формально осталась{" "}
+              {ECOSYSTEM.token.totalSupply.toLocaleString("ru-RU")}, а в реальном обращении —{" "}
               <b className="text-cream-soft">
                 {ECOSYSTEM.token.effectiveSupply.toLocaleString("ru-RU")} $DOFFA
               </b>
               . Все награды и все расчёты на сайте идут только от этого числа.
             </p>
+
+            {/* Граница утверждения. Мы говорим ровно то, что можем доказать, и
+                сами называем слабое место — иначе его назовёт кто-то другой. */}
+            <div className="mt-4 rounded-xl border border-cream/15 bg-white/[0.03] p-4">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-cream/45">
+                Где граница наших слов
+              </p>
+              <p className="mt-2 text-xs leading-relaxed text-cream/60">
+                Мы не пишем «сожжено»: сжигание уменьшает эмиссию в сети, а здесь она не
+                изменилась — токены лежат на адресе, а не уничтожены.
+                {blackHole.keyExistsButLost && (
+                  <>
+                    {" "}И не пишем «ключа не существует»: адрес лежит на кривой ed25519,
+                    значит ключ математически существует — просто им никто не владеет. Это
+                    слабее, чем у служебных адресов-инсинераторов, у которых ключа нет в
+                    принципе. Честная формулировка: за всё время с адреса не ушло ни одного
+                    токена, и это видно в сети.
+                  </>
+                )}
+              </p>
+            </div>
+
             <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-cream/45">
               Не верь на слово — проверь сам
             </p>
             <div className="mt-2 flex flex-wrap gap-2">
               <a
-                href={`https://solscan.io/tx/${unreachable.txSignature}`}
+                href={`https://solscan.io/tx/${blackHole.txSignature}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full border border-cream/25 px-4 py-2 text-sm font-semibold text-cream transition hover:border-amber hover:text-amber"
@@ -215,15 +242,15 @@ export default async function TransparencyPage() {
                 Та самая транзакция ↗
               </a>
               <a
-                href={`https://solscan.io/account/${unreachable.address}`}
+                href={`https://solscan.io/account/${blackHole.address}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full border border-cream/25 px-4 py-2 text-sm font-semibold text-cream transition hover:border-amber hover:text-amber"
               >
-                Кошелёк (баланс не меняется) ↗
+                Адрес (расходов нет ни одного) ↗
               </a>
             </div>
-            <p className="mt-3 break-all text-[11px] text-cream/40">{unreachable.address}</p>
+            <p className="mt-3 break-all text-[11px] text-cream/40">{blackHole.address}</p>
           </div>
         )}
       </section>

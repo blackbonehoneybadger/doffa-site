@@ -24,7 +24,7 @@ const KNOWN: Record<string, string> = {
   J3Gtgug3j2qdcTTYHWmjfVDuyFr9y6BANueQUjmofWD3: "ключ, которым выпускался токен (owner.json)",
   "6cAtKTM8ZPUgRgmzsgkRfZsq4jZTXymA7cLqjz9qYMFS": "казна проекта — 99 000 000 $DOFFA",
   Hk6X6qb32RD8N5DgMv17wiR8aj88v1h8BShSEHJGKcLV:
-    "утерянный кошелёк — 1 000 000 $DOFFA, ключ признан утраченным 2026-07-29",
+    "ЧЁРНАЯ ДЫРА проекта — 1 000 000 $DOFFA, ключ признан утраченным 2026-07-29",
   // Новый фонд наград. Живёт в Phantom («Аккаунт 4»), то есть выводится из
   // seed-фразы, а не из отдельного файла-ключа. Поэтому find-key его в файлах
   // НЕ найдёт — и это нормально, а не повод считать ключ потерянным.
