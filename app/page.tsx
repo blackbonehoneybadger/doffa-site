@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { dict, LANGS, TOKEN, CONTACT, GALLERY, VIDEOS, type Lang } from "./content";
+import { ECOSYSTEM } from "./config/ecosystem";
 import { REAL, solscanToken, solscanTokenOf, solscanHolders, fetchBalance, connectWalletById, disconnectWalletById } from "./solana";
 import { SmoothScroll, CursorGlow, MouseParallax, TiltCard, Magnetic, ScrollProgressBar } from "./cinematic";
 import { ThemeToggle } from "./theme-toggle";
@@ -15,13 +16,35 @@ import { Assistant } from "./assistant";
 // браузере и только когда компонент реально понадобится (см. hero3d.tsx).
 const Hero3D = dynamic(() => import("./hero3d").then((m) => m.Hero3D), { ssr: false });
 
-// Дефолтный ролик в hero, пока владелец кофейни не загрузил свои через /admin.
-const DEFAULT_HERO_VIDEO = "/brand/hero.mp4";
+// Погода в ауле: сама решает, показываться ли (нет данных — не рисуется).
+const WeatherChip = dynamic(() => import("./WeatherChip").then((m) => m.WeatherChip), { ssr: false });
 
-// Reward Vault — выделенный запас $DOFFA на игровые награды (1% эмиссии).
-const REWARD_VAULT = 1_000_000;
-// Игра DOFFA Defense (веб-версия).
-const GAME_URL = "https://zapisnoy-kozel.vercel.app";
+// Дефолтный ролик в hero, пока владелец кофейни не загрузил свои через /admin.
+const DEFAULT_HERO_VIDEO = "/brand/doffa-clip.mp4";
+
+// Reward Vault — назначенный запас $DOFFA на игровые награды. Берётся из
+// централизованной конфигурации, а не из отдельной константы: прежний фонд
+// утерян, и хардкод «1 000 000» здесь показывал бы несуществующий запас.
+// 0 означает «фонд не назначен» — тогда вместо цифр ставим прочерк.
+const REWARD_VAULT = ECOSYSTEM.rewardVault.initial;
+
+/** Доля фонда в эмиссии. «—», пока фонд не назначен. */
+function vaultSharePct(loc: string): string {
+  if (REWARD_VAULT <= 0) return "—";
+  const pct = (REWARD_VAULT / ECOSYSTEM.token.totalSupply) * 100;
+  return `${pct.toLocaleString(loc, { maximumFractionDigits: 2 })}%`;
+}
+// Публичная игра — DOFFA Heroes. Ссылка на веб-версию берётся из
+// централизованной конфигурации (env NEXT_PUBLIC_GAME_WEB_URL). Пока не задана —
+// не показываем фальшивую ссылку, кнопка ведёт на /game со статусом.
+const GAME_URL = ECOSYSTEM.game.webUrl;
+
+// Локализованная подпись для вкладки «Прозрачность» (fallback — английский).
+const TRANSPARENCY_LABEL: Partial<Record<Lang, string>> = {
+  ru: "Прозрачность", en: "Transparency", ar: "الشفافية", tr: "Şeffaflık",
+  es: "Transparencia", fr: "Transparence", de: "Transparenz", zh: "透明度",
+  hi: "पारदर्शिता", pt: "Transparência", it: "Trasparenza", ja: "透明性",
+};
 
 /* ---------- helpers ---------- */
 
@@ -202,17 +225,26 @@ export default function Home() {
             </span>
           </a>
           <nav className="hidden flex-1 items-center justify-center gap-3 whitespace-nowrap px-4 xl:gap-4 lg:flex">
-            {tabs.map((t) => (
-              <button
-                key={t.id}
-                onClick={() => setActiveTab(t.id)}
-                className={`text-xs xl:text-sm transition ${
-                  activeTab === t.id ? "font-semibold text-gold" : "text-cream/70 hover:text-gold"
-                }`}
-              >
-                {t.label}
-              </button>
-            ))}
+            {tabs.map((t) =>
+              t.id === "merch" ? (
+                <Link key={t.id} href="/merch" className="text-xs text-cream/70 transition hover:text-gold xl:text-sm">
+                  {t.label}
+                </Link>
+              ) : (
+                <button
+                  key={t.id}
+                  onClick={() => setActiveTab(t.id)}
+                  className={`text-xs xl:text-sm transition ${
+                    activeTab === t.id ? "font-semibold text-gold" : "text-cream/70 hover:text-gold"
+                  }`}
+                >
+                  {t.label}
+                </button>
+              ),
+            )}
+            <Link href="/transparency" className="text-xs text-cream/70 transition hover:text-gold xl:text-sm">
+              {TRANSPARENCY_LABEL[lang] ?? "Transparency"}
+            </Link>
             <Link
               href="/download"
               className="rounded-full border border-gold/40 bg-gold/10 px-3 py-1 text-xs font-semibold text-gold transition hover:bg-gold/20 xl:text-sm"
@@ -333,33 +365,51 @@ export default function Home() {
         {menuOpen && (
           <nav className="border-t border-white/10 bg-ink/95 backdrop-blur-md lg:hidden">
             <div className="mx-auto grid max-w-6xl grid-cols-2 gap-x-4 gap-y-1 px-5 py-4">
-              {tabs.map((t) => (
-                <button
-                  key={t.id}
-                  onClick={() => {
-                    setActiveTab(t.id);
-                    setMenuOpen(false);
-                  }}
-                  className={`rounded-lg px-3 py-2 text-sm transition ${
-                    activeTab === t.id
-                      ? "bg-gold/20 font-semibold text-gold"
-                      : "text-cream/75 hover:bg-white/5 hover:text-gold"
-                  }`}
-                >
-                  {t.label}
-                </button>
-              ))}
+              {tabs.map((t) =>
+                t.id === "merch" ? (
+                  <Link
+                    key={t.id}
+                    href="/merch"
+                    onClick={() => setMenuOpen(false)}
+                    className="block rounded-lg px-3 py-2 text-left text-sm text-cream/75 transition hover:bg-white/5 hover:text-gold"
+                  >
+                    {t.label}
+                  </Link>
+                ) : (
+                  <button
+                    key={t.id}
+                    onClick={() => {
+                      setActiveTab(t.id);
+                      setMenuOpen(false);
+                    }}
+                    className={`rounded-lg px-3 py-2 text-left text-sm transition ${
+                      activeTab === t.id
+                        ? "bg-gold/20 font-semibold text-gold"
+                        : "text-cream/75 hover:bg-white/5 hover:text-gold"
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                ),
+              )}
+              <Link
+                href="/transparency"
+                onClick={() => setMenuOpen(false)}
+                className="block rounded-lg px-3 py-2 text-left text-sm text-cream/75 transition hover:bg-white/5 hover:text-gold"
+              >
+                {TRANSPARENCY_LABEL[lang] ?? "Transparency"}
+              </Link>
               <Link
                 href="/download"
                 onClick={() => setMenuOpen(false)}
-                className="rounded-lg px-3 py-2 text-sm font-semibold text-gold hover:bg-gold/10"
+                className="block rounded-lg px-3 py-2 text-left text-sm font-semibold text-gold hover:bg-gold/10"
               >
                 {t.tabs.download} ↓
               </Link>
               <Link
                 href="/profile"
                 onClick={() => setMenuOpen(false)}
-                className="rounded-lg px-3 py-2 text-sm text-cream/75 hover:bg-white/5 hover:text-gold"
+                className="block rounded-lg px-3 py-2 text-left text-sm text-cream/75 hover:bg-white/5 hover:text-gold"
               >
                 {t.tabs.profile}
               </Link>
@@ -397,7 +447,11 @@ export default function Home() {
         <MouseParallax strength={-10} className="pointer-events-none absolute -right-32 bottom-0 h-80 w-80">
           <div className="glow-pulse h-80 w-80 rounded-full bg-teal/15 blur-[110px]" style={{ animationDelay: "2s" }} />
         </MouseParallax>
-        <Hero3D className="absolute right-6 top-24 hidden h-40 w-40 sm:block sm:h-52 sm:w-52" />
+        {/* Бутылка сильно крупнее: канвас квадратный, сама бутылка занимает
+            центральную треть его ширины — поэтому отрицательный right уводит за
+            край только пустое поле канваса, а не саму бутылку. Текст hero идёт
+            дальше по DOM и остаётся поверх. */}
+        <Hero3D className="absolute right-0 top-2 h-[64vw] w-[64vw] sm:-right-6 sm:top-20 sm:h-[28rem] sm:w-[28rem] lg:-right-8 lg:top-16 lg:h-[40rem] lg:w-[40rem]" />
         {/* эффект пара */}
         <div className="steam" />
         <div className="steam s2" />
@@ -423,6 +477,8 @@ export default function Home() {
               <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1.5">
                 🕖 07:00–22:00
               </span>
+              {/* Появляется, только когда заданы координаты кофейни и Open-Meteo ответил. */}
+              <WeatherChip />
             </div>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Magnetic>
@@ -431,9 +487,9 @@ export default function Home() {
                 </button>
               </Magnetic>
               <Magnetic>
-                <button onClick={() => setActiveTab("merch")} className="rounded-full border border-cream/30 px-7 py-3 font-semibold text-cream transition hover:border-gold hover:text-gold">
+                <Link href="/merch" className="rounded-full border border-cream/30 px-7 py-3 font-semibold text-cream transition hover:border-gold hover:text-gold">
                   {t.hero.ctaMenu}
-                </button>
+                </Link>
               </Magnetic>
             </div>
           </motion.div>
@@ -456,12 +512,12 @@ export default function Home() {
         <div className="marquee-track">
           {[0, 1].map((i) => (
             <span key={i} className="display inline-flex shrink-0 items-center gap-10 px-10 text-sm uppercase tracking-[0.3em] text-cream/40">
-              <span>1 чашка = 1 токен</span><span className="text-teal">·</span>
+              <span>Tap · Run · Claim</span><span className="text-teal">·</span>
               <span>Since 2021</span><span className="text-teal">·</span>
               <span>Solana SPL</span><span className="text-teal">·</span>
-              <span>Deflationary</span><span className="text-teal">·</span>
+              <span>DOFFA Heroes</span><span className="text-teal">·</span>
               <span>Halal spirit</span><span className="text-teal">·</span>
-              <span>DOFFA</span><span className="text-teal">·</span>
+              <span>DOFFA Games</span><span className="text-teal">·</span>
             </span>
           ))}
         </div>
@@ -620,9 +676,17 @@ export default function Home() {
                       </span>
                     </div>
                     <div className="mt-6 grid gap-5 sm:grid-cols-3">
-                      <Stat label={t.flow.vaultAmountLabel} value={REWARD_VAULT.toLocaleString(loc)} unit={TOKEN.symbol} accent />
+                      {/* Прочерк, пока фонд не назначен: показать здесь сумму
+                          прежнего фонда значило бы обещать выплаты из кошелька,
+                          доступ к которому утерян. Пояснение — в vaultNote ниже. */}
+                      <Stat
+                        label={t.flow.vaultAmountLabel}
+                        value={REWARD_VAULT > 0 ? REWARD_VAULT.toLocaleString(loc) : "—"}
+                        unit={REWARD_VAULT > 0 ? TOKEN.symbol : undefined}
+                        accent
+                      />
                       <Stat label={t.flow.vaultSupplyLabel} value={REAL.initialSupply.toLocaleString(loc)} unit={TOKEN.symbol} />
-                      <Stat label={t.flow.vaultShareLabel} value="1%" />
+                      <Stat label={t.flow.vaultShareLabel} value={vaultSharePct(loc)} />
                     </div>
                     <p className="mt-6 text-center text-xs leading-relaxed text-cream/50">{t.flow.vaultNote}</p>
                     <div className="mt-3 text-center">
@@ -645,21 +709,30 @@ export default function Home() {
                     <p className="mx-auto mt-3 max-w-2xl text-sm text-cream/70">{t.flow.claimNote}</p>
                     <div className="mt-7 flex flex-wrap items-center justify-center gap-4">
                       <Magnetic>
-                        <a
-                          href={GAME_URL}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold to-copper px-7 py-3 font-bold text-ink shadow-lg shadow-gold/10 transition hover:brightness-110"
-                        >
-                          🃏 {t.flow.playCta}
-                        </a>
+                        {GAME_URL ? (
+                          <a
+                            href={GAME_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold to-copper px-7 py-3 font-bold text-ink shadow-lg shadow-gold/10 transition hover:brightness-110"
+                          >
+                            ⚔️ {t.flow.playCta}
+                          </a>
+                        ) : (
+                          <Link
+                            href="/game"
+                            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold to-copper px-7 py-3 font-bold text-ink shadow-lg shadow-gold/10 transition hover:brightness-110"
+                          >
+                            ⚔️ {t.flow.playCta}
+                          </Link>
+                        )}
                       </Magnetic>
                       <Magnetic>
                         <Link
-                          href="/download"
+                          href="/game"
                           className="rounded-full border border-cream/30 px-7 py-3 font-semibold text-cream transition hover:border-gold hover:text-gold"
                         >
-                          {t.flow.downloadCta}
+                          {ECOSYSTEM.primaryGameName}
                         </Link>
                       </Magnetic>
                     </div>

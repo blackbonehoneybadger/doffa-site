@@ -30,6 +30,24 @@ export const videoRegisterSchema = z.object({
   pathname: z.string().min(1).max(512),
 });
 
+// Заявка на кожаное изделие на заказ (форма /merch). `website` — honeypot:
+// реальные люди его не заполняют, боты — да. Только name/contact/consent строго
+// обязательны, остальное опционально.
+export const merchOrderSchema = z.object({
+  name: z.string().trim().min(1).max(120),
+  contact: z.string().trim().min(1).max(200),
+  productType: z.string().trim().max(120).optional().default(""),
+  quantity: z.string().trim().max(60).optional().default(""),
+  personalization: z.string().trim().max(60).optional().default(""),
+  persoText: z.string().trim().max(200).optional().default(""),
+  idea: z.string().trim().max(2000).optional().default(""),
+  deadline: z.string().trim().max(120).optional().default(""),
+  budget: z.string().trim().max(120).optional().default(""),
+  location: z.string().trim().max(120).optional().default(""),
+  consent: z.literal(true),
+  website: z.string().max(0).optional().default(""), // honeypot: должен быть пустым
+});
+
 /**
  * Парсит и валидирует JSON-тело запроса по zod-схеме. Возвращает либо
  * { data }, либо { error } с человекочитаемым сообщением (для ответа 400).

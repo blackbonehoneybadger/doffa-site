@@ -13,7 +13,8 @@
     "revoke": "tsx src/05-revoke.ts",
     "verify": "tsx src/06-verify.ts",
     "switch": "tsx src/07-switch-mainnet.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "find-key": "tsx src/08-find-key.ts"
   },
   "dependencies": {
     "@metaplex-foundation/mpl-token-metadata": "^3.4.0",
