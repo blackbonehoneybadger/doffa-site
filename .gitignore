@@ -56,3 +56,22 @@ id.json
 *-key.json
 /token/.doffa-*.json
 /token/deploy-output/
+
+# ── Ключи, секреты, учётные данные ──────────────────────────────────────────
+# Широкие маски: раньше защищено было ровно одно имя (token/owner.json), и
+# ключ под любым другим именем ушёл бы в коммит. Проект уже терял 1 000 000
+# DOFFA из-за плохой работы с ключами — второй раз нельзя.
+*.key
+*.pem
+*.secret
+wallet*.json
+keypair*.json
+*keypair*.json
+*owner*.json
+*-key.json
+*.key.json
+id.json
+solana-keypair*
+credentials*
+/token/.doffa-*.json
+/token/deploy-output/

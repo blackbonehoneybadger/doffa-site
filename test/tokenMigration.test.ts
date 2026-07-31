@@ -169,12 +169,79 @@ function productionFiles(): string[] {
   return out;
 }
 
-test("новые token-скрипты не содержат старый mint и старый кошелёк", () => {
+test("старый mint есть ровно в одном token-скрипте — том, что его сжигает", () => {
+  // burn-legacy.ts обязан знать старый mint: иначе сжигать нечего. Он же
+  // единственное исключение — во всех остальных скриптах старый адрес означал
+  // бы, что операция уйдёт не в тот токен.
+  const withOld: string[] = [];
   for (const f of readdirSync(join(ROOT, "token/src"))) {
     const src = readFileSync(join(ROOT, "token/src", f), "utf8");
-    assert.ok(!src.includes(OLD_MINT), `${f} содержит старый mint`);
-    assert.ok(!src.includes(OLD_WALLET), `${f} содержит старый кошелёк`);
+    if (src.includes(OLD_MINT) || src.includes(OLD_WALLET)) withOld.push(f);
   }
+  assert.deepEqual(withOld, ["burn-legacy.ts"], `неожиданные файлы со старым токеном: ${withOld}`);
+});
+
+test("burn-legacy требует точную фразу и проверяет владельца", () => {
+  const src = readFileSync(join(ROOT, "token/src/burn-legacy.ts"), "utf8");
+  assert.match(src, /BURN ALL LEGACY DOFFA/, "нужна точная подтверждающая фраза");
+  assert.match(src, /ПОДПИСАНТ НЕ ТОТ/, "должен отказываться жечь чужие токены");
+  assert.match(src, /getGenesisHash/, "должен проверять, что это mainnet");
+});
+
+/* ────────────── старый токен не используется операционно ──────────────── */
+
+test("операционный mint не равен старому — и не выдуман", async () => {
+  // Ключевая проверка всей миграции: пока новый токен не создан, mint обязан
+  // быть null. Любое непустое значение здесь означало бы, что сайт показывает
+  // либо деприкированный токен, либо выдуманный адрес.
+  const { ECOSYSTEM } = await import("../app/config/ecosystem");
+  assert.notEqual(ECOSYSTEM.token.mint, OLD_MINT, "операционный mint = старый токен");
+  assert.equal(ECOSYSTEM.token.mint, null, "mint должен быть null, пока токен не выпущен");
+  assert.equal(ECOSYSTEM.token.deployed, false);
+  assert.equal(ECOSYSTEM.status.token, "planned");
+});
+
+test("старый токен доступен только как legacy, помечен deprecated", async () => {
+  const { ECOSYSTEM } = await import("../app/config/ecosystem");
+  assert.equal(ECOSYSTEM.legacy.mint, OLD_MINT, "адрес должен быть виден в разделе legacy");
+  assert.equal(ECOSYSTEM.legacy.ownerWallet, OLD_WALLET);
+  assert.ok(ECOSYSTEM.legacy.deprecatedAt, "должна быть дата деприкации");
+});
+
+test("owner wallet — новый управляемый кошелёк", async () => {
+  const { ECOSYSTEM } = await import("../app/config/ecosystem");
+  assert.equal(ECOSYSTEM.ownerWallet, "E4tvCMvkrpMeVKE8SvcLgxk6D2jovQ3SB97s2umSwLUr");
+  assert.notEqual(ECOSYSTEM.ownerWallet, OLD_WALLET);
+});
+
+test("оплата мерча в DOFFA выключена, пока нет mint", async () => {
+  const { DOFFA_PAYMENT_PUBLIC } = await import("../app/config/merch");
+  assert.equal(DOFFA_PAYMENT_PUBLIC.mint, null);
+  assert.equal(DOFFA_PAYMENT_PUBLIC.enabled, false, "нельзя принимать оплату в несуществующем токене");
+});
+
+/* ──────────────────── наградная модель: сумма долей ───────────────────── */
+
+test("сумма долей награды обязана равняться 100", async () => {
+  const { validateRewardSplit } = await import("../app/config/ecosystem");
+  assert.equal(validateRewardSplit(70, 20, 10).valid, true);
+  assert.equal(validateRewardSplit(100, 0, 0).valid, true);
+  // Недобор и перебор одинаково недопустимы: молча донормировать проценты
+  // нельзя — это исказило бы заявленную экономику.
+  assert.equal(validateRewardSplit(70, 20, 5).valid, false);
+  assert.equal(validateRewardSplit(70, 20, 20).valid, false);
+  assert.match(validateRewardSplit(70, 20, 5).reason ?? "", /сумма долей 95/);
+});
+
+test("неполный набор долей оставляет модель в draft", async () => {
+  const { validateRewardSplit, ECOSYSTEM } = await import("../app/config/ecosystem");
+  assert.equal(validateRewardSplit(80, 20, null).valid, false);
+  assert.equal(validateRewardSplit(null, null, null).valid, false);
+  // По умолчанию переменные не заданы → модель draft, проценты не показываются.
+  assert.equal(ECOSYSTEM.rewardModel.draft, true);
+  assert.equal(ECOSYSTEM.rewardModel.rewardPercent, null);
+  assert.equal(ECOSYSTEM.rewardModel.burnPercent, null);
+  assert.equal(ECOSYSTEM.rewardModel.treasuryPercent, null);
 });
 
 test("в коде нет приватных ключей и seed-фраз", () => {

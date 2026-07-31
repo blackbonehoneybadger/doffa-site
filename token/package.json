@@ -16,6 +16,7 @@
     "token:keygen": "tsx src/devnet-keygen.ts",
     "token:airdrop": "tsx src/devnet-airdrop.ts",
     "typecheck": "tsc --noEmit",
+    "token:burn-legacy": "tsx src/burn-legacy.ts",
     "legacy:find-key": "tsx ../archive/legacy-doffa-token/src/08-find-key.ts",
     "legacy:verify": "tsx ../archive/legacy-doffa-token/src/06-verify.ts",
     "legacy:burn": "tsx ../archive/legacy-doffa-token/src/04-burn.ts"

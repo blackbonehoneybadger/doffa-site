@@ -49,12 +49,25 @@ export const MERCH_FLAGS = {
 
 /** Публичные параметры оплаты в DOFFA (никаких секретов и приватных ключей). */
 export const DOFFA_PAYMENT_PUBLIC = {
-  /** Официальный mint из env или дефолт. */
-  mint: envStr(process.env.NEXT_PUBLIC_DOFFA_MINT) ?? "57aAfCuXx7uuc8g8P9kTxR65TKQtZsFDJeKhdD5xu6uo",
+  /**
+   * Официальный mint из env. null — токен ещё не выпущен.
+   *
+   * Дефолта нет намеренно: раньше здесь стоял старый mint, и приём оплаты
+   * продолжал бы работать в деприкированном токене. Пока mint не задан,
+   * оплата в DOFFA не может быть включена — см. `enabled` ниже.
+   */
+  mint: envStr(process.env.NEXT_PUBLIC_DOFFA_MINT),
   decimals: 6,
   /** Котировка цены в DOFFA действует ограниченное время. */
   quoteTtlMinutes: 10,
-  enabled: flag(process.env.NEXT_PUBLIC_DOFFA_PAYMENTS_ENABLED),
+  /**
+   * Приём оплаты в DOFFA. Требует ОБА условия: флаг включён И mint существует.
+   * Одного флага мало — без mint принимать платежи не в чем, и включённая
+   * кнопка «оплатить в DOFFA» вела бы в никуда.
+   */
+  enabled:
+    flag(process.env.NEXT_PUBLIC_DOFFA_PAYMENTS_ENABLED) &&
+    envStr(process.env.NEXT_PUBLIC_DOFFA_MINT) !== null,
 } as const;
 
 /** Статусы товара продавца (публично не показываем hidden/moderation). */

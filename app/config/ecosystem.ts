@@ -1,6 +1,6 @@
 // Централизованная конфигурация экосистемы DOFFA.
-// Единственный источник правды для: mint токена, Reward Vault, ссылок на игру/
-// APK/DEX/Solscan и СТАТУСОВ функций. Реальные значения приходят из env
+// Единственный источник правды для: токена, кошелька владельца, наградной
+// модели, ссылок и СТАТУСОВ функций. Реальные значения приходят из env
 // (NEXT_PUBLIC_*). Пока функция не подключена — её статус honestly = "planned"
 // или "testing", а UI обязан показывать это, а не выдавать демо за живую фичу.
 //
@@ -18,41 +18,6 @@ function envStr(v: string | undefined): string | null {
   return s ? s : null;
 }
 
-const DEFAULT_MINT = "57aAfCuXx7uuc8g8P9kTxR65TKQtZsFDJeKhdD5xu6uo";
-
-// Полная эмиссия $DOFFA. Подтверждается в сети (getTokenSupply) и не может
-// вырасти: право mint отозвано.
-const TOTAL_SUPPLY = 100_000_000;
-
-// Чёрная дыра $DOFFA — адрес, из которого токены не возвращаются.
-//
-// 2026-07-01 с кошелька проекта было переведено ровно 1 000 000 $DOFFA на
-// Hk6X6qb32RD8N5DgMv17wiR8aj88v1h8BShSEHJGKcLV — задумывался как фонд наград.
-// Приватный ключ к нему утерян: его искали в файлах, в истории git, во всех
-// аккаунтах Phantom и в переменных Railway — нигде. 2026-07-29 признан
-// утраченным, и этот адрес объявлен чёрной дырой проекта.
-//
-// ⚠️ ЧЕСТНАЯ ГРАНИЦА УТВЕРЖДЕНИЯ. Две вещи, которые нельзя смешивать:
-//
-// 1. Это НЕ сжигание. Сжигание (SPL burn) уменьшает supply в сети; здесь
-//    supply по-прежнему 100 000 000. Токены лежат на адресе, а не уничтожены.
-//    Поэтому сайт обязан показывать обе цифры и объяснять разницу.
-// 2. Адрес лежит НА кривой ed25519 — значит приватный ключ математически
-//    существует, просто им никто не владеет. Это отличает его от канонического
-//    инсинератора 1nc1nerator11111111111111111111111111111111, который вне
-//    кривой и ключа не имеет в принципе. Наша необратимость — утверждение о
-//    потере ключа, а не математическая гарантия, и формулировать надо так.
-//
-// Практический вывод: для БУДУЩИХ сжиганий использовать реальный SPL burn — он
-// уменьшает supply и проверяется в сети без доверия к нам. Досылать сюда новые
-// токены смысла нет: это слабее burn по проверяемости.
-const BLACK_HOLE_ADDRESS = "Hk6X6qb32RD8N5DgMv17wiR8aj88v1h8BShSEHJGKcLV";
-const BLACK_HOLE_AMOUNT = 1_000_000;
-// Подпись самой транзакции перевода 2026-07-01. Ссылка на неё — главное
-// доказательство: любой открывает и видит ровно то, что написано на сайте.
-const BLACK_HOLE_TX =
-  "v8NitwxyDKsySiSUPc9evfRLt6Yh3Jj4pC5wJpamyDZ8cU484zdCosa9A4wRkfarmxZMf5xMsqmMsKipKdL9kYA";
-
 /** Неотрицательное число из env. Пусто → дефолт; 0 задать можно явно. */
 function amountEnv(v: string | undefined, fallback: number): number {
   const s = (v ?? "").trim();
@@ -60,70 +25,182 @@ function amountEnv(v: string | undefined, fallback: number): number {
   const n = Number(s);
   return Number.isFinite(n) && n >= 0 ? n : fallback;
 }
-const mint = envStr(process.env.NEXT_PUBLIC_DOFFA_MINT) ?? DEFAULT_MINT;
+
+/* ═══════════════════════ НОВЫЙ ТОКЕН DOFFA ═══════════════════════ */
+
+/**
+ * Единственный управляемый кошелёк проекта. Вся эмиссия нового токена уходит
+ * на него. Дополнительных treasury/reward/liquidity кошельков нет — именно
+ * их размножение в прошлый раз и привело к потере ключа от одного из них.
+ */
+const OWNER_WALLET = "E4tvCMvkrpMeVKE8SvcLgxk6D2jovQ3SB97s2umSwLUr";
+
+const TOTAL_SUPPLY = 100_000_000;
+const DECIMALS = 6;
+
+/**
+ * Адрес mint нового токена.
+ *
+ * ⚠️ Дефолта здесь НЕТ и быть не должно. Пока токен в mainnet не создан,
+ * значение остаётся null, и сайт обязан честно показывать «Mainnet token not
+ * deployed yet». Подставить сюда старый mint или выдуманный адрес — значит
+ * соврать посетителю о том, чего не существует.
+ *
+ * Заполняется переменной NEXT_PUBLIC_DOFFA_MINT после реального выпуска.
+ */
+const mint = envStr(process.env.NEXT_PUBLIC_DOFFA_MINT);
+
+/** Постоянный URI метаданных (IPFS/Arweave). null — ещё не загружены. */
+const metadataUri = envStr(process.env.NEXT_PUBLIC_DOFFA_METADATA_URI);
+
+/* ═══════════════════════ LEGACY-ТОКЕН (DEPRECATED) ═══════════════════════ */
+
+/**
+ * Старый токен DOFFA. НЕ ИСПОЛЬЗУЕТСЯ в игровых механиках, оплате и наградах.
+ *
+ * Адреса живут здесь по одной причине: сайт обязан показать их на /token в
+ * разделе legacy — старый токен публично виден в сети, и умолчать о нём
+ * значило бы попытаться скрыть. Но ни одно операционное поле (token.mint,
+ * оплата мерча, награды) на него больше не ссылается — это проверяется тестом.
+ *
+ * Чёрная дыра Hk6X6qb… — адрес, из которого токены не возвращаются: ключ к
+ * нему утерян. Две границы, которые нельзя усиливать, потому что обе
+ * проверяются публично:
+ *   1. Это НЕ сжигание — supply старого токена в сети не изменился.
+ *   2. Адрес НА кривой ed25519 — ключ математически существует, просто им
+ *      никто не владеет. Не то же самое, что канонический инсинератор.
+ */
+type LegacyToken = {
+  readonly mint: string;
+  readonly ownerWallet: string;
+  readonly totalSupply: number;
+  readonly deprecatedAt: string;
+  readonly blackHole: {
+    readonly address: string;
+    readonly amount: number;
+    readonly txSignature: string;
+    readonly keyExistsButLost: boolean;
+  };
+};
+
+const LEGACY: LegacyToken = {
+  mint: "57aAfCuXx7uuc8g8P9kTxR65TKQtZsFDJeKhdD5xu6uo",
+  ownerWallet: "6cAtKTM8ZPUgRgmzsgkRfZsq4jZTXymA7cLqjz9qYMFS",
+  totalSupply: 100_000_000,
+  deprecatedAt: "2026-07-30",
+  blackHole: {
+    address: "Hk6X6qb32RD8N5DgMv17wiR8aj88v1h8BShSEHJGKcLV",
+    amount: 1_000_000,
+    txSignature:
+      "v8NitwxyDKsySiSUPc9evfRLt6Yh3Jj4pC5wJpamyDZ8cU484zdCosa9A4wRkfarmxZMf5xMsqmMsKipKdL9kYA",
+    /** Ключ существует математически, но утерян. Не «ключа не существует». */
+    keyExistsButLost: true,
+  },
+};
+
+/* ═══════════════════════ НАГРАДНАЯ МОДЕЛЬ (DRAFT) ═══════════════════════ */
+
+/**
+ * Распределение DOFFA в игровых механиках: игроку / на сжигание / в казну.
+ *
+ * ⚠️ Экономика владельцем ещё НЕ утверждена, поэтому по умолчанию модель
+ * выключена (draft) и сайт не показывает никаких процентов. Показать
+ * непроверенные доли значило бы дать обещание, которого никто не давал.
+ *
+ * Чтобы включить, нужно задать ВСЕ три переменные, и их сумма обязана быть
+ * ровно 100. Любое другое сочетание оставляет модель в draft — молча
+ * «донормировать» проценты нельзя: это исказило бы заявленную экономику.
+ */
+function pctEnv(v: string | undefined): number | null {
+  const s = (v ?? "").trim();
+  if (!s) return null;
+  const n = Number(s);
+  return Number.isFinite(n) && n >= 0 && n <= 100 ? n : null;
+}
+
+const rewardPct = pctEnv(process.env.NEXT_PUBLIC_GAME_REWARD_PERCENT);
+const burnPct = pctEnv(process.env.NEXT_PUBLIC_GAME_BURN_PERCENT);
+const treasuryPct = pctEnv(process.env.NEXT_PUBLIC_GAME_TREASURY_PERCENT);
+
+const allPctSet = rewardPct !== null && burnPct !== null && treasuryPct !== null;
+const pctSum = allPctSet ? rewardPct + burnPct + treasuryPct : null;
+const pctValid = pctSum === 100;
+
+/**
+ * Проверка суммы долей. Экспортируется, чтобы её можно было вызвать в тестах
+ * и в CI, а не только полагаться на то, что кто-то посмотрит на сайт.
+ */
+export function validateRewardSplit(
+  reward: number | null,
+  burn: number | null,
+  treasury: number | null,
+): { valid: boolean; sum: number | null; reason: string | null } {
+  if (reward === null || burn === null || treasury === null) {
+    return { valid: false, sum: null, reason: "заданы не все три доли — модель остаётся draft" };
+  }
+  const sum = reward + burn + treasury;
+  if (sum !== 100) {
+    return { valid: false, sum, reason: `сумма долей ${sum} ≠ 100` };
+  }
+  return { valid: true, sum, reason: null };
+}
+
+/* ═══════════════════════ ПРОЧЕЕ ═══════════════════════ */
+
 const vaultAddress = envStr(process.env.NEXT_PUBLIC_REWARD_VAULT_ADDRESS);
 const apkUrl = envStr(process.env.NEXT_PUBLIC_ANDROID_APK_URL);
-
-// Доля награды: игроку / на сжигание. Берётся из env, дефолт 80/20.
-function pct(v: string | undefined, fallback: number): number {
-  const s = (v ?? "").trim();
-  if (!s) return fallback; // пусто → дефолт (Number("") === 0 иначе прошёл бы проверку)
-  const n = Number(s);
-  return Number.isFinite(n) && n >= 0 && n <= 100 ? n : fallback;
-}
-const playerRewardPercent = pct(process.env.NEXT_PUBLIC_PLAYER_REWARD_PERCENT, 80);
-const burnPercent = pct(process.env.NEXT_PUBLIC_BURN_PERCENT, 20);
 
 export const ECOSYSTEM = {
   // Публичное название игрового направления и главной игры.
   productName: envStr(process.env.NEXT_PUBLIC_GAMES_NAME) ?? "DOFFA Games",
   primaryGameName: envStr(process.env.NEXT_PUBLIC_PRIMARY_GAME_NAME) ?? "DOFFA Heroes",
+
+  /** Единственный управляемый кошелёк владельца. */
+  ownerWallet: envStr(process.env.NEXT_PUBLIC_DOFFA_OWNER_WALLET) ?? OWNER_WALLET,
+
   token: {
-    symbol: "$DOFFA",
+    name: "DOFFA",
+    symbol: "DOFFA",
+    /** null — токен в mainnet ещё не создан. Выдумывать адрес нельзя. */
     mint,
-    solscanUrl:
-      envStr(process.env.NEXT_PUBLIC_SOLSCAN_TOKEN_URL) ?? `https://solscan.io/token/${mint}`,
-    /** Полная эмиссия по данным сети. */
-    totalSupply: TOTAL_SUPPLY,
-    /**
-     * Фактически доступный объём: эмиссия за вычетом того, что ушло в чёрную
-     * дыру. Именно этой цифрой корректно описывать живой запас проекта.
-     */
-    effectiveSupply: TOTAL_SUPPLY - amountEnv(process.env.NEXT_PUBLIC_BLACK_HOLE_AMOUNT, BLACK_HOLE_AMOUNT),
+    /** true только когда mint реально существует. */
+    deployed: mint !== null,
+    decimals: DECIMALS,
+    network: "mainnet-beta" as const,
+    /** Заявленная эмиссия. Фактическая читается из сети и может быть меньше после burn. */
+    initialSupply: TOTAL_SUPPLY,
+    metadataUri,
+    /** Ссылка на explorer. null, пока mint не создан. */
+    solscanUrl: mint ? `https://solscan.io/token/${mint}` : null,
   },
+
+  /** Старый токен. Только для отображения в разделе legacy, не для механик. */
+  legacy: LEGACY,
+
   /**
-   * Чёрная дыра проекта: адрес, с которого токены не возвращаются.
-   * amount = 0 → в дыре ничего нет, блок на сайте не показывается.
-   *
-   * ВАЖНО: это не сжигание (supply в сети не меняется) и не математическая
-   * невозвратность (адрес на кривой, ключ существует, но утерян). Подробности
-   * и границы утверждения — в комментарии к BLACK_HOLE_ADDRESS выше.
+   * Наградная модель. Пока draft — сайт не показывает процентов вообще.
+   * Включается только полным и корректным набором из трёх долей.
    */
-  blackHole: {
-    address: envStr(process.env.NEXT_PUBLIC_BLACK_HOLE_ADDRESS) ?? BLACK_HOLE_ADDRESS,
-    amount: amountEnv(process.env.NEXT_PUBLIC_BLACK_HOLE_AMOUNT, BLACK_HOLE_AMOUNT),
-    /** Транзакция перевода — прямое доказательство, ссылку даём на сайте. */
-    txSignature: envStr(process.env.NEXT_PUBLIC_BLACK_HOLE_TX) ?? BLACK_HOLE_TX,
-    /**
-     * Ключ существует математически (адрес на кривой ed25519), но утерян.
-     * false означало бы адрес вне кривой — там ключа нет в принципе.
-     * Сайт использует это, чтобы не обещать больше, чем может доказать.
-     */
-    keyExistsButLost: true,
+  rewardModel: {
+    draft: !pctValid,
+    valid: pctValid,
+    rewardPercent: pctValid ? rewardPct : null,
+    burnPercent: pctValid ? burnPct : null,
+    treasuryPercent: pctValid ? treasuryPct : null,
+    sum: pctSum,
   },
+
   rewardVault: {
-    /**
-     * Размер назначенного фонда наград. 0 — фонд не назначен: прежний утерян,
-     * новый пока не выделен. Заполняется через NEXT_PUBLIC_REWARD_POOL_INITIAL
-     * одновременно с NEXT_PUBLIC_REWARD_VAULT_ADDRESS.
-     */
     initial: amountEnv(process.env.NEXT_PUBLIC_REWARD_POOL_INITIAL, 0),
-    /** Публичный адрес фонда. null — ещё не назначен (показывать «Planned»). */
+    /** Публичный адрес фонда. null — ещё не назначен. */
     address: vaultAddress,
   },
+
   game: {
     /** URL веб-версии игры. null — не показывать фальшивую ссылку. */
     webUrl: envStr(process.env.NEXT_PUBLIC_GAME_WEB_URL),
+    shelfUrl: envStr(process.env.NEXT_PUBLIC_SHELF_URL),
+    arenaUrl: envStr(process.env.NEXT_PUBLIC_ARENA_URL),
     apk: {
       url: apkUrl,
       version: envStr(process.env.NEXT_PUBLIC_ANDROID_VERSION),
@@ -131,23 +208,25 @@ export const ECOSYSTEM = {
       sha256: envStr(process.env.NEXT_PUBLIC_ANDROID_SHA256),
     },
   },
+
   dex: {
     /** URL стороннего DEX-пула DOFFA/SOL. null — «Пул пока не запущен». */
     url: envStr(process.env.NEXT_PUBLIC_DEX_URL),
   },
-  // Наградная модель DOFFA Heroes. Доли берутся из конфигурации, не из «воздуха».
-  reward: {
-    playerPercent: playerRewardPercent,
-    burnPercent,
-  },
+
   // Честные статусы функций. UI обязан показывать их, а не выдавать Planned за Live.
   status: {
-    claims: parseStatus(process.env.NEXT_PUBLIC_CLAIMS_STATUS, "testing"),
+    // Токен — Live только когда mint существует в сети.
+    token: (mint ? "live" : "planned") as FeatureStatus,
+    claims: parseStatus(process.env.NEXT_PUBLIC_CLAIMS_STATUS, "planned"),
     dex: parseStatus(process.env.NEXT_PUBLIC_DEX_STATUS, "planned"),
     burn: parseStatus(process.env.NEXT_PUBLIC_BURN_STATUS, "planned"),
+    shelf: parseStatus(process.env.NEXT_PUBLIC_SHELF_STATUS, "planned"),
+    arena: parseStatus(process.env.NEXT_PUBLIC_ARENA_STATUS, "planned"),
     android: (apkUrl ? "live" : "planned") as FeatureStatus,
     rewardVault: (vaultAddress ? "live" : "planned") as FeatureStatus,
   },
+
   ads: {
     enabled: (process.env.NEXT_PUBLIC_ADS_ENABLED ?? "").trim() === "true",
   },

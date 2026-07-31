@@ -80,8 +80,10 @@ const STEPS: { n: string; t: string; d: string }[] = [
 export default function GamePage() {
   const webUrl = ECOSYSTEM.game.webUrl;
   const burnLive = ECOSYSTEM.status.burn === "live";
-  const player = ECOSYSTEM.reward.playerPercent;
-  const burn = ECOSYSTEM.reward.burnPercent;
+  // Наградная модель ещё не утверждена владельцем. Пока она в draft, сайт не
+  // показывает никаких процентов: назвать доли до их утверждения значило бы
+  // дать обещание, которого никто не давал.
+  const split = ECOSYSTEM.rewardModel;
 
   return (
     <main className="mx-auto min-h-screen max-w-5xl px-5 pb-24 pt-28">
@@ -259,8 +261,19 @@ export default function GamePage() {
               </button>
             </div>
             <p className="mt-3 text-[11px] leading-relaxed text-cream/45">
-              Числа выше — пример, а не гарантированная сумма. Ориентировочное распределение
-              наградной суммы: {player}% игроку, {burn}% на сжигание (значения из конфигурации).
+              Числа выше — пример, а не гарантированная сумма.{" "}
+              {split.valid ? (
+                <>
+                  Распределение наградной суммы: {split.rewardPercent}% игроку,{" "}
+                  {split.burnPercent}% на сжигание, {split.treasuryPercent}% в казну.
+                </>
+              ) : (
+                <>
+                  Правила распределения награды ещё не утверждены — конкретные доли
+                  появятся здесь, когда экономика будет зафиксирована. Придумывать их
+                  заранее мы не станем.
+                </>
+              )}
             </p>
             <p className="mt-2 text-[11px] font-semibold text-cream/55">
               Статус сжигания: {burnLive ? STATUS_LABEL_RU.live : STATUS_LABEL_RU[ECOSYSTEM.status.burn]}
