@@ -87,8 +87,41 @@ export default function GamePage() {
 
   return (
     <main className="mx-auto min-h-screen max-w-5xl px-5 pb-24 pt-28">
+      {/* ---------- ВИДЕО-ШАПКА ----------
+          Зациклено и без звука, как hero на главной. Но там видео —
+          съёмка, её можно кропать через object-cover. Здесь кадр текстовый:
+          при кропе обрезались бы надписи, поэтому контейнер держит
+          пропорцию 16:9, а видео вписывается целиком. */}
+      <div className="relative mb-12 overflow-hidden rounded-3xl border border-cream/10 bg-ink shadow-2xl shadow-black/40">
+        <video
+          poster="/brand/doffa-reel-poster.jpg"
+          autoPlay
+          muted
+          loop
+          playsInline
+          // preload="metadata": сам файл тянется только когда дошли до блока,
+          // до этого грузится лишь заголовок. Постер закрывает первый кадр,
+          // чтобы вместо чёрного прямоугольника сразу был логотип.
+          preload="metadata"
+          aria-label={`Видео о ${ECOSYSTEM.productName}`}
+          className="block aspect-video w-full object-cover"
+        >
+          {/* Два источника, браузер берёт первый поддерживаемый.
+              WebM идёт первым: он легче, а главное — сборки Chromium без
+              проприетарных кодеков не умеют H.264 и на одном MP4 показали бы
+              «DEMUXER_ERROR_NO_SUPPORTED_STREAMS» вместо видео.
+              MP4 остаётся для Safari и старых браузеров. */}
+          <source src="/brand/doffa-reel.webm" type="video/webm" />
+          <source src="/brand/doffa-reel.mp4" type="video/mp4" />
+        </video>
+        {/* Затемняющего градиента по низу здесь намеренно нет. На главной он
+            уместен — там видео уходит под текст. Здесь кадр текстовый, и
+            любая заливка поверх рискует перекрыть подписи; в светлой теме он
+            к тому же давал размытую полосу поверх нижней трети. */}
+      </div>
+
       {/* HERO */}
-      <Kicker>{ECOSYSTEM.productName} · BEAN DUEL</Kicker>
+      <Kicker>{ECOSYSTEM.productName} · {GAME}</Kicker>
       <h1 className="display mt-4 text-5xl font-extrabold leading-[0.98] tracking-tight text-cream-soft sm:text-6xl">
         <span className="bg-gradient-to-r from-gold via-amber to-copper bg-clip-text text-transparent">{GAME}</span>
       </h1>
