@@ -13,6 +13,7 @@
     "token:verify": "tsx src/verify-token.ts",
     "token:revoke": "tsx src/revoke-authorities.ts",
     "token:burn": "tsx src/burn.ts",
+    "token:import": "tsx src/import-key.ts",
     "token:keygen": "tsx src/devnet-keygen.ts",
     "token:airdrop": "tsx src/devnet-airdrop.ts",
     "typecheck": "tsc --noEmit",
