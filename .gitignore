@@ -44,3 +44,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# ── Ключи Solana ────────────────────────────────────────────────────────────
+# Widely-cast маски: раньше защищено было ровно одно имя (token/owner.json), и
+# ключ, сохранённый под любым другим именем, ушёл бы в коммит. Проект уже терял
+# 1 000 000 $DOFFA из-за плохой работы с ключами — второй раз нельзя.
+*owner*.json
+*keypair*.json
+*.key.json
+id.json
+*-key.json
+/token/.doffa-*.json
+/token/deploy-output/

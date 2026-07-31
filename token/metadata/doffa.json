@@ -1,0 +1,17 @@
+{
+  "name": "DOFFA",
+  "symbol": "DOFFA",
+  "description": "DOFFA is the utility token of the DOFFA gaming ecosystem, connecting DOFFA Shelf, DOFFA Arena and DOFFA Heroes.",
+  "image": "REPLACE_WITH_PERMANENT_LOGO_URL",
+  "external_url": "https://doffa.coffee",
+  "attributes": [],
+  "properties": {
+    "files": [
+      {
+        "uri": "REPLACE_WITH_PERMANENT_LOGO_URL",
+        "type": "image/png"
+      }
+    ],
+    "category": "image"
+  }
+}
