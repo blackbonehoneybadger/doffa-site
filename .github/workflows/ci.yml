@@ -51,6 +51,11 @@ jobs:
   secrets:
     name: secret scanning
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # gitleaks-action запрашивает список коммитов PR. Без этого права
+      # действие падает с 403 «Resource not accessible by integration».
+      pull-requests: read
     steps:
       - uses: actions/checkout@v4
         with:
@@ -65,18 +70,51 @@ jobs:
 
       - name: Ключи Solana в отслеживаемых файлах
         run: |
-          echo "Ищу JSON-массивы из 64 чисел — так выглядит keypair Solana."
-          # Исключаем package-lock.json и подобное: там законные длинные массивы
-          # не встречаются, но файл огромный и его разбор бессмыслен.
-          FOUND=$(git ls-files -z \
-            | grep -zvE '(package-lock\.json|\.next/|node_modules/)' \
-            | xargs -0 grep -lE '\[[[:space:]]*([0-9]{1,3}[[:space:]]*,[[:space:]]*){60,}[0-9]{1,3}[[:space:]]*\]' 2>/dev/null || true)
-          if [ -n "$FOUND" ]; then
-            echo "::error::Похоже на приватный ключ Solana в отслеживаемых файлах:"
-            echo "$FOUND"
-            exit 1
-          fi
-          echo "OK — ключей Solana не найдено."
+          # Точная проверка вместо грубого grep по «64 числа подряд».
+          #
+          # Грубый вариант давал ложное срабатывание на файлах покрытия тестов:
+          # там тоже встречаются длинные числовые массивы. Признак настоящего
+          # keypair другой — им является ВСЁ содержимое файла целиком:
+          # массив ровно из 64 чисел 0..255 и ничего больше.
+          #
+          # Дополнительно ищем такие массивы, вшитые прямо в исходники, — там
+          # длинных числовых литералов быть не должно вовсе.
+          node -e '
+            const { execSync } = require("child_process");
+            const fs = require("fs");
+            const files = execSync("git ls-files -z", { maxBuffer: 64e6 })
+              .toString().split("\0").filter(Boolean)
+              .filter((f) => !/package-lock\.json|^\.next\/|node_modules\//.test(f));
+
+            const bad = [];
+            const embedded = /\[\s*(?:\d{1,3}\s*,\s*){60,}\d{1,3}\s*\]/;
+
+            for (const f of files) {
+              let text;
+              try { text = fs.readFileSync(f, "utf8"); } catch { continue; }
+
+              if (f.endsWith(".json")) {
+                try {
+                  const j = JSON.parse(text);
+                  const isKey = Array.isArray(j) && j.length === 64 &&
+                    j.every((n) => Number.isInteger(n) && n >= 0 && n <= 255);
+                  if (isKey) bad.push(f + "  (файл целиком — keypair Solana)");
+                } catch { /* не JSON — не наш случай */ }
+                continue;
+              }
+
+              if (/\.(ts|tsx|js|jsx|mjs|cjs)$/.test(f) && embedded.test(text)) {
+                bad.push(f + "  (массив из 64+ чисел внутри исходника)");
+              }
+            }
+
+            if (bad.length) {
+              console.log("::error::Похоже на приватный ключ Solana:");
+              bad.forEach((b) => console.log("  " + b));
+              process.exit(1);
+            }
+            console.log("OK — ключей Solana не найдено (" + files.length + " файлов проверено).");
+          '
 
       - name: Seed-фразы в отслеживаемых файлах
         run: |
