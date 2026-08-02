@@ -59,7 +59,6 @@ function num(n: number): string {
 export default async function TokenPage() {
   const t = ECOSYSTEM.token;
   const owner = ECOSYSTEM.ownerWallet;
-  const legacy = ECOSYSTEM.legacy;
 
   // Пока mint не создан, в сеть не ходим вообще: спрашивать нечего.
   // Подставить старый mint, чтобы «было что показать», нельзя — страница
@@ -268,51 +267,6 @@ export default async function TokenPage() {
           уменьшает количество токенов в сети — это факт, проверяемый в explorer, но
           не обещание какой-либо цены.
         </p>
-      </section>
-
-      {/* ── Legacy ───────────────────────────────────────────────────── */}
-      <section className="mt-14">
-        <div className="flex flex-wrap items-center gap-3">
-          <h2 className="display text-2xl font-bold text-cream-soft sm:text-3xl">
-            Старый токен
-          </h2>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-cream/25 bg-white/5 px-2.5 py-0.5 text-[11px] font-semibold text-cream/55">
-            deprecated
-          </span>
-        </div>
-        <p className="mt-4 text-sm leading-relaxed text-cream/70">
-          До {legacy.deprecatedAt} у проекта был другой токен DOFFA. Он{" "}
-          <b className="text-cream-soft">больше не используется</b> ни в играх, ни в
-          наградах, ни в оплате. Удалить его из сети невозможно, поэтому мы публикуем адрес
-          открыто: умолчать о токене, который виден в блокчейне, значило бы попытаться
-          что-то скрыть.
-        </p>
-        <div className="card mt-4 rounded-2xl px-6 py-2">
-          <Row label="Старый mint" value={legacy.mint} hint="deprecated, не использовать" />
-          <Row label="Старый кошелёк" value={legacy.ownerWallet} />
-          <Row label="Эмиссия старого токена" value={`${num(legacy.totalSupply)} DOFFA`} />
-          <Row
-            label="В чёрной дыре"
-            value={`${num(legacy.blackHole.amount)} DOFFA`}
-            hint="ключ утерян, средства оттуда не выходят"
-          />
-        </div>
-        <div className="mt-4 flex flex-wrap gap-2">
-          <a
-            href={`https://solscan.io/token/${legacy.mint}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-full border border-cream/25 px-4 py-2 text-sm font-semibold text-cream transition hover:border-amber hover:text-amber"
-          >
-            Старый токен в Solscan ↗
-          </a>
-          <Link
-            href="/transparency"
-            className="inline-flex items-center gap-2 rounded-full border border-cream/25 px-4 py-2 text-sm font-semibold text-cream transition hover:border-amber hover:text-amber"
-          >
-            Подробности на Transparency
-          </Link>
-        </div>
       </section>
 
       <div className="mt-16 flex flex-wrap justify-center gap-6 text-center">

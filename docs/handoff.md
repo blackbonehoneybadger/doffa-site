@@ -76,11 +76,11 @@ CI              ✅ все проверки зелёные
 
 | Файл | Что изменилось |
 |---|---|
-| `app/config/ecosystem.ts` | переписан: `mint` без дефолта, блок `legacy`, `rewardModel` вместо `reward`, `validateRewardSplit()` |
+| `app/config/ecosystem.ts` | переписан: `mint` без дефолта, `rewardModel` вместо `reward`, `validateRewardSplit()`; поле `legacy` удалено 2026-08-02 |
 | `app/solana.ts` | убран хардкод старого mint и кошелька → `mint: null`, владелец `E4tvCMvk…` |
 | `app/config/merch.ts` | убран хардкод mint; оплата в DOFFA гасится сама, если mint нет |
 | `app/lib/external/price.ts` | обработан случай `mint === null` — SOL котируется, DOFFA нет |
-| `app/transparency/page.tsx` | чёрная дыра переехала в `legacy`, доли награды — draft |
+| `app/transparency/page.tsx` | раздел чёрной дыры убран 2026-08-02, доли награды — draft |
 | `app/game/page.tsx` | **видео-шапка**, имя игры из конфигурации вместо хардкода |
 | `app/page.tsx` | навигация: Shelf · Arena · Heroes · Token |
 | `app/sitemap.ts` | добавлены `/shelf`, `/arena`, `/token` |
@@ -92,7 +92,7 @@ CI              ✅ все проверки зелёные
 
 | Файл | Назначение |
 |---|---|
-| `app/token/page.tsx` | все параметры токена, статус выпуска, DOFFA ≠ Beans, раздел legacy |
+| `app/token/page.tsx` | все параметры токена, статус выпуска, DOFFA ≠ Beans; раздел про старый токен убран 2026-08-02 |
 | `app/shelf/page.tsx` | DOFFA Shelf — тапалка, Beans |
 | `app/arena/page.tsx` | DOFFA Arena — быстрые игры |
 

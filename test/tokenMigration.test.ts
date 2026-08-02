@@ -244,11 +244,25 @@ test("операционный mint не равен старому — и не �
   assert.equal(ECOSYSTEM.status.token, "planned");
 });
 
-test("старый токен доступен только как legacy, помечен deprecated", async () => {
-  const { ECOSYSTEM } = await import("../app/config/ecosystem");
-  assert.equal(ECOSYSTEM.legacy.mint, OLD_MINT, "адрес должен быть виден в разделе legacy");
-  assert.equal(ECOSYSTEM.legacy.ownerWallet, OLD_WALLET);
-  assert.ok(ECOSYSTEM.legacy.deprecatedAt, "должна быть дата деприкации");
+test("старого токена нет в конфиге сайта вообще", async () => {
+  // Решение владельца от 2026-08-02: сайт о старом токене не рассказывает.
+  // Проверяем отсутствие именно поля, а не только текста на странице: пока
+  // legacy лежит в ECOSYSTEM, любая новая страница может его отрисовать.
+  const eco = (await import("../app/config/ecosystem")).ECOSYSTEM as Record<string, unknown>;
+  assert.equal("legacy" in eco, false, "поле legacy должно быть удалено из ECOSYSTEM");
+});
+
+test("старых адресов нет ни в одном файле, попадающем в сборку", () => {
+  // Черная дыра сюда же: её адрес — часть истории старого токена.
+  const BLACK_HOLE = "Hk6X6qb32RD8N5DgMv17wiR8aj88v1h8BShSEHJGKcLV";
+  const found: string[] = [];
+  for (const f of productionFiles()) {
+    const src = readFileSync(f, "utf8");
+    if (src.includes(OLD_MINT) || src.includes(OLD_WALLET) || src.includes(BLACK_HOLE)) {
+      found.push(f.replace(ROOT + "/", ""));
+    }
+  }
+  assert.deepEqual(found, [], `старые адреса вернулись в код сайта: ${found}`);
 });
 
 test("owner wallet — новый управляемый кошелёк", async () => {

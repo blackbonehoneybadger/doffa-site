@@ -53,50 +53,16 @@ const mint = envStr(process.env.NEXT_PUBLIC_DOFFA_MINT);
 /** Постоянный URI метаданных (IPFS/Arweave). null — ещё не загружены. */
 const metadataUri = envStr(process.env.NEXT_PUBLIC_DOFFA_METADATA_URI);
 
-/* ═══════════════════════ LEGACY-ТОКЕН (DEPRECATED) ═══════════════════════ */
-
-/**
- * Старый токен DOFFA. НЕ ИСПОЛЬЗУЕТСЯ в игровых механиках, оплате и наградах.
+/* ─────────────────────────── о старом токене ────────────────────────────
  *
- * Адреса живут здесь по одной причине: сайт обязан показать их на /token в
- * разделе legacy — старый токен публично виден в сети, и умолчать о нём
- * значило бы попытаться скрыть. Но ни одно операционное поле (token.mint,
- * оплата мерча, награды) на него больше не ссылается — это проверяется тестом.
+ * До 2026-07-30 у проекта был другой токен DOFFA. По решению владельца сайт
+ * о нём не рассказывает: ни адресов, ни эмиссии, ни чёрной дыры. Поэтому
+ * здесь нет ни поля legacy, ни констант со старыми адресами — тест следит,
+ * чтобы они не вернулись ни в один файл, попадающий в сборку.
  *
- * Чёрная дыра Hk6X6qb… — адрес, из которого токены не возвращаются: ключ к
- * нему утерян. Две границы, которые нельзя усиливать, потому что обе
- * проверяются публично:
- *   1. Это НЕ сжигание — supply старого токена в сети не изменился.
- *   2. Адрес НА кривой ed25519 — ключ математически существует, просто им
- *      никто не владеет. Не то же самое, что канонический инсинератор.
- */
-type LegacyToken = {
-  readonly mint: string;
-  readonly ownerWallet: string;
-  readonly totalSupply: number;
-  readonly deprecatedAt: string;
-  readonly blackHole: {
-    readonly address: string;
-    readonly amount: number;
-    readonly txSignature: string;
-    readonly keyExistsButLost: boolean;
-  };
-};
-
-const LEGACY: LegacyToken = {
-  mint: "57aAfCuXx7uuc8g8P9kTxR65TKQtZsFDJeKhdD5xu6uo",
-  ownerWallet: "6cAtKTM8ZPUgRgmzsgkRfZsq4jZTXymA7cLqjz9qYMFS",
-  totalSupply: 100_000_000,
-  deprecatedAt: "2026-07-30",
-  blackHole: {
-    address: "Hk6X6qb32RD8N5DgMv17wiR8aj88v1h8BShSEHJGKcLV",
-    amount: 1_000_000,
-    txSignature:
-      "v8NitwxyDKsySiSUPc9evfRLt6Yh3Jj4pC5wJpamyDZ8cU484zdCosa9A4wRkfarmxZMf5xMsqmMsKipKdL9kYA",
-    /** Ключ существует математически, но утерян. Не «ключа не существует». */
-    keyExistsButLost: true,
-  },
-};
+ * Данные не потеряны: они остались в docs/LEGACY-TOKEN.md и в скрипте
+ * token/src/burn-legacy.ts, которому старый mint нужен по существу.
+ * ──────────────────────────────────────────────────────────────────────── */
 
 /* ═══════════════════════ НАГРАДНАЯ МОДЕЛЬ (DRAFT) ═══════════════════════ */
 
@@ -173,9 +139,6 @@ export const ECOSYSTEM = {
     /** Ссылка на explorer. null, пока mint не создан. */
     solscanUrl: mint ? `https://solscan.io/token/${mint}` : null,
   },
-
-  /** Старый токен. Только для отображения в разделе legacy, не для механик. */
-  legacy: LEGACY,
 
   /**
    * Наградная модель. Пока draft — сайт не показывает процентов вообще.
