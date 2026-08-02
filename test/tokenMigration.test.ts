@@ -142,6 +142,49 @@ test("повторный выпуск эмиссии заблокирован", 
   assert.match(src, /supply\s*>\s*0n/, "непустой supply должен останавливать выпуск");
 });
 
+test("подтверждение необратимой операции требует живого терминала", () => {
+  // Фраза имеет смысл только пока её печатает человек. Читать её из пайпа —
+  // значит позволить автоматике подтвердить необратимую операцию самой себе.
+  const src = readFileSync(join(ROOT, "token/src/config.ts"), "utf8");
+  assert.match(src, /confirmExactPhrase/);
+  assert.match(src, /process\.stdin\.isTTY[\s\S]{0,300}живого терминала/);
+});
+
+test("прогон одной командой не отзывает полномочия и не жжёт", () => {
+  // token:go выпускает токен. Отзыв authority и сжигание необратимы иначе,
+  // чем всё остальное: их нельзя откатить даже частично, поэтому они остаются
+  // отдельными командами с отдельными фразами.
+  const src = readFileSync(join(ROOT, "token/src/run-all.ts"), "utf8");
+  const steps = [...src.matchAll(/file:\s*"([^"]+)"/g)].map((m) => m[1]);
+  assert.deepEqual(steps, [
+    "check-wallet.ts",
+    "create-mint.ts",
+    "create-owner-token-account.ts",
+    "create-metadata.ts",
+    "mint-supply.ts",
+    "verify-token.ts",
+  ]);
+  for (const forbidden of ["revoke-authorities.ts", "burn.ts", "burn-legacy.ts"]) {
+    assert.ok(!steps.includes(forbidden), `${forbidden} не должен входить в token:go`);
+  }
+});
+
+test("прогон в mainnet требует фразу, devnet-репетицию и постоянные метаданные", () => {
+  const src = readFileSync(join(ROOT, "token/src/run-all.ts"), "utf8");
+  assert.match(src, /CREATE MAINNET DOFFA/, "нужна точная подтверждающая фраза");
+  assert.match(src, /deploy-output[\s\S]{0,200}devnet\.json/, "должен требовать след devnet-прогона");
+  assert.match(src, /signatures\?\.mintSupply/, "devnet-прогон должен быть доведён до эмиссии");
+  assert.match(src, /DOFFA_METADATA_URI пуст/, "без метаданных в mainnet нельзя");
+  assert.match(src, /vercel\\\.app/, "временные хостинги должны отвергаться");
+});
+
+test("token:go зарегистрирован в package.json", () => {
+  const pkg = JSON.parse(readFileSync(join(ROOT, "token/package.json"), "utf8")) as {
+    scripts: Record<string, string>;
+  };
+  assert.equal(pkg.scripts["token:go"], "tsx src/run-all.ts");
+});
+
 test("devnet-скрипты отказываются работать в mainnet", () => {
   for (const f of ["devnet-keygen.ts", "devnet-airdrop.ts"]) {
     const src = readFileSync(join(ROOT, "token/src", f), "utf8");

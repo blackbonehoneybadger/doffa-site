@@ -6,6 +6,7 @@
   "description": "Скрипты выпуска, проверки и сжигания токена DOFFA на Solana",
   "scripts": {
     "token:check-wallet": "tsx src/check-wallet.ts",
+    "token:go": "tsx src/run-all.ts",
     "token:create": "tsx src/create-mint.ts",
     "token:account": "tsx src/create-owner-token-account.ts",
     "token:metadata": "tsx src/create-metadata.ts",

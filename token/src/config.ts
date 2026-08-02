@@ -338,6 +338,35 @@ export function printHeader(action: string, extra: Record<string, string> = {}):
   console.log(`${bar}\n`);
 }
 
+/**
+ * Требует ввести точную фразу перед необратимой операцией.
+ *
+ * Живой терминал обязателен: смысл фразы в том, что её печатает человек.
+ * Через пайп её так же легко подставить автоматике, и защита превратилась бы
+ * в формальность — поэтому перенаправленный ввод отвергается, а не читается.
+ */
+export async function confirmExactPhrase(phrase: string): Promise<void> {
+  if (!process.stdin.isTTY) {
+    throw new Error(
+      "⛔ Подтверждение требует живого терминала.\n\n" +
+        "   Запуск с перенаправленным вводом (пайп, CI, автоматизация) запрещён:\n" +
+        "   необратимая операция не должна происходить без человека за клавиатурой.",
+    );
+  }
+  console.log(`   Чтобы продолжить, введи точно: ${phrase}`);
+  console.log("   Любой другой ввод — отмена.\n");
+
+  const { createInterface } = await import("node:readline/promises");
+  const rl = createInterface({ input: process.stdin, output: process.stdout });
+  const answer = await rl.question("> ");
+  rl.close();
+
+  if (answer.trim() !== phrase) {
+    throw new Error("Отменено: фраза не совпала. Ничего не выполнено, ни одна транзакция не отправлена.");
+  }
+  console.log("");
+}
+
 /** Единая обработка ошибок: печатаем сообщение и выходим с кодом 1. */
 export function fail(e: unknown): never {
   const msg = e instanceof Error ? e.message : String(e);
