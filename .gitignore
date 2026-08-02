@@ -75,3 +75,8 @@ solana-keypair*
 credentials*
 /token/.doffa-*.json
 /token/deploy-output/
+
+# Печатный лист резервной копии ключа — содержит приватный ключ открытым
+# текстом. Создаётся token:backup-sheet локально, печатается и удаляется.
+doffa-key-backup.html
+*key-backup*.html
