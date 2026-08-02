@@ -54,6 +54,17 @@ export async function getTokenPrices(): Promise<TokenPrices> {
   if (!INTEGRATIONS.price.enabled) return empty;
 
   const mint = ECOSYSTEM.token.mint;
+  // Токен ещё не выпущен — котировать нечего. Спрашивать цену несуществующего
+  // mint бессмысленно, а подставить старый значило бы показать чужую цену
+  // как цену DOFFA. SOL при этом всё равно отдаём: он от токена не зависит.
+  if (mint === null) {
+    const solOnly = await fetchJson(`https://lite-api.jup.ag/price/v3?ids=${SOL_MINT}`, {
+      revalidate: 300,
+      headers: INTEGRATIONS.price.apiKey ? { "x-api-key": INTEGRATIONS.price.apiKey } : undefined,
+    });
+    return solOnly === null ? empty : { solUsd: parseTokenPrice(solOnly, SOL_MINT), doffaUsd: null };
+  }
+
   const url = `https://lite-api.jup.ag/price/v3?ids=${SOL_MINT},${encodeURIComponent(mint)}`;
   const headers = INTEGRATIONS.price.apiKey
     ? { "x-api-key": INTEGRATIONS.price.apiKey }

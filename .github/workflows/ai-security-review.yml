@@ -1,0 +1,106 @@
+name: AI security review
+
+# Два независимых ИИ-ревьюера на каждый PR: от Anthropic и от OpenAI.
+#
+# Зачем два. Оба читают код смыслово, а не по шаблонам, и находят то, что
+# grep не найдёт: обход авторизации, логические дыры, утечки через поток
+# данных. Но у каждой модели свои слепые пятна, и совпадение двух независимых
+# мнений — куда более сильный сигнал, чем одно.
+#
+# Для этого проекта цена ошибки особенная: речь про токен с эмиссией
+# 100 000 000 и про необратимые операции (отзыв authority, burn). Ошибку в
+# них не откатить, поэтому лишний ревьюер дешевле последствий.
+#
+# ⚠️ Оба инструмента платные — тратят токены API на каждый PR.
+# ⚠️ Оба НЕ защищены от prompt injection: в PR из форков может лежать текст,
+#    который попытается ими управлять. Поэтому оба джоба запускаются только
+#    для PR из этого же репозитория, а форки пропускаются намеренно.
+#
+# Ключей в репозитории нет и не будет: они добавляются в
+# Settings → Secrets and variables → Actions. Пока секрет не задан, джоб
+# честно пропускается, а не падает — красный CI, который нельзя починить
+# кодом, это просто шум.
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  # ── Claude ───────────────────────────────────────────────────────────────
+  claude:
+    name: Claude security review
+    runs-on: ubuntu-latest
+    # Форки пропускаем: их содержимое может пытаться управлять ревьюером.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    env:
+      HAS_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+    steps:
+      - name: Пропуск, если ключ не задан
+        if: env.HAS_KEY != 'true'
+        run: |
+          echo "::notice::ANTHROPIC_API_KEY не задан — Claude-ревью пропущено."
+          echo "Добавь секрет в Settings → Secrets and variables → Actions."
+
+      - uses: actions/checkout@v4
+        if: env.HAS_KEY == 'true'
+        with:
+          # Полная история нужна, чтобы корректно посчитать диф PR.
+          fetch-depth: 0
+
+      - name: Claude security review
+        if: env.HAS_KEY == 'true'
+        uses: anthropics/claude-code-security-review@main
+        with:
+          claude-api-key: ${{ secrets.ANTHROPIC_API_KEY }}
+          comment-pr: 'true'
+          # Архив и служебные скрипты агентов не развиваются и в бандл не идут.
+          exclude-directories: 'archive,.claude,node_modules,.next'
+          custom-security-scan-instructions: |
+            Это репозиторий сайта проекта с SPL-токеном на Solana.
+            Особое внимание удели:
+            1. Приватным ключам и seed-фразам — их не должно быть нигде,
+               включая тесты, фикстуры и примеры конфигурации.
+            2. Скриптам в token/src: это операции с реальными деньгами.
+               Проверь, что необратимые действия (отзыв mint/freeze authority,
+               burn) невозможно выполнить случайно, что сеть сверяется до
+               подписи, и что суммы считаются в BigInt без float.
+            3. Файлам конфигурации: адрес mint не должен подставляться
+               дефолтом, если токен не выпущен.
+            4. Обработке пользовательского ввода в API-роутах и оплате мерча.
+
+  # ── Codex ────────────────────────────────────────────────────────────────
+  codex:
+    name: Codex security scan
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    env:
+      HAS_KEY: ${{ secrets.OPENAI_API_KEY != '' }}
+    steps:
+      - name: Пропуск, если ключ не задан
+        if: env.HAS_KEY != 'true'
+        run: |
+          echo "::notice::OPENAI_API_KEY не задан — Codex-скан пропущен."
+          echo "Добавь секрет в Settings → Secrets and variables → Actions."
+
+      - uses: actions/checkout@v4
+        if: env.HAS_KEY == 'true'
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        if: env.HAS_KEY == 'true'
+        with:
+          node-version: 22
+
+      - name: Codex Security scan
+        if: env.HAS_KEY == 'true'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          # Домашняя директория раннера не всегда доступна на запись.
+          CODEX_SECURITY_STATE_DIR: ${{ runner.temp }}/codex-security
+        run: |
+          mkdir -p "$CODEX_SECURITY_STATE_DIR"
+          npx --yes @openai/codex-security scan . --auth api-key

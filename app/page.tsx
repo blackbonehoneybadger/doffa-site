@@ -31,7 +31,7 @@ const REWARD_VAULT = ECOSYSTEM.rewardVault.initial;
 /** Доля фонда в эмиссии. «—», пока фонд не назначен. */
 function vaultSharePct(loc: string): string {
   if (REWARD_VAULT <= 0) return "—";
-  const pct = (REWARD_VAULT / ECOSYSTEM.token.totalSupply) * 100;
+  const pct = (REWARD_VAULT / ECOSYSTEM.token.initialSupply) * 100;
   return `${pct.toLocaleString(loc, { maximumFractionDigits: 2 })}%`;
 }
 // Публичная игра — DOFFA Heroes. Ссылка на веб-версию берётся из
@@ -242,6 +242,19 @@ export default function Home() {
                 </button>
               ),
             )}
+            {/* Структура экосистемы: Shelf → Arena → Heroes, затем токен. */}
+            <Link href="/shelf" className="text-xs text-cream/70 transition hover:text-gold xl:text-sm">
+              Shelf
+            </Link>
+            <Link href="/arena" className="text-xs text-cream/70 transition hover:text-gold xl:text-sm">
+              Arena
+            </Link>
+            <Link href="/game" className="text-xs text-cream/70 transition hover:text-gold xl:text-sm">
+              Heroes
+            </Link>
+            <Link href="/token" className="text-xs text-cream/70 transition hover:text-gold xl:text-sm">
+              Token
+            </Link>
             <Link href="/transparency" className="text-xs text-cream/70 transition hover:text-gold xl:text-sm">
               {TRANSPARENCY_LABEL[lang] ?? "Transparency"}
             </Link>
@@ -392,6 +405,22 @@ export default function Home() {
                   </button>
                 ),
               )}
+              {/* Структура экосистемы: Shelf → Arena → Heroes, затем токен. */}
+              {[
+                { href: "/shelf", label: "DOFFA Shelf" },
+                { href: "/arena", label: "DOFFA Arena" },
+                { href: "/game", label: "DOFFA Heroes" },
+                { href: "/token", label: "Token" },
+              ].map((l) => (
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  onClick={() => setMenuOpen(false)}
+                  className="block rounded-lg px-3 py-2 text-left text-sm text-cream/75 transition hover:bg-white/5 hover:text-gold"
+                >
+                  {l.label}
+                </Link>
+              ))}
               <Link
                 href="/transparency"
                 onClick={() => setMenuOpen(false)}

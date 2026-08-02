@@ -49,21 +49,24 @@ function amount(n: number): string {
 export default async function TransparencyPage() {
   const mint = ECOSYSTEM.token.mint;
   const vault = ECOSYSTEM.rewardVault;
-  const blackHole = ECOSYSTEM.blackHole;
   const rewardsStatus = ECOSYSTEM.status.claims;
   const initial = vault.initial.toLocaleString("ru-RU");
 
   // Реальные данные из сети. Каждая часть независима: недоступность одной не
   // мешает показать остальные, а null означает «не показываем ничего».
+  //
+  // Пока новый mint не создан, читать из сети нечего: запросы не отправляются
+  // и всё остаётся null. Подставлять сюда старый mint нельзя — страница
+  // показывала бы данные деприкированного токена как данные действующего.
   const [prices, supply, authorities, vaultBalance] = await Promise.all([
     getTokenPrices(),
-    getSupply(mint),
-    getMintAuthorities(mint),
-    vault.address ? getTokenBalance(vault.address, mint) : Promise.resolve(null),
+    mint ? getSupply(mint) : Promise.resolve(null),
+    mint ? getMintAuthorities(mint) : Promise.resolve(null),
+    vault.address && mint ? getTokenBalance(vault.address, mint) : Promise.resolve(null),
   ]);
 
   // Сожжено = заявленная первоначальная эмиссия минус текущая по данным сети.
-  const burned = burnedFromSupply(ECOSYSTEM.token.totalSupply, supply);
+  const burned = burnedFromSupply(ECOSYSTEM.token.initialSupply, supply);
 
   // Статус сжигания больше не берётся из env вслепую: если сеть показывает
   // сожжённые токены — это Live по факту, а не по настройке.
@@ -94,9 +97,9 @@ export default async function TransparencyPage() {
       <p className="mt-6 max-w-2xl text-lg leading-relaxed text-cream/75">
         Награды не создаются из воздуха — они выплачиваются из выделенного{" "}
         <b className="text-cream-soft">Reward Vault</b>. Здесь мы показываем только реальные
-        данные и честные статусы — без придуманных адресов, балансов и транзакций. В том
-        числе неудобные: {blackHole.amount > 0 && "часть токенов ушла в чёрную дыру, и мы пишем об этом ниже"}
-        {blackHole.amount === 0 && "если что-то не работает, мы говорим об этом прямо"}.
+        данные и честные статусы — без придуманных адресов, балансов и транзакций. Если
+        что-то ещё не готово, так и написано: «не назначен», «не опубликован». Пустое поле
+        честнее красивой цифры, которую нельзя проверить.
       </p>
 
       {/* REWARD VAULT */}
@@ -117,9 +120,8 @@ export default async function TransparencyPage() {
               <>
                 <p className="display mt-2 text-3xl font-extrabold text-cream/45">Не назначен</p>
                 <p className="mt-2 text-xs leading-relaxed text-cream/50">
-                  Прежний фонд на {blackHole.amount.toLocaleString("ru-RU")} $DOFFA ушёл
-                  в чёрную дыру (см. ниже). Новый запас на награды пока не выделен — как
-                  только это произойдёт, адрес и баланс появятся здесь.
+                  Запас на награды пока не выделен — как только это произойдёт, адрес и
+                  баланс появятся здесь и их можно будет проверить в Solscan.
                 </p>
               </>
             )}
@@ -169,90 +171,6 @@ export default async function TransparencyPage() {
           </div>
         </div>
 
-        {/* Чёрная дыра $DOFFA. Два утверждения, которые НЕЛЬЗЯ усиливать:
-            (1) это не сжигание — supply в сети не изменился;
-            (2) адрес на кривой ed25519, ключ существует, но утерян — то есть
-                необратимость практическая, а не математическая.
-            Написать «сожжено» или «ключа не существует» было бы ложью, которую
-            легко поймать: и supply, и кривая проверяются публично. */}
-        {blackHole.amount > 0 && (
-          <div className="card mt-4 rounded-2xl border border-amber/25 p-6">
-            <div className="flex flex-wrap items-center gap-3">
-              <p className="text-xs font-semibold uppercase tracking-wider text-amber">
-                Чёрная дыра $DOFFA · вне обращения
-              </p>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber/40 bg-amber/10 px-2.5 py-0.5 text-[11px] font-semibold text-amber">
-                <span className="h-1.5 w-1.5 rounded-full bg-current" />
-                Обратно не выходит
-              </span>
-            </div>
-            <p className="display mt-3 text-3xl font-extrabold text-cream-soft">
-              {blackHole.amount.toLocaleString("ru-RU")} $DOFFA
-            </p>
-            <p className="mt-3 text-sm leading-relaxed text-cream/70">
-              У проекта есть адрес, из которого токены не возвращаются, — чёрная дыра.
-              1 июля 2026 года на него ушёл {blackHole.amount.toLocaleString("ru-RU")} $DOFFA:
-              этот кошелёк создавался под фонд наград, но приватный ключ к нему был утерян.
-              Мы искали его в файлах, в истории репозитория, во всех аккаунтах Phantom и в
-              переменных сервера — нигде. 29 июля 2026 года ключ признан утраченным, а адрес
-              объявлен чёрной дырой: тратить оттуда не может никто, включая нас.
-            </p>
-            <p className="mt-3 text-sm leading-relaxed text-cream/70">
-              Для держателей результат тот же, что от сжигания:{" "}
-              {blackHole.amount.toLocaleString("ru-RU")} $DOFFA никогда не попадут на рынок и
-              никому не будут розданы. Эмиссия в сети формально осталась{" "}
-              {ECOSYSTEM.token.totalSupply.toLocaleString("ru-RU")}, а в реальном обращении —{" "}
-              <b className="text-cream-soft">
-                {ECOSYSTEM.token.effectiveSupply.toLocaleString("ru-RU")} $DOFFA
-              </b>
-              . Все награды и все расчёты на сайте идут только от этого числа.
-            </p>
-
-            {/* Граница утверждения. Мы говорим ровно то, что можем доказать, и
-                сами называем слабое место — иначе его назовёт кто-то другой. */}
-            <div className="mt-4 rounded-xl border border-cream/15 bg-white/[0.03] p-4">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-cream/45">
-                Где граница наших слов
-              </p>
-              <p className="mt-2 text-xs leading-relaxed text-cream/60">
-                Мы не пишем «сожжено»: сжигание уменьшает эмиссию в сети, а здесь она не
-                изменилась — токены лежат на адресе, а не уничтожены.
-                {blackHole.keyExistsButLost && (
-                  <>
-                    {" "}И не пишем «ключа не существует»: адрес лежит на кривой ed25519,
-                    значит ключ математически существует — просто им никто не владеет. Это
-                    слабее, чем у служебных адресов-инсинераторов, у которых ключа нет в
-                    принципе. Честная формулировка: за всё время с адреса не ушло ни одного
-                    токена, и это видно в сети.
-                  </>
-                )}
-              </p>
-            </div>
-
-            <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-cream/45">
-              Не верь на слово — проверь сам
-            </p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              <a
-                href={`https://solscan.io/tx/${blackHole.txSignature}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-cream/25 px-4 py-2 text-sm font-semibold text-cream transition hover:border-amber hover:text-amber"
-              >
-                Та самая транзакция ↗
-              </a>
-              <a
-                href={`https://solscan.io/account/${blackHole.address}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-cream/25 px-4 py-2 text-sm font-semibold text-cream transition hover:border-amber hover:text-amber"
-              >
-                Адрес (расходов нет ни одного) ↗
-              </a>
-            </div>
-            <p className="mt-3 break-all text-[11px] text-cream/40">{blackHole.address}</p>
-          </div>
-        )}
       </section>
 
       {/* РАСПРЕДЕЛЕНИЕ И СЖИГАНИЕ */}
@@ -260,16 +178,41 @@ export default async function TransparencyPage() {
         <h2 className="display text-3xl font-bold text-cream-soft sm:text-4xl">Распределение и сжигание</h2>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <div className="card rounded-2xl p-6">
-            <p className="text-xs font-semibold uppercase tracking-wider text-cream/45">Ориентировочное распределение награды</p>
-            <div className="mt-3 flex items-center gap-4">
-              <span className="display text-2xl font-extrabold text-cream-soft">{ECOSYSTEM.reward.playerPercent}%</span>
-              <span className="text-sm text-cream/60">игроку</span>
-            </div>
-            <div className="mt-1.5 flex items-center gap-4">
-              <span className="display text-xl font-bold text-copper">{ECOSYSTEM.reward.burnPercent}%</span>
-              <span className="text-sm text-cream/60">на сжигание</span>
-            </div>
-            <p className="mt-3 text-[11px] text-cream/45">Значения берутся из конфигурации и могут меняться.</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-cream/45">Распределение награды</p>
+            {ECOSYSTEM.rewardModel.valid ? (
+              <>
+                <div className="mt-3 flex items-center gap-4">
+                  <span className="display text-2xl font-extrabold text-cream-soft">
+                    {ECOSYSTEM.rewardModel.rewardPercent}%
+                  </span>
+                  <span className="text-sm text-cream/60">игроку</span>
+                </div>
+                <div className="mt-1.5 flex items-center gap-4">
+                  <span className="display text-xl font-bold text-copper">
+                    {ECOSYSTEM.rewardModel.burnPercent}%
+                  </span>
+                  <span className="text-sm text-cream/60">на сжигание</span>
+                </div>
+                <div className="mt-1.5 flex items-center gap-4">
+                  <span className="display text-xl font-bold text-teal">
+                    {ECOSYSTEM.rewardModel.treasuryPercent}%
+                  </span>
+                  <span className="text-sm text-cream/60">в казну</span>
+                </div>
+                <p className="mt-3 text-[11px] text-cream/45">
+                  Сумма долей проверяется и равна 100%.
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="display mt-3 text-2xl font-extrabold text-cream/45">Draft</p>
+                <p className="mt-2 text-xs leading-relaxed text-cream/55">
+                  Экономика ещё не утверждена, поэтому конкретных долей здесь нет. Показать
+                  проценты до их утверждения значило бы дать обещание, которого никто не
+                  давал. Появятся, когда модель будет зафиксирована.
+                </p>
+              </>
+            )}
           </div>
           <div className="card rounded-2xl p-6">
             <div className="flex items-center gap-3">
@@ -286,7 +229,7 @@ export default async function TransparencyPage() {
                 </p>
                 <p className="mt-2 text-xs text-cream/55">
                   Сожжено навсегда. Считается по эмиссии в сети: было{" "}
-                  {ECOSYSTEM.token.totalSupply.toLocaleString("ru-RU")}, сейчас {amount(supply!.total)}.
+                  {ECOSYSTEM.token.initialSupply.toLocaleString("ru-RU")}, сейчас {amount(supply!.total)}.
                 </p>
               </>
             ) : (
@@ -328,19 +271,39 @@ export default async function TransparencyPage() {
 
       {/* ТОКЕН */}
       <section className="mt-14">
-        <h2 className="display text-3xl font-bold text-cream-soft sm:text-4xl">Токен $DOFFA</h2>
-        <p className="mt-4 text-sm leading-relaxed text-cream/70">
-          Mint токена открыт в Solscan — проверить можно в любой момент.
-        </p>
-        <a
-          href={ECOSYSTEM.token.solscanUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-4 inline-flex w-fit items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-5 py-2 text-sm font-semibold text-gold transition hover:bg-gold/20"
-        >
-          Открыть $DOFFA в Solscan ↗
-        </a>
-        <p className="mt-3 break-all text-[11px] text-cream/40">mint: {mint}</p>
+        <h2 className="display text-3xl font-bold text-cream-soft sm:text-4xl">Токен DOFFA</h2>
+        {mint ? (
+          <>
+            <p className="mt-4 text-sm leading-relaxed text-cream/70">
+              Mint токена открыт в Solscan — проверить можно в любой момент.
+            </p>
+            <a
+              href={ECOSYSTEM.token.solscanUrl ?? "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-flex w-fit items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-5 py-2 text-sm font-semibold text-gold transition hover:bg-gold/20"
+            >
+              Открыть DOFFA в Solscan ↗
+            </a>
+            <p className="mt-3 break-all text-[11px] text-cream/40">mint: {mint}</p>
+          </>
+        ) : (
+          <>
+            {/* Токена ещё нет. Показывать здесь адрес — значит показывать чужой:
+                либо старый деприкированный, либо выдуманный. Не делаем ни того,
+                ни другого. */}
+            <p className="mt-4 text-sm leading-relaxed text-cream/70">
+              <b className="text-cream-soft">Mainnet token not deployed yet.</b> Токен в
+              основной сети ещё не создан, поэтому адреса mint не существует — и мы его
+              не показываем. Как только выпуск состоится, адрес и все данные появятся
+              здесь и на странице{" "}
+              <Link href="/token" className="font-semibold text-gold hover:text-amber">
+                Token
+              </Link>
+              , и их можно будет проверить в explorer.
+            </p>
+          </>
+        )}
 
         {/* Данные из сети: эмиссия и права на выпуск/заморозку. Раньше сайт
             просто утверждал, что права отозваны, — теперь это подтверждается. */}

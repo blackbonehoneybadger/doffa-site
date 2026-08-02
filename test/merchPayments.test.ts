@@ -11,7 +11,8 @@ import {
 } from "../app/lib/payments/doffa";
 import { getPaymentProvider } from "../app/lib/payments/provider";
 
-const MINT = "57aAfCuXx7uuc8g8P9kTxR65TKQtZsFDJeKhdD5xu6uo";
+// Фиктивный mint — тест про арифметику котировки, а не про конкретный токен.
+const MINT = "TestMint1111111111111111111111111111111111";
 const RECV = "DoFFAReceiverAddress1111111111111111111111";
 const NOW = 1_700_000_000_000;
 

@@ -2,14 +2,17 @@
 // читаем данные токена через публичный JSON-RPC и подключаем Phantom через
 // встроенный в браузер провайдер.
 //
-// $DOFFA выпущен на mainnet: эмиссия 100 000 000, mint/freeze authority
-// отозваны навсегда. Токен — награда игровой экосистемы DOFFA Games (DOFFA Heroes).
-// Название игры менялось: Crazy 8 → Bean Duel / Defense → DOFFA Heroes (2026-07-29).
+// DOFFA — токен игровой экосистемы DOFFA Games (Shelf → Arena → Heroes).
+//
+// ⚠️ Новый токен в mainnet ЕЩЁ НЕ СОЗДАН. Пока mint не существует, `mint`
+//    остаётся null, и интерфейс обязан показывать это честно, а не подставлять
+//    старый или выдуманный адрес. Старый токен деприкирован и на сайте не
+//    упоминается — история осталась в docs/LEGACY-TOKEN.md.
 //
 // Переменные окружения Vercel (NEXT_PUBLIC_*):
-//   NEXT_PUBLIC_REAL_MINT   = адрес mint (обязательна)
-//   NEXT_PUBLIC_REAL_RPC    = RPC mainnet (по умолчанию публичный)
-//   NEXT_PUBLIC_REAL_WALLET = кошелёк-держатель (для отображения до выпуска)
+//   NEXT_PUBLIC_DOFFA_MINT   = адрес mint (появляется после выпуска)
+//   NEXT_PUBLIC_REAL_RPC     = RPC mainnet (по умолчанию публичный)
+//   NEXT_PUBLIC_DOFFA_OWNER_WALLET = кошелёк владельца
 
 export type Cluster = "devnet" | "mainnet-beta";
 
@@ -24,13 +27,22 @@ export type TokenInfo = {
   initialSupply: number;
 };
 
-/** $DOFFA на mainnet — боевой токен экосистемы (игровые награды из Reward Vault). */
+/**
+ * DOFFA на mainnet — боевой токен экосистемы.
+ *
+ * ⚠️ Дефолтного mint здесь НЕТ намеренно. Пока токен не выпущен, `mint` равен
+ * null: все функции чтения возвращают 0/пусто, а UI показывает статус «не
+ * создан». Раньше здесь стоял хардкод старого mint, из-за чего сайт продолжал
+ * бы показывать деприкированный токен как действующий.
+ */
 export const REAL: TokenInfo = {
   cluster: "mainnet-beta",
   rpc: process.env.NEXT_PUBLIC_REAL_RPC || "https://api.mainnet-beta.solana.com",
-  mint: process.env.NEXT_PUBLIC_REAL_MINT?.trim() || "57aAfCuXx7uuc8g8P9kTxR65TKQtZsFDJeKhdD5xu6uo",
-  // Phantom-кошелёк проекта — держатель основной эмиссии.
-  wallet: process.env.NEXT_PUBLIC_REAL_WALLET?.trim() || "6cAtKTM8ZPUgRgmzsgkRfZsq4jZTXymA7cLqjz9qYMFS",
+  mint: process.env.NEXT_PUBLIC_DOFFA_MINT?.trim() || null,
+  // Единственный управляемый кошелёк владельца.
+  wallet:
+    process.env.NEXT_PUBLIC_DOFFA_OWNER_WALLET?.trim() ||
+    "E4tvCMvkrpMeVKE8SvcLgxk6D2jovQ3SB97s2umSwLUr",
   initialSupply: 100_000_000,
 };
 
