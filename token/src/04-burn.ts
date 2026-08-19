@@ -4,8 +4,6 @@
 //
 // Пример: npm run burn -- 1 "sale_20240618_001" "a1b2c3d4"
 import {
-  Connection,
-  Keypair,
   PublicKey,
   Transaction,
   TransactionInstruction,
@@ -16,14 +14,13 @@ import {
   getAssociatedTokenAddress,
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
-import { CFG, loadKeypair, connection, resolveMint, explorerUrl } from "./config.js";
+import { CFG, loadKeypair, connection, resolveMint, explorerTxUrl } from "./config.js";
+import { assertMainnetWriteEnabled, parseTokenAmount, validateMemoField } from "./safety.js";
 
 const MEMO_PROGRAM_ID = new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr");
 
 const [qtyArg, saleIdArg, hashArg] = process.argv.slice(2);
-const human = Number(qtyArg);
-
-if (!Number.isFinite(human) || human <= 0) {
+if (!qtyArg) {
   console.error("⛔ Укажи количество и (опционально) sale_id и receipt_hash.");
   console.error("   Пример: npm run burn -- 1 sale_001 abc12345");
   process.exit(1);
@@ -32,13 +29,23 @@ if (!Number.isFinite(human) || human <= 0) {
 const keypair = loadKeypair();
 const conn = connection();
 const mint = resolveMint();
-const amount = BigInt(Math.round(human)) * 10n ** BigInt(CFG.decimals);
+assertMainnetWriteEnabled(CFG.cluster, "burn", mint.toBase58());
+
+let amount: bigint;
+let saleId: string;
+let receiptHash: string;
+try {
+  amount = parseTokenAmount(qtyArg, CFG.decimals);
+  saleId = validateMemoField(saleIdArg ?? `manual-${Date.now()}`, "sale_id", 80);
+  receiptHash = validateMemoField(hashArg ?? "no-pos-hash", "receipt_hash", 128);
+} catch (error) {
+  console.error("⛔", error instanceof Error ? error.message : "Некорректные параметры");
+  process.exit(1);
+}
 
 const tokenAccount = await getAssociatedTokenAddress(mint, keypair.publicKey);
 
 // Если sale_id не указан — генерируем автоматически (ручное сжигание)
-const saleId   = saleIdArg ?? `manual-${Date.now()}`;
-const receiptHash = hashArg ?? "no-pos-hash";
 const memoText = `DOFFA coffee burn | ${saleId} | ${receiptHash}`;
 
 const tx = new Transaction();
@@ -65,7 +72,7 @@ tx.add(
 );
 
 console.log(`\nСеть:      ${CFG.cluster}`);
-console.log(`Сжигаю:    ${human} ${CFG.symbol}`);
+console.log(`Сжигаю:    ${qtyArg} ${CFG.symbol}`);
 console.log(`Memo:      ${memoText}\n`);
 
 const sig = await sendAndConfirmTransaction(conn, tx, [keypair], {
@@ -74,5 +81,5 @@ const sig = await sendAndConfirmTransaction(conn, tx, [keypair], {
 
 console.log("🔥 Готово.");
 console.log("   TX:      ", sig);
-console.log("   Solscan: ", explorerUrl(resolveMint().toBase58()));
+console.log("   Solscan: ", explorerTxUrl(sig));
 console.log("\n   Burn-запись появится в дашборде на сайте автоматически (из блокчейна).");

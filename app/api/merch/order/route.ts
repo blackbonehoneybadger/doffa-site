@@ -1,6 +1,7 @@
 import { query } from "../../../lib/db";
 import { parseJson, merchOrderSchema } from "../../../lib/validation";
 import { MERCH } from "../../../config/merch";
+import { clientIp, crossOriginError } from "../../../lib/requestSecurity";
 
 // Приём заявок на кожаные изделия. Честно: если онлайн-приём не включён
 // (NEXT_PUBLIC_MERCH_ORDERS_ENABLED != true) — не делаем вид, что отправили,
@@ -8,13 +9,10 @@ import { MERCH } from "../../../config/merch";
 const MAX_PER_WINDOW = 5;
 const WINDOW_MINUTES = 60;
 
-function clientIp(req: Request): string {
-  const xff = req.headers.get("x-forwarded-for");
-  if (xff) return xff.split(",")[0].trim();
-  return req.headers.get("x-real-ip")?.trim() || "unknown";
-}
-
 export async function POST(req: Request) {
+  const originError = crossOriginError(req);
+  if (originError) return originError;
+
   if (!MERCH.ordersEnabled) {
     return Response.json(
       { ok: false, code: "disabled", error: "Онлайн-приём заявок пока готовится" },
@@ -24,7 +22,7 @@ export async function POST(req: Request) {
 
   const parsed = await parseJson(req, merchOrderSchema);
   if (!parsed.ok) {
-    return Response.json({ ok: false, error: parsed.error }, { status: 400 });
+    return Response.json({ ok: false, error: parsed.error }, { status: parsed.status });
   }
   const d = parsed.data;
 
@@ -53,6 +51,12 @@ export async function POST(req: Request) {
         { status: 429 },
       );
     }
+
+    // IP — персональные служебные данные. Старые антиспам-записи не храним
+    // бессрочно; чистка не должна мешать приёму текущей заявки.
+    await query(
+      `delete from merch_order_attempts where window_start < now() - interval '30 days'`,
+    ).catch(() => {});
 
     await query(
       `insert into merch_orders

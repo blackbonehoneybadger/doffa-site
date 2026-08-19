@@ -18,9 +18,19 @@ const SESSION_TTL_MS = 90 * 24 * 60 * 60 * 1000; // 90 дней
 const NONCE_TTL_MS = 5 * 60 * 1000; // 5 минут на подпись
 
 const SESSION_SECRET =
-  process.env.SESSION_SECRET?.trim() || crypto.randomUUID() + crypto.randomUUID();
+  process.env.SESSION_SECRET?.trim() ||
+  (process.env.NODE_ENV !== "production" ? randomBytes(32).toString("hex") : "");
+
+/** В production nonce нельзя подписывать эфемерным секретом разных инстансов. */
+export function userAuthConfigError(): string | null {
+  if (process.env.NODE_ENV === "production" && !process.env.SESSION_SECRET?.trim()) {
+    return "SESSION_SECRET не задан";
+  }
+  return null;
+}
 
 function sign(value: string): string {
+  if (!SESSION_SECRET) throw new Error("User auth is not configured");
   return createHmac("sha256", SESSION_SECRET).update(value).digest("hex");
 }
 

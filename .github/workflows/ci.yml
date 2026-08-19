@@ -1,0 +1,67 @@
+name: Security and quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: audit · lint · typecheck · tests · build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Node 22
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm audit --audit-level=high
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - name: Production build (offline font fixture)
+        # Webpack currently supports Next's official font mock hook; Turbopack
+        # production remains the normal Vercel path with real Google responses.
+        run: npm run build -- --webpack
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+          NEXT_FONT_GOOGLE_MOCKED_RESPONSES: ${{ github.workspace }}/scripts/security/next-font-mock.cjs
+          # Static pages degrade to honest «данные недоступны» without external
+          # providers; CI must not depend on Solana/Jupiter/FX uptime.
+          FX_RATES_ENABLED: "false"
+          TOKEN_PRICE_ENABLED: "false"
+          SOLANA_RPC: http://127.0.0.1:9
+
+  secrets:
+    name: full-history secret scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Node 22
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - run: node scripts/security/scan-secrets.mjs

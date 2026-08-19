@@ -3,10 +3,12 @@
 // Это ключевой шаг доверия. Делать ПОСЛЕ того, как весь объём заминчен.
 import { setAuthority, AuthorityType, getMint } from "@solana/spl-token";
 import { connection, loadKeypair, resolveMint, CFG, explorerUrl } from "./config.js";
+import { assertMainnetWriteEnabled } from "./safety.js";
 
 const conn = connection();
 const owner = loadKeypair();
 const mint = resolveMint();
+assertMainnetWriteEnabled(CFG.cluster, "revoke", mint.toBase58());
 
 console.log(`Отзываю права у токена ${mint.toBase58()} (сеть ${CFG.cluster}) ...`);
 

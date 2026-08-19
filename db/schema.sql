@@ -64,19 +64,18 @@ create table if not exists admin_sessions (
 create index if not exists admin_sessions_expires_idx on admin_sessions (expires_at);
 
 -- Учёт неудачных попыток входа в админку по IP — для rate limit и временной
--- блокировки после серии неверных паролей.
--- Старая форма (id/attempted_at/success) несовместима: пересоздаём таблицу.
--- Данные rate-limit эфемерны, терять их безопасно.
-drop table if exists admin_login_attempts;
-
-create table if not exists admin_login_attempts (
+-- блокировки после серии неверных паролей. Используем новое имя вместо DROP
+-- старой несовместимой таблицы: повторный запуск миграции ничего не удаляет.
+create table if not exists admin_login_limits (
   ip text primary key,
   fail_count integer not null default 0,
   first_failed_at timestamptz not null default now(),
-  locked_until timestamptz
+  locked_until timestamptz,
+  updated_at timestamptz not null default now()
 );
 
-create index if not exists admin_login_attempts_locked_idx on admin_login_attempts (locked_until);
+create index if not exists admin_login_limits_locked_idx on admin_login_limits (locked_until);
+create index if not exists admin_login_limits_updated_idx on admin_login_limits (updated_at);
 
 -- Простой счётчик посещений сайта (одна строка на ключ) — для админ-дашборда.
 -- Не критичен: сбой записи молча игнорируется на стороне API.
@@ -85,6 +84,16 @@ create table if not exists site_stats (
   value bigint not null default 0,
   updated_at timestamptz not null default now()
 );
+
+-- Дедупликация публичного счётчика. visitor_hash — HMAC, исходный IP в эту
+-- таблицу не пишется. Старше 31 дня строки удаляет /api/track.
+create table if not exists site_visit_days (
+  visitor_hash text not null,
+  visit_day date not null default current_date,
+  primary key (visitor_hash, visit_day)
+);
+
+create index if not exists site_visit_days_date_idx on site_visit_days (visit_day);
 
 -- Заявки на кожаные изделия на заказ (форма /merch). Персональные данные
 -- клиента; наружу не отдаём, доступ — только на бэкенде.

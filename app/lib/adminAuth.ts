@@ -42,7 +42,7 @@ export function checkPassword(input: string): boolean {
 /** IP сейчас заблокирован из-за перебора пароля? */
 export async function isLockedOut(ip: string): Promise<boolean> {
   const rows = await query<{ locked_until: string | null }>(
-    `select locked_until from admin_login_attempts where ip = $1`,
+    `select locked_until from admin_login_limits where ip = $1`,
     [ip],
   );
   const lockedUntil = rows[0]?.locked_until;
@@ -53,20 +53,21 @@ export async function isLockedOut(ip: string): Promise<boolean> {
 export async function recordFailure(ip: string): Promise<void> {
   // Счётчик сбрасывается, если прошлая серия ошибок старше окна.
   await query(
-    `insert into admin_login_attempts (ip, fail_count, first_failed_at)
-     values ($1, 1, now())
+    `insert into admin_login_limits (ip, fail_count, first_failed_at, updated_at)
+     values ($1, 1, now(), now())
      on conflict (ip) do update set
        fail_count = case
-         when admin_login_attempts.first_failed_at < now() - interval '${FAIL_WINDOW_MINUTES} minutes'
-         then 1 else admin_login_attempts.fail_count + 1 end,
+         when admin_login_limits.first_failed_at < now() - interval '${FAIL_WINDOW_MINUTES} minutes'
+         then 1 else admin_login_limits.fail_count + 1 end,
        first_failed_at = case
-         when admin_login_attempts.first_failed_at < now() - interval '${FAIL_WINDOW_MINUTES} minutes'
-         then now() else admin_login_attempts.first_failed_at end`,
+         when admin_login_limits.first_failed_at < now() - interval '${FAIL_WINDOW_MINUTES} minutes'
+         then now() else admin_login_limits.first_failed_at end,
+       updated_at = now()`,
     [ip],
   );
   await query(
-    `update admin_login_attempts
-     set locked_until = now() + interval '${LOCKOUT_MINUTES} minutes'
+    `update admin_login_limits
+     set locked_until = now() + interval '${LOCKOUT_MINUTES} minutes', updated_at = now()
      where ip = $1 and fail_count >= $2`,
     [ip, MAX_FAILS],
   );
@@ -74,7 +75,7 @@ export async function recordFailure(ip: string): Promise<void> {
 
 /** Сбрасывает счётчик попыток (после успешного входа). */
 export async function clearFailures(ip: string): Promise<void> {
-  await query(`delete from admin_login_attempts where ip = $1`, [ip]).catch(() => {});
+  await query(`delete from admin_login_limits where ip = $1`, [ip]).catch(() => {});
 }
 
 export async function createSession(ip?: string, userAgent?: string): Promise<void> {
@@ -88,8 +89,7 @@ export async function createSession(ip?: string, userAgent?: string): Promise<vo
   // Опортунистическая уборка просроченных сессий и старых записей о попытках.
   await query(`delete from admin_sessions where expires_at < now()`).catch(() => {});
   await query(
-    `delete from admin_login_attempts
-     where coalesce(locked_until, first_failed_at) < now() - interval '1 day'`,
+    `delete from admin_login_limits where updated_at < now() - interval '30 days'`,
   ).catch(() => {});
   const store = await cookies();
   store.set(COOKIE_NAME, `${id}.${signId(id, ADMIN_SECRET)}`, {

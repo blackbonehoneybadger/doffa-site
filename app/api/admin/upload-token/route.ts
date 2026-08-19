@@ -1,16 +1,24 @@
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
-import { isAuthed } from "../../../lib/adminAuth";
 import { friendlyStorageError } from "../../../lib/videoStore";
+import { requireAdminApi } from "../../../lib/adminApi";
+import { crossOriginError } from "../../../lib/requestSecurity";
+import { readJsonBody } from "../../../lib/validation";
+import { reportServerError } from "../../../lib/serverError";
 
 // Выдаёт клиенту одноразовый токен на загрузку файла напрямую в Vercel Blob,
 // минуя serverless-функцию (у неё лимит на размер тела запроса — видео через
 // неё не прошло бы). Здесь только проверяем права и ограничения на файл.
 export async function POST(request: Request) {
-  if (!(await isAuthed())) {
-    return Response.json({ error: "Не авторизован" }, { status: 401 });
-  }
+  const originError = crossOriginError(request);
+  if (originError) return originError;
+  const authError = await requireAdminApi();
+  if (authError) return authError;
 
-  const body = (await request.json()) as HandleUploadBody;
+  const parsed = await readJsonBody(request, 64 * 1024);
+  if (!parsed.ok) {
+    return Response.json({ error: parsed.error }, { status: parsed.status });
+  }
+  const body = parsed.data as HandleUploadBody;
 
   try {
     const jsonResponse = await handleUpload({
@@ -32,6 +40,7 @@ export async function POST(request: Request) {
     });
     return Response.json(jsonResponse);
   } catch (err) {
+    reportServerError("admin blob upload token failed", err);
     return Response.json({ error: friendlyStorageError(err) }, { status: 400 });
   }
 }

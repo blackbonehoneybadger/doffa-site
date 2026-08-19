@@ -13,7 +13,7 @@ if (existsSync(path)) {
 }
 
 const kp = Keypair.generate();
-writeFileSync(path, JSON.stringify(Array.from(kp.secretKey)));
+writeFileSync(path, JSON.stringify(Array.from(kp.secretKey)), { mode: 0o600, flag: "wx" });
 
 console.log("✅ Ключ владельца создан.");
 console.log("   Файл:        ", path);

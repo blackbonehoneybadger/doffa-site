@@ -14,6 +14,7 @@
     "verify": "tsx src/06-verify.ts",
     "switch": "tsx src/07-switch-mainnet.ts",
     "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test test/*.test.ts",
     "find-key": "tsx src/08-find-key.ts"
   },
   "dependencies": {

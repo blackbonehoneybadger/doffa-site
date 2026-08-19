@@ -17,10 +17,25 @@ export type HeroVideo = {
  *  лежит в нашей папке hero-videos/ (и это не сам манифест). Это не даёт
  *  зарегистрировать произвольный чужой URL через публичный клиентский POST. */
 export function isValidBlobEntry(url: string, pathname: string): boolean {
-  if (!pathname.startsWith("hero-videos/") || pathname === MANIFEST_PATH) return false;
+  if (
+    !pathname.startsWith("hero-videos/") ||
+    pathname === MANIFEST_PATH ||
+    !/\.(?:mp4|webm|mov)$/i.test(pathname)
+  ) return false;
   try {
-    const host = new URL(url).hostname;
-    return host.endsWith(".public.blob.vercel-storage.com");
+    const parsed = new URL(url);
+    if (
+      parsed.protocol !== "https:" ||
+      parsed.username ||
+      parsed.password ||
+      parsed.port ||
+      parsed.search ||
+      parsed.hash ||
+      !/^[a-z0-9-]+\.public\.blob\.vercel-storage\.com$/i.test(parsed.hostname)
+    ) return false;
+
+    const urlPath = decodeURIComponent(parsed.pathname.replace(/^\/+/, ""));
+    return urlPath === pathname;
   } catch {
     return false;
   }
@@ -32,7 +47,8 @@ export function friendlyStorageError(err: unknown): string {
   if (raw.includes("No blob credentials found") || raw.includes("BLOB_READ_WRITE_TOKEN")) {
     return "Хранилище видео не подключено. Зайди в Vercel → Storage → создай Blob-хранилище и подключи к проекту.";
   }
-  return raw;
+  if (raw.startsWith("Уже загружено максимум")) return raw;
+  return "Хранилище видео временно недоступно";
 }
 
 async function readManifest(): Promise<HeroVideo[]> {
@@ -41,8 +57,21 @@ async function readManifest(): Promise<HeroVideo[]> {
   if (!found) return [];
   const res = await fetch(found.url, { cache: "no-store" });
   if (!res.ok) return [];
-  const data = (await res.json()) as HeroVideo[];
-  return Array.isArray(data) ? data : [];
+  const data = (await res.json()) as unknown;
+  if (!Array.isArray(data)) return [];
+  return data.filter((entry): entry is HeroVideo => {
+    if (typeof entry !== "object" || entry === null) return false;
+    const value = entry as Partial<HeroVideo>;
+    return (
+      typeof value.id === "string" &&
+      value.id.length <= 100 &&
+      typeof value.url === "string" &&
+      typeof value.pathname === "string" &&
+      typeof value.uploadedAt === "number" &&
+      Number.isFinite(value.uploadedAt) &&
+      isValidBlobEntry(value.url, value.pathname)
+    );
+  }).slice(0, MAX_VIDEOS);
 }
 
 async function writeManifest(videos: HeroVideo[]): Promise<void> {

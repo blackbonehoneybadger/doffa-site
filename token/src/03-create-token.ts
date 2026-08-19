@@ -9,6 +9,7 @@ import {
 } from "@metaplex-foundation/mpl-token-metadata";
 import { generateSigner, percentAmount, publicKey, some } from "@metaplex-foundation/umi";
 import { CFG, makeUmi, MINT_FILE, explorerUrl } from "./config.js";
+import { assertMainnetWriteEnabled } from "./safety.js";
 
 if (!CFG.metadataUri) {
   console.error("⛔ METADATA_URI пуст. Укажи в .env ссылку на JSON-метаданные токена (лого/имя).");
@@ -21,6 +22,8 @@ if (CFG.cluster === "mainnet-beta" && !CFG.recipient) {
   console.error("⛔ RECIPIENT_ADDRESS пуст. На mainnet укажи адрес treasury-кошелька в .env.");
   process.exit(1);
 }
+
+assertMainnetWriteEnabled(CFG.cluster, "create", "CREATE_NEW_MINT");
 
 const umi = makeUmi();
 const mint = generateSigner(umi);
