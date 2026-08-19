@@ -1,17 +1,19 @@
-import { isAuthed } from "../../../lib/adminAuth";
 import { listVideos, deleteVideo, registerVideo, friendlyStorageError, isValidBlobEntry, MAX_VIDEOS } from "../../../lib/videoStore";
 import { parseJson, videoRegisterSchema } from "../../../lib/validation";
+import { requireAdminApi } from "../../../lib/adminApi";
+import { crossOriginError } from "../../../lib/requestSecurity";
+import { reportServerError } from "../../../lib/serverError";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  if (!(await isAuthed())) {
-    return Response.json({ ok: false, error: "Не авторизован" }, { status: 401 });
-  }
+  const authError = await requireAdminApi();
+  if (authError) return authError;
   try {
     const videos = await listVideos();
     return Response.json({ ok: true, videos, max: MAX_VIDEOS });
   } catch (err) {
+    reportServerError("admin video list failed", err);
     return Response.json({ ok: false, error: friendlyStorageError(err) }, { status: 503 });
   }
 }
@@ -19,12 +21,13 @@ export async function GET() {
 // Клиент вызывает это сразу после того, как upload() из @vercel/blob/client
 // завершился успешно — регистрирует уже загруженный файл в манифесте.
 export async function POST(req: Request) {
-  if (!(await isAuthed())) {
-    return Response.json({ ok: false, error: "Не авторизован" }, { status: 401 });
-  }
+  const originError = crossOriginError(req);
+  if (originError) return originError;
+  const authError = await requireAdminApi();
+  if (authError) return authError;
   const parsed = await parseJson(req, videoRegisterSchema);
   if (!parsed.ok) {
-    return Response.json({ ok: false, error: parsed.error }, { status: 400 });
+    return Response.json({ ok: false, error: parsed.error }, { status: parsed.status });
   }
   // Принимаем только файлы из нашей папки hero-videos/ на нашем же Blob-хосте —
   // защита от регистрации произвольных чужих URL через этот эндпоинт.
@@ -35,14 +38,16 @@ export async function POST(req: Request) {
     const videos = await registerVideo({ url: parsed.data.url, pathname: parsed.data.pathname });
     return Response.json({ ok: true, videos });
   } catch (err) {
+    reportServerError("admin video registration failed", err);
     return Response.json({ ok: false, error: friendlyStorageError(err) }, { status: 400 });
   }
 }
 
 export async function DELETE(req: Request) {
-  if (!(await isAuthed())) {
-    return Response.json({ ok: false, error: "Не авторизован" }, { status: 401 });
-  }
+  const originError = crossOriginError(req);
+  if (originError) return originError;
+  const authError = await requireAdminApi();
+  if (authError) return authError;
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
   if (!id) {
@@ -52,6 +57,7 @@ export async function DELETE(req: Request) {
     const videos = await deleteVideo(id);
     return Response.json({ ok: true, videos });
   } catch (err) {
+    reportServerError("admin video deletion failed", err);
     return Response.json({ ok: false, error: friendlyStorageError(err) }, { status: 503 });
   }
 }

@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Служебные CommonJS-скрипты агентов не входят в приложение и используют
+    // require() по контракту своей среды.
+    ".claude/**",
   ]),
 ]);
 

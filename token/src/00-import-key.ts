@@ -96,7 +96,7 @@ if (actual !== expectedAddress) {
   process.exit(1);
 }
 
-writeFileSync(path, JSON.stringify(Array.from(kp.secretKey)));
+writeFileSync(path, JSON.stringify(Array.from(kp.secretKey)), { mode: 0o600, flag: "wx" });
 
 console.log("✅ Кошелёк импортирован в", path);
 console.log("   Публичный адрес:", actual);

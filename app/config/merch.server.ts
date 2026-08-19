@@ -1,3 +1,5 @@
+import "server-only";
+
 // СЕРВЕРНАЯ конфигурация DOFFA Marketplace. ЗДЕСЬ живут значения из НЕ-публичных
 // env (без префикса NEXT_PUBLIC_). Импортировать ТОЛЬКО из серверного кода
 // (server components, route handlers, app/lib/**). Не импортировать в "use client"

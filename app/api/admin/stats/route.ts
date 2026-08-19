@@ -1,6 +1,7 @@
-import { isAuthed } from "../../../lib/adminAuth";
+import { requireAdminApi } from "../../../lib/adminApi";
 import { query } from "../../../lib/db";
 import { REAL, fetchSupply } from "../../../solana";
+import { reportServerError } from "../../../lib/serverError";
 
 export const dynamic = "force-dynamic";
 
@@ -8,16 +9,8 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   // isAuthed() ходит в БД (admin_sessions). Если хранилище сессий недоступно —
   // отдаём контролируемый 503, а не необработанный 500. Авторизация fail-closed.
-  let authed: boolean;
-  try {
-    authed = await isAuthed();
-  } catch (err) {
-    console.error("admin/stats: проверка сессии упала", err);
-    return Response.json({ ok: false, error: "Сервис временно недоступен" }, { status: 503 });
-  }
-  if (!authed) {
-    return Response.json({ ok: false, error: "Не авторизован" }, { status: 401 });
-  }
+  const authError = await requireAdminApi();
+  if (authError) return authError;
 
   // null = данные недоступны (нет таблицы / сбой БД), 0 = реально ноль посещений.
   // Число из БД валидируем: битое значение (NaN) тоже считаем «недоступно».
@@ -28,7 +21,7 @@ export async function GET() {
     visits = Number.isFinite(parsed) ? parsed : null;
   } catch (err) {
     // таблицы может ещё не быть до миграции — оставляем null (неизвестно)
-    console.error("admin/stats: запрос visits упал", err);
+    reportServerError("admin stats visits failed", err);
   }
 
   let circulating: number | null = null;
@@ -38,7 +31,7 @@ export async function GET() {
     burned = Math.max(0, REAL.initialSupply - circulating);
   } catch (err) {
     // RPC недоступен — отдадим null, клиент покажет «—»
-    console.error("admin/stats: чтение supply с блокчейна упало", err);
+    reportServerError("admin stats supply failed", err);
   }
 
   return Response.json({ ok: true, visits, circulating, burned, initialSupply: REAL.initialSupply });

@@ -45,8 +45,69 @@ export const merchOrderSchema = z.object({
   budget: z.string().trim().max(120).optional().default(""),
   location: z.string().trim().max(120).optional().default(""),
   consent: z.literal(true),
-  website: z.string().max(0).optional().default(""), // honeypot: должен быть пустым
+  // Боту даём пройти схему, чтобы ниже тихо принять honeypot и ничего не писать
+  // в БД. max(0) делал эту ветку недостижимой и возвращал ботам явный 400.
+  website: z.string().max(200).optional().default(""),
 });
+
+export type JsonBodyResult<T> =
+  | { ok: true; data: T }
+  | { ok: false; error: string; status: 400 | 413 | 415 };
+
+const DEFAULT_MAX_JSON_BYTES = 16 * 1024;
+
+async function readLimitedText(request: Request, maxBytes: number): Promise<string | null> {
+  const declared = request.headers.get("content-length");
+  if (declared !== null) {
+    const value = Number(declared);
+    if (!Number.isFinite(value) || value < 0 || value > maxBytes) return null;
+  }
+
+  if (!request.body) return "";
+  const reader = request.body.getReader();
+  const decoder = new TextDecoder();
+  let total = 0;
+  let text = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > maxBytes) {
+      await reader.cancel().catch(() => {});
+      return null;
+    }
+    text += decoder.decode(value, { stream: true });
+  }
+  return text + decoder.decode();
+}
+
+/** Читает JSON с ограничением по реальному числу байт, включая chunked body. */
+export async function readJsonBody(
+  request: Request,
+  maxBytes = DEFAULT_MAX_JSON_BYTES,
+): Promise<JsonBodyResult<unknown>> {
+  const contentType = request.headers.get("content-type")?.split(";", 1)[0]?.trim().toLowerCase();
+  if (contentType && contentType !== "application/json" && !contentType.endsWith("+json")) {
+    return { ok: false, error: "Ожидается JSON", status: 415 };
+  }
+
+  let text: string | null;
+  try {
+    text = await readLimitedText(request, maxBytes);
+  } catch {
+    return { ok: false, error: "Не удалось прочитать запрос", status: 400 };
+  }
+  if (text === null) {
+    return { ok: false, error: "Тело запроса слишком большое", status: 413 };
+  }
+
+  try {
+    return { ok: true, data: JSON.parse(text) as unknown };
+  } catch {
+    return { ok: false, error: "Некорректный JSON", status: 400 };
+  }
+}
 
 /**
  * Парсит и валидирует JSON-тело запроса по zod-схеме. Возвращает либо
@@ -55,16 +116,17 @@ export const merchOrderSchema = z.object({
 export async function parseJson<T>(
   request: Request,
   schema: z.ZodType<T>,
-): Promise<{ ok: true; data: T } | { ok: false; error: string }> {
-  let raw: unknown;
-  try {
-    raw = await request.json();
-  } catch {
-    return { ok: false, error: "Некорректный JSON" };
-  }
-  const result = schema.safeParse(raw);
+  maxBytes = DEFAULT_MAX_JSON_BYTES,
+): Promise<JsonBodyResult<T>> {
+  const body = await readJsonBody(request, maxBytes);
+  if (!body.ok) return body;
+  const result = schema.safeParse(body.data);
   if (!result.success) {
-    return { ok: false, error: result.error.issues[0]?.message ?? "Некорректные данные" };
+    return {
+      ok: false,
+      error: result.error.issues[0]?.message ?? "Некорректные данные",
+      status: 400,
+    };
   }
   return { ok: true, data: result.data };
 }

@@ -1,12 +1,25 @@
-import { verifyNonceToken, consumeNonce, createUserSession } from "../../../lib/userAuth";
+import {
+  verifyNonceToken,
+  consumeNonce,
+  createUserSession,
+  userAuthConfigError,
+} from "../../../lib/userAuth";
 import { verifyWalletSignature } from "../../../lib/solanaAuth";
 import { upsertUserLogin } from "../../../lib/users";
 import { parseJson, verifyRequestSchema } from "../../../lib/validation";
+import { crossOriginError } from "../../../lib/requestSecurity";
+import { reportServerError } from "../../../lib/serverError";
 
 export async function POST(request: Request) {
+  const originError = crossOriginError(request);
+  if (originError) return originError;
+  if (userAuthConfigError()) {
+    return Response.json({ error: "Вход временно недоступен" }, { status: 503 });
+  }
+
   const parsed = await parseJson(request, verifyRequestSchema);
   if (!parsed.ok) {
-    return Response.json({ error: parsed.error }, { status: 400 });
+    return Response.json({ error: parsed.error }, { status: parsed.status });
   }
   const body = parsed.data;
 
@@ -29,7 +42,7 @@ export async function POST(request: Request) {
     await createUserSession(nonce.wallet, request.headers.get("user-agent") ?? undefined);
     return Response.json({ ok: true, user });
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    return Response.json({ error: message }, { status: 503 });
+    reportServerError("wallet auth verify failed", err);
+    return Response.json({ error: "Вход временно недоступен" }, { status: 503 });
   }
 }
