@@ -1,20 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { TonConnectUIProvider, useTonConnectUI } from "@tonconnect/ui-react";
 import { dict, LANGS, type Lang } from "../content";
-import {
-  connectWalletDetailed,
-  disconnectWalletById,
-  signMessageById,
-  peekPendingWallet,
-  clearPendingWallet,
-  type WalletId,
-} from "../solana";
 import { Identicon } from "../components/Identicon";
 
 type User = {
   wallet_address: string;
+  /** Человекочитаемая форма адреса (UQ…). Приезжает вместе с ответом входа. */
+  friendly?: string;
   nickname: string | null;
   avatar_url: string | null;
   created_at: string;
@@ -26,14 +21,22 @@ type Loyalty = {
   purchases: { id: number; item: string; amount_cents: number | null; points_earned: number; created_at: string }[];
 };
 
-const WALLET_OPTS = [
-  { id: "phantom" as const, name: "Phantom" },
-  { id: "solflare" as const, name: "Solflare" },
-  { id: "trust" as const, name: "Trust Wallet" },
-  { id: "backpack" as const, name: "Backpack" },
-];
+/**
+ * Кошелёк выбирает сам человек в окне TON Connect, поэтому списка кошельков
+ * здесь нет: он приезжает от самого TON Connect и всегда свежий.
+ *
+ * Манифест отдаётся маршрутом от того же происхождения, с которого открыт
+ * сайт, — иначе кошелёк показал бы человеку чужой адрес на предпросмотре.
+ */
+export default function ProfileClient({ manifestUrl }: { manifestUrl: string }) {
+  return (
+    <TonConnectUIProvider manifestUrl={manifestUrl}>
+      <ProfileInner />
+    </TonConnectUIProvider>
+  );
+}
 
-export default function ProfileClient() {
+function ProfileInner() {
   const [lang, setLang] = useState<Lang>("ru");
   const t = dict[lang];
 
@@ -41,7 +44,7 @@ export default function ProfileClient() {
   const [user, setUser] = useState<User | null>(null);
   const [loyalty, setLoyalty] = useState<Loyalty | null>(null);
 
-  const [walletId, setWalletId] = useState<string | null>(null);
+  const [tonConnectUI] = useTonConnectUI();
   const [connecting, setConnecting] = useState(false);
   const [signing, setSigning] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,9 +53,11 @@ export default function ProfileClient() {
   const [nickname, setNickname] = useState("");
   const [saving, setSaving] = useState(false);
   const [savedFlash, setSavedFlash] = useState(false);
-  const autoResumeDone = useRef(false);
+  // Одно подключение — один вход. Без этого возврат из приложения кошелька
+  // успевает дёрнуть проверку дважды, и второй раз код уже потрачен.
+  const входИдёт = useRef(false);
 
-  async function loadProfile() {
+  const loadProfile = useCallback(async () => {
     try {
       const res = await fetch("/api/profile");
       const data = await res.json();
@@ -60,133 +65,120 @@ export default function ProfileClient() {
         setUser(data.user);
         setLoyalty(data.loyalty);
         setNickname(data.user.nickname ?? "");
+        return true;
       }
     } catch {
       // тихо — просто останемся на экране входа
-    } finally {
-      setLoading(false);
     }
-  }
+    return false;
+  }, []);
 
-  async function completeSignIn(id: WalletId, addr: string) {
-    setWalletId(id);
-    setSigning(true);
-    setError(null);
+  /**
+   * Просит у сервера свежий код и кладёт его в параметры подключения. Кошелёк
+   * подпишет именно его, и сервер узнает свою подпись.
+   *
+   * Код живёт пять минут, поэтому его берут заново перед каждым подключением,
+   * а не один раз при загрузке страницы.
+   */
+  const подготовитьКод = useCallback(async () => {
+    tonConnectUI.setConnectRequestParameters({ state: "loading" });
     try {
-      const nonceRes = await fetch("/api/auth/nonce", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ wallet: addr }),
-      }).then((r) => r.json());
-      if (!nonceRes.token) {
-        setError(nonceRes.error ?? t.profile.errorGeneric);
-        return;
-      }
-      const signature = await signMessageById(id, nonceRes.message);
-      if (!signature) {
-        setError(t.profile.errorGeneric);
-        return;
-      }
-      const verifyRes = await fetch("/api/auth/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: nonceRes.token, signature }),
-      }).then((r) => r.json());
-      if (!verifyRes.ok) {
-        setError(verifyRes.error ?? t.profile.errorGeneric);
-        return;
-      }
-      clearPendingWallet();
-      setHint(null);
-      await loadProfile();
+      const res = await fetch("/api/auth/nonce", { method: "POST" }).then((r) => r.json());
+      if (!res.payload) throw new Error("нет кода");
+      tonConnectUI.setConnectRequestParameters({
+        state: "ready",
+        value: { tonProof: res.payload },
+      });
     } catch {
+      // Без кода подключение не докажет владение кошельком. Снимаем запрос
+      // целиком, а не пускаем подключиться «просто так»: иначе человек увидит
+      // подключённый кошелёк и не поймёт, почему он не вошёл.
+      tonConnectUI.setConnectRequestParameters(null);
       setError(t.profile.errorGeneric);
-    } finally {
-      setSigning(false);
     }
-  }
+  }, [tonConnectUI, t.profile.errorGeneric]);
 
-  async function handleConnectAndSignIn(id: WalletId) {
+  /** Отправляет подпись на сервер и поднимает сессию. */
+  const завершитьВход = useCallback(
+    async (адрес: string, публичныйКлюч: string, proof: unknown) => {
+      if (входИдёт.current) return;
+      входИдёт.current = true;
+      setSigning(true);
+      setError(null);
+      try {
+        const res = await fetch("/api/auth/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ address: адрес, publicKey: публичныйКлюч, proof }),
+        }).then((r) => r.json());
+        if (!res.ok) {
+          setError(res.error ?? t.profile.errorGeneric);
+          // Кошелёк остался подключённым, а сессии нет — это самое запутанное
+          // состояние для человека. Отключаем, чтобы следующая попытка начала
+          // с чистого листа и со свежим кодом.
+          await tonConnectUI.disconnect().catch(() => {});
+          return;
+        }
+        setHint(null);
+        await loadProfile();
+      } catch {
+        setError(t.profile.errorGeneric);
+      } finally {
+        setSigning(false);
+        входИдёт.current = false;
+      }
+    },
+    [tonConnectUI, loadProfile, t.profile.errorGeneric],
+  );
+
+  async function handleConnect() {
     setError(null);
     setHint(null);
     setConnecting(true);
-    const outcome = await connectWalletDetailed(id);
-    setConnecting(false);
-
-    if (outcome.status === "opened_app") {
-      setHint(
-        lang === "ru"
-          ? "Открываю приложение кошелька… Подтверди вход там — страница откроется внутри кошелька."
-          : "Opening the wallet app… Confirm there — the site will continue inside the wallet browser.",
-      );
-      return;
+    try {
+      await подготовитьКод();
+      await tonConnectUI.openModal();
+    } finally {
+      setConnecting(false);
     }
-    if (outcome.status === "needs_install") {
-      setError(
-        lang === "ru"
-          ? "Расширение кошелька не найдено. Установи его в браузере и обнови страницу."
-          : "Wallet extension not found. Install it in your browser and refresh.",
-      );
-      return;
-    }
-    if (outcome.status !== "connected") return;
-    await completeSignIn(id, outcome.address);
   }
 
+  // Сессия могла остаться с прошлого раза — тогда вход не нужен вовсе.
   useEffect(() => {
-    let cancelled = false;
-    fetch("/api/profile")
-      .then((r) => r.json())
-      .then(async (data) => {
-        if (cancelled) return;
-        if (data.ok) {
-          setUser(data.user);
-          setLoyalty(data.loyalty);
-          setNickname(data.user.nickname ?? "");
-          clearPendingWallet();
-          return;
-        }
-        // Вернулись из приложения кошелька — дожимаем вход автоматически.
-        const pending = peekPendingWallet();
-        if (pending && !autoResumeDone.current) {
-          autoResumeDone.current = true;
-          setConnecting(true);
-          setHint(
-            lang === "ru"
-              ? "Кошелёк открыт — завершаю вход…"
-              : "Wallet ready — finishing sign-in…",
-          );
-          const outcome = await connectWalletDetailed(pending);
-          setConnecting(false);
-          if (outcome.status === "connected") {
-            await completeSignIn(pending, outcome.address);
-          } else if (outcome.status !== "opened_app") {
-            setHint(
-              lang === "ru"
-                ? "Нажми кнопку кошелька ещё раз, чтобы войти."
-                : "Tap your wallet button again to sign in.",
-            );
-          }
-        }
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
+    let отменено = false;
+    void (async () => {
+      await loadProfile();
+      if (!отменено) setLoading(false);
+    })();
     return () => {
-      cancelled = true;
+      отменено = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- resume once on mount
-  }, []);
+  }, [loadProfile]);
+
+  // Подключение кошелька приходит сюда же и после возврата из приложения на
+  // телефоне, поэтому вход дожимается автоматически, без второго нажатия.
+  useEffect(() => {
+    const отписаться = tonConnectUI.onStatusChange(async (wallet) => {
+      if (!wallet) return;
+      const proof = wallet.connectItems?.tonProof;
+      if (!proof || !("proof" in proof)) {
+        // Кошелёк подключился, но подпись не отдал — старая версия кошелька
+        // или отказ. Входа не будет, и молчать об этом нельзя.
+        setError(t.profile.errorGeneric);
+        await tonConnectUI.disconnect().catch(() => {});
+        return;
+      }
+      await завершитьВход(wallet.account.address, wallet.account.publicKey ?? "", proof.proof);
+    });
+    return () => отписаться();
+  }, [tonConnectUI, завершитьВход, t.profile.errorGeneric]);
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
-    if (walletId) await disconnectWalletById(walletId);
+    await tonConnectUI.disconnect().catch(() => {});
     setUser(null);
     setLoyalty(null);
-    setWalletId(null);
     setNickname("");
-    clearPendingWallet();
   }
 
   async function handleSaveNickname() {
@@ -260,25 +252,17 @@ export default function ProfileClient() {
       ) : !user ? (
         <div className="card mt-10 rounded-3xl p-8">
           <p className="mb-4 text-xs uppercase tracking-wider text-cream/40">{t.profile.chooseWallet}</p>
-          <div className="flex flex-col gap-2">
-            {WALLET_OPTS.map((w) => (
-              <button
-                key={w.id}
-                disabled={connecting || signing}
-                onClick={() => handleConnectAndSignIn(w.id)}
-                className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-left text-sm font-semibold text-cream transition hover:border-gold/40 hover:bg-white/10 disabled:opacity-50"
-              >
-                <span>{w.name}</span>
-                <span className="text-xs font-normal text-cream/40">
-                  {connecting ? t.profile.connecting : signing ? t.profile.signing : t.profile.connectCta}
-                </span>
-              </button>
-            ))}
-          </div>
+          <button
+            disabled={connecting || signing}
+            onClick={handleConnect}
+            className="w-full rounded-xl bg-gradient-to-r from-gold to-copper px-5 py-3.5 text-sm font-bold text-ink transition hover:brightness-110 disabled:opacity-50"
+          >
+            {connecting ? t.profile.connecting : signing ? t.profile.signing : t.profile.connectCta}
+          </button>
           <p className="mt-5 text-xs leading-relaxed text-cream/45">
             {lang === "ru"
-              ? "На телефоне откроется приложение кошелька (Phantom и др.) — вход продолжится внутри него. На компьютере нужно расширение браузера."
-              : "On phones this opens your wallet app (Phantom etc.) so you sign in inside it. On desktop you need the browser extension."}
+              ? "Подойдёт любой кошелёк TON: Tonkeeper, MyTonWallet, Telegram Wallet и другие. Список покажет само окно подключения."
+              : "Any TON wallet works: Tonkeeper, MyTonWallet, Telegram Wallet and others. The connect window lists them."}
           </p>
         </div>
       ) : (
@@ -288,7 +272,8 @@ export default function ProfileClient() {
               <Identicon seed={user.wallet_address} label={user.nickname ?? undefined} size={56} />
               <div className="min-w-0">
                 <p className="font-mono text-sm text-cream/60 break-all">
-                  {user.wallet_address.slice(0, 6)}…{user.wallet_address.slice(-6)}
+                  {(user.friendly ?? user.wallet_address).slice(0, 6)}…
+                  {(user.friendly ?? user.wallet_address).slice(-6)}
                 </p>
                 {memberSinceDate && (
                   <p className="mt-0.5 text-xs text-cream/40">

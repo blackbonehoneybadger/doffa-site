@@ -228,8 +228,8 @@ export default function Home() {
             </Link>
           </nav>
           <div className="flex shrink-0 items-center gap-3 sm:gap-2">
-            {/* Кнопка в игру. Раньше здесь подключался Solana-кошелёк —
-                но покупать на сайте нечего, а играть есть где. */}
+            {/* Кнопка в игру. Раньше здесь подключался кошелёк — но покупать
+                на сайте нечего, а играть есть где. */}
             <a
               href={ECOSYSTEM.game.telegramUrl}
               target="_blank"
