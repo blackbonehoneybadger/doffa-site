@@ -48,12 +48,19 @@ export function formatUsd(price: number): string {
   }).format(price);
 }
 
-/** Котировки SOL и $DOFFA. Обе части независимы: SOL может быть, а DOFFA — нет. */
+/**
+ * Котировки SOL и прежней $DOFFA в Solana. Обе части независимы: SOL может
+ * быть, а DOFFA — нет.
+ *
+ * Главной монеты экосистемы — DOFF в TON — здесь нет намеренно: у неё пока нет
+ * пула на бирже (ECOSYSTEM.status.dex — «Готовится»), а значит нет и цены.
+ * Показать «0» или чужую котировку с тем же тикером было бы неправдой.
+ */
 export async function getTokenPrices(): Promise<TokenPrices> {
   const empty: TokenPrices = { solUsd: null, doffaUsd: null };
   if (!INTEGRATIONS.price.enabled) return empty;
 
-  const mint = ECOSYSTEM.token.mint;
+  const mint = ECOSYSTEM.legacy.mint;
   const url = `https://lite-api.jup.ag/price/v3?ids=${SOL_MINT},${encodeURIComponent(mint)}`;
   const headers = INTEGRATIONS.price.apiKey
     ? { "x-api-key": INTEGRATIONS.price.apiKey }

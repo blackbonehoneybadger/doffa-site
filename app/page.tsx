@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { dict, LANGS, TOKEN, CONTACT, GALLERY, VIDEOS, type Lang } from "./content";
 import { ECOSYSTEM } from "./config/ecosystem";
-import { REAL, solscanToken, solscanTokenOf, solscanHolders, fetchBalance, connectWalletById, disconnectWalletById } from "./solana";
+import { fetchBalance, connectWalletById, disconnectWalletById } from "./solana";
 import { SmoothScroll, CursorGlow, MouseParallax, TiltCard, Magnetic, ScrollProgressBar } from "./cinematic";
 import { ThemeToggle } from "./theme-toggle";
 import { Assistant } from "./assistant";
@@ -22,10 +22,11 @@ const WeatherChip = dynamic(() => import("./WeatherChip").then((m) => m.WeatherC
 // Дефолтный ролик в hero, пока владелец кофейни не загрузил свои через /admin.
 const DEFAULT_HERO_VIDEO = "/brand/doffa-clip.mp4";
 
-// Reward Vault — назначенный запас $DOFFA на игровые награды. Берётся из
-// централизованной конфигурации, а не из отдельной константы: прежний фонд
-// утерян, и хардкод «1 000 000» здесь показывал бы несуществующий запас.
-// 0 означает «фонд не назначен» — тогда вместо цифр ставим прочерк.
+// Фонд наград — рабочий запас DOFF на игровые награды. Берётся из
+// централизованной конфигурации, а не из отдельной константы. 0 означает
+// «рабочий остаток здесь не назван» — тогда вместо цифры ставим прочерк, а
+// настоящий остаток читается из сети на странице прозрачности. Хардкод суммы
+// показывал бы запас, которого может не быть на кошельке.
 const REWARD_VAULT = ECOSYSTEM.rewardVault.initial;
 
 /** Доля фонда в эмиссии. «—», пока фонд не назначен. */
@@ -34,10 +35,9 @@ function vaultSharePct(loc: string): string {
   const pct = (REWARD_VAULT / ECOSYSTEM.token.totalSupply) * 100;
   return `${pct.toLocaleString(loc, { maximumFractionDigits: 2 })}%`;
 }
-// Публичная игра — DOFFA Heroes. Ссылка на веб-версию берётся из
-// централизованной конфигурации (env NEXT_PUBLIC_GAME_WEB_URL). Пока не задана —
-// не показываем фальшивую ссылку, кнопка ведёт на /game со статусом.
-const GAME_URL = ECOSYSTEM.game.webUrl;
+// Публичная игра — DOFFA DRAKA. Она живёт в Telegram, и ссылка на неё есть
+// всегда: заглушки «игра готовится» здесь больше нет, потому что игра работает.
+const GAME_URL = ECOSYSTEM.game.telegramUrl;
 
 // Локализованная подпись для вкладки «Прозрачность» (fallback — английский).
 const TRANSPARENCY_LABEL: Partial<Record<Lang, string>> = {
@@ -512,10 +512,10 @@ export default function Home() {
         <div className="marquee-track">
           {[0, 1].map((i) => (
             <span key={i} className="display inline-flex shrink-0 items-center gap-10 px-10 text-sm uppercase tracking-[0.3em] text-cream/40">
-              <span>Tap · Run · Claim</span><span className="text-teal">·</span>
+              <span>Tap · Fight · Claim</span><span className="text-teal">·</span>
               <span>Since 2021</span><span className="text-teal">·</span>
-              <span>Solana SPL</span><span className="text-teal">·</span>
-              <span>DOFFA Heroes</span><span className="text-teal">·</span>
+              <span>TON Jetton</span><span className="text-teal">·</span>
+              <span>DOFFA DRAKA</span><span className="text-teal">·</span>
               <span>Halal spirit</span><span className="text-teal">·</span>
               <span>DOFFA Games</span><span className="text-teal">·</span>
             </span>
@@ -672,7 +672,7 @@ export default function Home() {
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <span className="text-sm font-bold text-cream-soft">{t.flow.vaultTag} · mainnet</span>
                       <span className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-gradient-to-r from-gold/20 to-copper/20 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-gold">
-                        $DOFFA · SOLANA
+                        {ECOSYSTEM.token.symbol} · {ECOSYSTEM.token.network.toUpperCase()}
                       </span>
                     </div>
                     <div className="mt-6 grid gap-5 sm:grid-cols-3">
@@ -685,13 +685,13 @@ export default function Home() {
                         unit={REWARD_VAULT > 0 ? TOKEN.symbol : undefined}
                         accent
                       />
-                      <Stat label={t.flow.vaultSupplyLabel} value={REAL.initialSupply.toLocaleString(loc)} unit={TOKEN.symbol} />
+                      <Stat label={t.flow.vaultSupplyLabel} value={ECOSYSTEM.token.totalSupply.toLocaleString(loc)} unit={TOKEN.symbol} />
                       <Stat label={t.flow.vaultShareLabel} value={vaultSharePct(loc)} />
                     </div>
                     <p className="mt-6 text-center text-xs leading-relaxed text-cream/50">{t.flow.vaultNote}</p>
                     <div className="mt-3 text-center">
                       <a
-                        href={solscanTokenOf(REAL)}
+                        href={ECOSYSTEM.token.explorerUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1.5 text-xs font-semibold text-gold transition hover:text-amber"
@@ -753,8 +753,8 @@ export default function Home() {
                   <Reveal>
                     <VerifyCard
                       label={t.verify.mintLabel}
-                      value={REAL.mint ?? ""}
-                      href={solscanToken()}
+                      value={ECOSYSTEM.token.master}
+                      href={ECOSYSTEM.token.explorerUrl}
                       cta={t.verify.viewToken}
                       copiedLabel={t.ui.copied}
                       copyLabel={t.ui.copy}
@@ -764,7 +764,7 @@ export default function Home() {
                     <VerifyCard
                       label={t.verify.reserveLabel}
                       value={t.verify.reserveNote}
-                      href={solscanHolders()}
+                      href={ECOSYSTEM.rewardVault.explorerUrl}
                       cta={t.verify.viewHolders}
                       mono={false}
                       copiedLabel={t.ui.copied}

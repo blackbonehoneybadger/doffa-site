@@ -4,16 +4,17 @@ import { ECOSYSTEM, STATUS_LABEL_RU, type FeatureStatus } from "../config/ecosys
 import { getTokenPrices, formatUsd } from "../lib/external/price";
 import {
   burnedFromSupply,
-  getMintAuthorities,
-  getSupply,
-  getTokenBalance,
-} from "../lib/solana/chain";
-
+  dailyPool,
+  equilibrium,
+  getJetton,
+  getJettonBalance,
+} from "../lib/ton/chain";
+import { getSupply as getSolanaSupply } from "../lib/solana/chain";
 
 export const metadata: Metadata = {
-  title: "Прозрачность — Reward Vault и сжигание · DOFFA Games",
+  title: "Прозрачность — фонд наград и сжигание · DOFFA Games",
   description:
-    "Как устроены награды DOFFA Games: Reward Vault, распределение и сжигание. Показываем только реальные данные и честные статусы — без придуманных адресов и цифр.",
+    "Как устроена экономика DOFF: фонд наград, дневной пул, сжигание и призовой фонд. Только реальные данные из сети TON и честные статусы — без придуманных адресов и цифр.",
   alternates: { canonical: "/transparency" },
 };
 
@@ -47,43 +48,37 @@ function amount(n: number): string {
 }
 
 export default async function TransparencyPage() {
-  const mint = ECOSYSTEM.token.mint;
-  const vault = ECOSYSTEM.rewardVault;
-  const blackHole = ECOSYSTEM.blackHole;
-  const rewardsStatus = ECOSYSTEM.status.claims;
-  const initial = vault.initial.toLocaleString("ru-RU");
+  const токен = ECOSYSTEM.token;
+  const фонд = ECOSYSTEM.rewardVault;
+  const ЭК = ECOSYSTEM.economy;
+  const прежний = ECOSYSTEM.legacy;
+  const дыра = прежний.blackHole;
 
-  // Реальные данные из сети. Каждая часть независима: недоступность одной не
-  // мешает показать остальные, а null означает «не показываем ничего».
-  const [prices, supply, authorities, vaultBalance] = await Promise.all([
+  // Реальные данные из сетей. Каждая часть независима: недоступность одной не
+  // мешает показать остальные, а null означает «данных нет» — не «ноль».
+  const [jetton, vaultBalance, prices, legacySupply] = await Promise.all([
+    getJetton(токен.master),
+    getJettonBalance(фонд.address, токен.master, токен.decimals),
     getTokenPrices(),
-    getSupply(mint),
-    getMintAuthorities(mint),
-    vault.address ? getTokenBalance(vault.address, mint) : Promise.resolve(null),
+    getSolanaSupply(прежний.mint),
   ]);
 
-  // Сожжено = заявленная первоначальная эмиссия минус текущая по данным сети.
-  const burned = burnedFromSupply(ECOSYSTEM.token.totalSupply, supply);
+  // Сожжено = выпущенная эмиссия минус текущая по данным сети.
+  const burned = burnedFromSupply(токен.totalSupply, jetton);
 
-  // Статус сжигания больше не берётся из env вслепую: если сеть показывает
-  // сожжённые токены — это Live по факту, а не по настройке.
-  const burnStatus: FeatureStatus =
-    burned !== null && burned > 0 ? "live" : ECOSYSTEM.status.burn;
+  // Статусы не берутся из env вслепую там, где сеть может ответить сама.
+  const burnStatus: FeatureStatus = burned !== null && burned > 0 ? "live" : ECOSYSTEM.status.burn;
+  const vaultStatus: FeatureStatus = vaultBalance !== null ? "live" : ECOSYSTEM.status.rewardVault;
+  const dexStatus: FeatureStatus = prices.doffaUsd !== null ? "live" : ECOSYSTEM.status.dex;
 
-  // То же для фонда: адрес опубликован и баланс реально прочитан — Live.
-  const vaultStatus: FeatureStatus =
-    vaultBalance !== null ? "live" : ECOSYSTEM.status.rewardVault;
+  // Дневной пул и равновесие считаются от настоящего остатка фонда, а не от
+  // числа в конфигурации. Нет остатка — нет и цифр: врать нечем.
+  const пул = vaultBalance !== null ? dailyPool(vaultBalance, ЭК.poolDenominator) : null;
 
-  // И для DEX-пула. Котировка у токена появляется только при наличии пула
-  // ликвидности, поэтому полученная цена — доказательство, что пул создан.
-  // Ставить статус вручную не нужно: сайт узнает об этом сам.
-  const dexStatus: FeatureStatus =
-    prices.doffaUsd !== null ? "live" : ECOSYSTEM.status.dex;
-
-  const authoritiesRevoked =
-    authorities !== null &&
-    authorities.mintAuthority === null &&
-    authorities.freezeAuthority === null;
+  // Прогноз без притока вовсе — нарочно худший случай: игра не зарабатывает
+  // ничего, фонд только тратится. Считается той же формулой, что в игре.
+  const через = (суток: number): number | null =>
+    vaultBalance === null ? null : vaultBalance * Math.pow(1 - 1 / ЭК.poolDenominator, суток);
 
   return (
     <main className="mx-auto min-h-screen max-w-4xl px-5 pb-24 pt-28">
@@ -92,94 +87,380 @@ export default async function TransparencyPage() {
         Прозрачность
       </h1>
       <p className="mt-6 max-w-2xl text-lg leading-relaxed text-cream/75">
-        Награды не создаются из воздуха — они выплачиваются из выделенного{" "}
-        <b className="text-cream-soft">Reward Vault</b>. Здесь мы показываем только реальные
-        данные и честные статусы — без придуманных адресов, балансов и транзакций. В том
-        числе неудобные: {blackHole.amount > 0 && "часть токенов ушла в чёрную дыру, и мы пишем об этом ниже"}
-        {blackHole.amount === 0 && "если что-то не работает, мы говорим об этом прямо"}.
+        Награды не создаются из воздуха — они выплачиваются из{" "}
+        <b className="text-cream-soft">фонда наград</b> в сети TON. Здесь только реальные
+        данные и честные статусы, в том числе неудобные: что не работает, названо не
+        работающим, а у прежней монеты проекта есть история, которую мы не прячем.
       </p>
 
-      {/* REWARD VAULT */}
+      {/* ТОКЕН DOFF */}
       <section className="mt-14">
-        <div className="flex items-center gap-3">
-          <h2 className="display text-3xl font-bold text-cream-soft sm:text-4xl">Reward Vault</h2>
-          <StatusBadge status={vaultStatus} />
+        <div className="flex flex-wrap items-center gap-3">
+          <h2 className="display text-3xl font-bold text-cream-soft sm:text-4xl">
+            {токен.symbol} в {токен.network}
+          </h2>
+          <StatusBadge status={ECOSYSTEM.status.token} />
         </div>
+        <p className="mt-4 text-sm leading-relaxed text-cream/70">
+          Стандарт {токен.standard}. У монеты один-единственный настоящий адрес — по нему
+          кошелёк отличает {токен.symbol} от подделки с тем же тикером. Сверяйте всегда его,
+          а не название.
+        </p>
+        <a
+          href={токен.explorerUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 inline-flex w-fit items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-5 py-2 text-sm font-semibold text-gold transition hover:bg-gold/20"
+        >
+          Открыть {токен.symbol} в обозревателе ↗
+        </a>
+        <p className="mt-3 break-all text-[11px] text-cream/40">контракт: {токен.master}</p>
+
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <div className="card rounded-2xl p-6">
-            <p className="text-xs font-semibold uppercase tracking-wider text-cream/45">Назначенный фонд</p>
-            {vault.initial > 0 ? (
+          <div className="card rounded-2xl p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-cream/45">
+              Эмиссия в сети
+            </p>
+            {jetton ? (
               <>
-                <p className="display mt-2 text-3xl font-extrabold text-cream-soft">{initial} $DOFFA</p>
-                <p className="mt-2 text-xs text-cream/50">Выделенный запас на игровые награды.</p>
+                <p className="display mt-2 text-2xl font-extrabold text-cream-soft">
+                  {amount(jetton.totalSupply)} {токен.symbol}
+                </p>
+                <p className="mt-2 text-[11px] text-cream/45">
+                  Прочитано из сети прямо сейчас, {jetton.decimals} знаков после запятой.
+                </p>
               </>
             ) : (
+              <p className="mt-2 text-sm text-cream/60">
+                Сейчас не удалось прочитать эмиссию из сети. Показывать вместо неё
+                какое-либо число мы не будем — проверьте по ссылке выше.
+              </p>
+            )}
+          </div>
+          <div className="card rounded-2xl p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-cream/45">
+              Права на контракт
+            </p>
+            {jetton === null ? (
+              <p className="mt-2 text-sm text-cream/60">Сейчас не удалось проверить права через сеть.</p>
+            ) : (
               <>
-                <p className="display mt-2 text-3xl font-extrabold text-cream/45">Не назначен</p>
-                <p className="mt-2 text-xs leading-relaxed text-cream/50">
-                  Прежний фонд на {blackHole.amount.toLocaleString("ru-RU")} $DOFFA ушёл
-                  в чёрную дыру (см. ниже). Новый запас на награды пока не выделен — как
-                  только это произойдёт, адрес и баланс появятся здесь.
+                <p className={`mt-2 text-sm font-semibold ${jetton.mintable ? "text-amber" : "text-teal"}`}>
+                  {jetton.mintable ? "Допечатка ещё возможна" : "Допечатка закрыта навсегда"}
+                </p>
+                <p className="mt-2 text-[11px] leading-relaxed text-cream/45">
+                  {jetton.admin === null ? (
+                    <>
+                      Администратор контракта снят: менять контракт и его метаданные больше
+                      не может никто, включая владельца проекта. Проверено в сети, а не
+                      заявлено на словах.
+                    </>
+                  ) : (
+                    <>
+                      Администратор контракта пока сохранён. Он не позволяет выпускать новые{" "}
+                      {токен.symbol} сверх эмиссии, но позволяет менять метаданные. Снятие
+                      прав — отдельная необратимая операция.
+                      <br />
+                      <span className="break-all">админ: {jetton.admin}</span>
+                    </>
+                  )}
                 </p>
               </>
             )}
           </div>
+        </div>
+      </section>
+
+      {/* ФОНД НАГРАД */}
+      <section className="mt-14">
+        <div className="flex flex-wrap items-center gap-3">
+          <h2 className="display text-3xl font-bold text-cream-soft sm:text-4xl">Фонд наград</h2>
+          <StatusBadge status={vaultStatus} />
+        </div>
+        <p className="mt-4 text-sm leading-relaxed text-cream/70">
+          Из этого кошелька игра платит за обменянные зёрна. Адрес публичный — остаток
+          смотрит кто угодно и когда угодно. Ключ от него живёт только в секретах и никогда
+          не попадает ни в репозиторий, ни в журналы, ни в отчёты.
+        </p>
+
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <div className="card rounded-2xl p-6">
-            <p className="text-xs font-semibold uppercase tracking-wider text-cream/45">Текущий баланс фонда</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-cream/45">Остаток фонда</p>
             {vaultBalance !== null ? (
               <>
-                {/* Цифра прочитана из сети прямо сейчас, а не записана в конфиг. */}
                 <p className="display mt-2 text-3xl font-extrabold text-cream-soft">
-                  {amount(vaultBalance)} $DOFFA
+                  {amount(vaultBalance)} {токен.symbol}
                 </p>
-                <p className="mt-2 text-xs text-cream/50">
-                  Прочитано из блокчейна.
-                  {vault.initial > 0 && (
-                    <>
-                      {" "}Роздано из фонда:{" "}
-                      <b className="text-cream/70">
-                        {amount(Math.max(0, vault.initial - vaultBalance))} $DOFFA
-                      </b>
-                      .
-                    </>
-                  )}
-                </p>
-                <a
-                  href={`https://solscan.io/account/${vault.address}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-4 inline-flex w-fit items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-5 py-2 text-sm font-semibold text-gold transition hover:bg-gold/20"
-                >
-                  Проверить в Solscan ↗
-                </a>
+                <p className="mt-2 text-xs text-cream/50">Прочитано из сети, а не записано в конфиг.</p>
               </>
-            ) : vault.address ? (
-              <p className="mt-2 text-sm leading-relaxed text-cream/60">
-                Адрес фонда опубликован, но прочитать баланс из сети сейчас не удалось.
-                Показывать вместо него какое-либо число мы не будем — проверить фонд
-                можно напрямую в Solscan.
-              </p>
             ) : (
               <p className="mt-2 text-sm leading-relaxed text-cream/60">
-                Публичный адрес фонда ещё не опубликован — статус{" "}
-                <b className="text-cream/80">{STATUS_LABEL_RU.planned}</b>. Пока адрес не задан,
-                мы не показываем никаких «текущих» цифр, чтобы не выдавать выдуманное за реальное.
+                Адрес фонда опубликован, но прочитать остаток из сети сейчас не удалось.
+                Показывать вместо него какое-либо число мы не будем — проверьте напрямую.
               </p>
             )}
+            <a
+              href={фонд.explorerUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-flex w-fit items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-5 py-2 text-sm font-semibold text-gold transition hover:bg-gold/20"
+            >
+              Проверить фонд ↗
+            </a>
+            <p className="mt-3 break-all text-[11px] text-cream/40">{фонд.address}</p>
+          </div>
+
+          <div className="card rounded-2xl p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-cream/45">
+              Дневной пул
+            </p>
+            {пул !== null ? (
+              <>
+                <p className="display mt-2 text-3xl font-extrabold text-cream-soft">
+                  {amount(пул)} {токен.symbol}
+                </p>
+                <p className="mt-2 text-xs leading-relaxed text-cream/50">
+                  Столько фонд отдаёт игрокам за сегодняшние сутки — это ровно{" "}
+                  1/{ЭК.poolDenominator.toLocaleString("ru-RU")} остатка, и ни единицей больше.
+                </p>
+              </>
+            ) : (
+              <p className="mt-2 text-sm leading-relaxed text-cream/60">
+                Пул считается от настоящего остатка фонда. Пока остаток не прочитан из сети,
+                показывать тут нечего.
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* ПОЧЕМУ ФОНД НЕ КОНЧАЕТСЯ. Это главное утверждение всей страницы, и
+            оно держится на арифметике, а не на обещании. Формула та же, что в
+            коде игры (server/emission.mjs), и её может проверить любой. */}
+        <div className="card mt-4 rounded-2xl border border-teal/25 p-6">
+          <p className="text-xs font-semibold uppercase tracking-wider text-teal">
+            Почему фонд не кончается
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-cream/75">
+            Фонд отдаёт в сутки не число монет, а <b className="text-cream-soft">долю самого себя</b>.
+            Отсюда прямое следствие: Ф(n) = Ф₀ · (1 − p)<sup>n</sup> строго больше нуля при
+            любом n. Это не «надолго хватит» — это «не кончается в принципе».
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-cream/75">
+            Так было не всегда. При постоянном курсе «1 000 зёрен → 1 {токен.symbol}» и
+            дневном потолке {ЭК.dailyBeanCap.toLocaleString("ru-RU")} зёрен один аккаунт
+            забирал бы 25 {токен.symbol} в сутки: тысяча игроков вынесла бы фонд в миллион за
+            сорок суток, десять тысяч — за четверо. Чем лучше шли бы дела, тем быстрее игра
+            убивала бы себя. Теперь этого не может случиться математически.
+          </p>
+
+          {vaultBalance !== null && (
+            <div className="mt-5 overflow-hidden rounded-xl border border-white/10">
+              <p className="bg-white/[0.03] px-4 py-2 text-[11px] leading-relaxed text-cream/45">
+                Худший случай: игра не зарабатывает вообще ничего, фонд только тратится.
+              </p>
+              <table className="w-full text-sm">
+                <tbody className="divide-y divide-white/10">
+                  {[
+                    { t: "через год", d: 365 },
+                    { t: "через 5 лет", d: 1825 },
+                    { t: "через 10 лет", d: 3650 },
+                    { t: "через 50 лет", d: 18250 },
+                  ].map((r) => (
+                    <tr key={r.d} className="bg-white/[0.02]">
+                      <td className="px-4 py-2.5 text-cream/60">{r.t}</td>
+                      <td className="px-4 py-2.5 text-right">
+                        <span className="display font-bold text-cream-soft">
+                          {amount(через(r.d)!)} {токен.symbol}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          <p className="mt-4 text-sm leading-relaxed text-cream/75">
+            И это без притока. А приток есть: {ЭК.fight.burn} % с банка каждого боя и{" "}
+            {ЭК.withdrawal.prize} % с каждого вывода возвращаются в фонд. Когда приток
+            сравнивается с пулом, фонд перестаёт таять вовсе и живёт с оборота. Точка
+            равновесия — приток, умноженный на {ЭК.poolDenominator.toLocaleString("ru-RU")}:
+            например,{" "}
+            <b className="text-cream-soft">
+              {amount(equilibrium(1000, ЭК.poolDenominator)!)} {токен.symbol}
+            </b>{" "}
+            в фонде держатся неподвижно при 1 000 {токен.symbol} притока в сутки.
+          </p>
+          <p className="mt-3 text-[11px] leading-relaxed text-cream/45">
+            Курс «зёрна → {токен.symbol}» пересчитывается раз в сутки: пул делится на
+            вчерашний спрос. Внутри суток курс постоянен — игрок видит число до нажатия.
+            Шаг заперт множителем два в обе стороны, поэтому ни тихий день, ни наплыв не
+            дают качелей.
+          </p>
+        </div>
+      </section>
+
+      {/* СЖИГАНИЕ И ПРИЗОВОЙ ФОНД */}
+      <section className="mt-14">
+        <h2 className="display text-3xl font-bold text-cream-soft sm:text-4xl">
+          Сжигание и призовой фонд
+        </h2>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <div className="card rounded-2xl p-6">
+            <p className="text-xs font-semibold uppercase tracking-wider text-cream/45">
+              Как делится каждая сумма
+            </p>
+            <dl className="mt-3 space-y-3 text-sm">
+              <div>
+                <dt className="text-cream/60">Банк боя на {токен.symbol}</dt>
+                <dd className="mt-1 text-cream-soft">
+                  <b className="text-teal">{ЭК.fight.winner} %</b> победителю ·{" "}
+                  <b className="text-copper">{ЭК.fight.burn} %</b> сгорает ·{" "}
+                  <b className="text-gold">{ЭК.fight.prize} %</b> в призовой фонд
+                </dd>
+              </div>
+              <div>
+                <dt className="text-cream/60">Вывод на свой кошелёк</dt>
+                <dd className="mt-1 text-cream-soft">
+                  <b className="text-teal">{ЭК.withdrawal.player} %</b> игроку ·{" "}
+                  <b className="text-copper">{ЭК.withdrawal.burn} %</b> сгорает ·{" "}
+                  <b className="text-gold">{ЭК.withdrawal.prize} %</b> в призовой фонд
+                </dd>
+              </div>
+            </dl>
+            <p className="mt-4 text-[11px] leading-relaxed text-cream/45">
+              Округление названо прямо: сжигание и приз считаются вниз, а весь остаток до
+              последней единицы достаётся человеку. Иначе округление работало бы против него,
+              а «пыль» копилась бы у нас — незаметно и постоянно.
+            </p>
+          </div>
+          <div className="card rounded-2xl p-6">
+            <div className="flex items-center gap-3">
+              <p className="text-xs font-semibold uppercase tracking-wider text-cream/45">Сожжено</p>
+              <StatusBadge status={burnStatus} />
+            </div>
+            {burned !== null && burned > 0 ? (
+              <>
+                <p className="display mt-3 text-3xl font-extrabold text-copper">
+                  {amount(burned)} {токен.symbol}
+                </p>
+                <p className="mt-2 text-xs leading-relaxed text-cream/55">
+                  Уничтожено навсегда. Считается по эмиссии в сети: выпущено{" "}
+                  {токен.totalSupply.toLocaleString("ru-RU")}, сейчас {amount(jetton!.totalSupply)}.
+                  Это настоящее сжигание — оно уменьшает эмиссию, и его проверяет любой,
+                  не доверяя нам ни в чём.
+                </p>
+              </>
+            ) : (
+              <p className="mt-3 text-sm leading-relaxed text-cream/70">
+                {jetton
+                  ? `Эмиссия в сети сейчас ${amount(jetton.totalSupply)} — она равна выпущенной, значит подтверждённых сжиганий пока нет.`
+                  : "Прочитать эмиссию из сети сейчас не удалось, поэтому объём сжигания не показываем."}{" "}
+                Сжигание начнётся вместе с обменом: статус — «{STATUS_LABEL_RU[burnStatus]}». Мы
+                не обещаем, что оно уже идёт.
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* СТАТУСЫ */}
+      <section className="mt-14">
+        <h2 className="display text-3xl font-bold text-cream-soft sm:text-4xl">Статусы функций</h2>
+        <div className="mt-6 divide-y divide-white/10 overflow-hidden rounded-2xl border border-white/10">
+          {[
+            { label: `Игра ${ECOSYSTEM.primaryGameName} в Telegram`, status: ECOSYSTEM.status.game },
+            { label: `Токен ${токен.symbol} выпущен в ${токен.network}`, status: ECOSYSTEM.status.token },
+            { label: "Фонд наград (публичный адрес)", status: vaultStatus },
+            { label: `Обмен зёрен на ${токен.symbol}`, status: ECOSYSTEM.status.exchange },
+            { label: "Вывод на свой кошелёк", status: ECOSYSTEM.status.claims },
+            { label: "Сжигание в сети", status: burnStatus },
+            { label: `Пул на бирже (${токен.symbol})`, status: dexStatus },
+          ].map((r) => (
+            <div key={r.label} className="flex items-center justify-between gap-4 bg-white/[0.02] px-5 py-3">
+              <span className="text-sm text-cream/75">{r.label}</span>
+              <StatusBadge status={r.status} />
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 text-[11px] leading-relaxed text-cream/45">
+          Почему обмен и вывод — не «работает», хотя монета выпущена. Игра списывает зёрна и
+          ставит заявку в очередь, а платит по ней отправитель, подписывающий перевод ключом
+          фонда. Ключ не попадает в репозиторий, и пока он не положен в секреты, платить
+          некому: включить флаг значило бы копить заявки, по которым никто не платит. Обмен
+          открывают четыре условия сразу, а не правка одной строки.
+        </p>
+      </section>
+
+      {/* РЫНОЧНАЯ ЦЕНА */}
+      <section className="mt-14">
+        <h2 className="display text-3xl font-bold text-cream-soft sm:text-4xl">Рыночная цена</h2>
+        <div className="card mt-6 rounded-2xl p-5">
+          <p className="text-sm leading-relaxed text-cream/70">
+            У {токен.symbol} пока нет рыночной цены: пул ликвидности на бирже не создан
+            (статус — «{STATUS_LABEL_RU[dexStatus]}»). Рисовать вместо цены ноль или прочерк,
+            который можно принять за котировку, мы не будем.
+          </p>
+          {prices.solUsd !== null && (
+            <p className="mt-3 text-[11px] text-cream/40">
+              Для ориентира, SOL: {formatUsd(prices.solUsd)} · источник Jupiter, обновление раз
+              в 5 минут
+            </p>
+          )}
+        </div>
+      </section>
+
+      {/* ПРЕЖНЯЯ МОНЕТА */}
+      <section className="mt-14">
+        <h2 className="display text-3xl font-bold text-cream-soft sm:text-4xl">
+          Прежняя монета проекта: {прежний.symbol} в {прежний.network}
+        </h2>
+        <p className="mt-4 text-sm leading-relaxed text-cream/70">
+          До {токен.symbol} у проекта была монета {прежний.symbol} в сети {прежний.network}.
+          Она никуда не делась из сети, у неё есть держатели, и вход в личный кабинет по
+          кошельку {прежний.network} работает на ней. Наградой в игре она больше не служит и
+          продуктом не называется — но удалить её со страницы было бы неправдой.
+        </p>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <div className="card rounded-2xl p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-cream/45">
+              Эмиссия
+            </p>
+            <p className="display mt-2 text-2xl font-extrabold text-cream-soft">
+              {legacySupply ? amount(legacySupply.total) : прежний.totalSupply.toLocaleString("ru-RU")}{" "}
+              {прежний.symbol}
+            </p>
+            <p className="mt-2 text-[11px] text-cream/45">
+              {legacySupply ? "Прочитано из сети." : "По данным выпуска; сеть сейчас недоступна."}
+            </p>
+          </div>
+          <div className="card rounded-2xl p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-cream/45">
+              Контракт
+            </p>
+            <a
+              href={прежний.solscanUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-flex w-fit items-center gap-2 rounded-full border border-cream/25 px-4 py-2 text-sm font-semibold text-cream transition hover:border-amber hover:text-amber"
+            >
+              Открыть в Solscan ↗
+            </a>
+            <p className="mt-3 break-all text-[11px] text-cream/40">mint: {прежний.mint}</p>
           </div>
         </div>
 
         {/* Чёрная дыра $DOFFA. Два утверждения, которые НЕЛЬЗЯ усиливать:
-            (1) это не сжигание — supply в сети не изменился;
+            (1) это не сжигание — эмиссия в сети не изменилась;
             (2) адрес на кривой ed25519, ключ существует, но утерян — то есть
                 необратимость практическая, а не математическая.
             Написать «сожжено» или «ключа не существует» было бы ложью, которую
-            легко поймать: и supply, и кривая проверяются публично. */}
-        {blackHole.amount > 0 && (
+            легко поймать: и эмиссия, и кривая проверяются публично. */}
+        {дыра.amount > 0 && (
           <div className="card mt-4 rounded-2xl border border-amber/25 p-6">
             <div className="flex flex-wrap items-center gap-3">
               <p className="text-xs font-semibold uppercase tracking-wider text-amber">
-                Чёрная дыра $DOFFA · вне обращения
+                Чёрная дыра {прежний.symbol} · вне обращения
               </p>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-amber/40 bg-amber/10 px-2.5 py-0.5 text-[11px] font-semibold text-amber">
                 <span className="h-1.5 w-1.5 rounded-full bg-current" />
@@ -187,25 +468,24 @@ export default async function TransparencyPage() {
               </span>
             </div>
             <p className="display mt-3 text-3xl font-extrabold text-cream-soft">
-              {blackHole.amount.toLocaleString("ru-RU")} $DOFFA
+              {дыра.amount.toLocaleString("ru-RU")} {прежний.symbol}
             </p>
             <p className="mt-3 text-sm leading-relaxed text-cream/70">
-              У проекта есть адрес, из которого токены не возвращаются, — чёрная дыра.
-              1 июля 2026 года на него ушёл {blackHole.amount.toLocaleString("ru-RU")} $DOFFA:
-              этот кошелёк создавался под фонд наград, но приватный ключ к нему был утерян.
-              Мы искали его в файлах, в истории репозитория, во всех аккаунтах Phantom и в
-              переменных сервера — нигде. 29 июля 2026 года ключ признан утраченным, а адрес
-              объявлен чёрной дырой: тратить оттуда не может никто, включая нас.
+              1 июля 2026 года на этот адрес ушёл {дыра.amount.toLocaleString("ru-RU")}{" "}
+              {прежний.symbol}: кошелёк создавался под фонд наград, но приватный ключ к нему
+              был утерян. Мы искали его в файлах, в истории репозитория, во всех аккаунтах
+              Phantom и в переменных сервера — нигде. 29 июля 2026 года ключ признан
+              утраченным, а адрес объявлен чёрной дырой: тратить оттуда не может никто,
+              включая нас.
             </p>
             <p className="mt-3 text-sm leading-relaxed text-cream/70">
-              Для держателей результат тот же, что от сжигания:{" "}
-              {blackHole.amount.toLocaleString("ru-RU")} $DOFFA никогда не попадут на рынок и
-              никому не будут розданы. Эмиссия в сети формально осталась{" "}
-              {ECOSYSTEM.token.totalSupply.toLocaleString("ru-RU")}, а в реальном обращении —{" "}
+              Эмиссия в сети формально осталась {прежний.totalSupply.toLocaleString("ru-RU")},
+              а в реальном обращении —{" "}
               <b className="text-cream-soft">
-                {ECOSYSTEM.token.effectiveSupply.toLocaleString("ru-RU")} $DOFFA
+                {прежний.effectiveSupply.toLocaleString("ru-RU")} {прежний.symbol}
               </b>
-              . Все награды и все расчёты на сайте идут только от этого числа.
+              . Именно этот случай и научил нас делать сжигание {токен.symbol} настоящим:
+              оно уменьшает эмиссию в сети и проверяется без доверия к нам.
             </p>
 
             {/* Граница утверждения. Мы говорим ровно то, что можем доказать, и
@@ -217,7 +497,7 @@ export default async function TransparencyPage() {
               <p className="mt-2 text-xs leading-relaxed text-cream/60">
                 Мы не пишем «сожжено»: сжигание уменьшает эмиссию в сети, а здесь она не
                 изменилась — токены лежат на адресе, а не уничтожены.
-                {blackHole.keyExistsButLost && (
+                {дыра.keyExistsButLost && (
                   <>
                     {" "}И не пишем «ключа не существует»: адрес лежит на кривой ed25519,
                     значит ключ математически существует — просто им никто не владеет. Это
@@ -234,7 +514,7 @@ export default async function TransparencyPage() {
             </p>
             <div className="mt-2 flex flex-wrap gap-2">
               <a
-                href={`https://solscan.io/tx/${blackHole.txSignature}`}
+                href={`https://solscan.io/tx/${дыра.txSignature}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full border border-cream/25 px-4 py-2 text-sm font-semibold text-cream transition hover:border-amber hover:text-amber"
@@ -242,7 +522,7 @@ export default async function TransparencyPage() {
                 Та самая транзакция ↗
               </a>
               <a
-                href={`https://solscan.io/account/${blackHole.address}`}
+                href={`https://solscan.io/account/${дыра.address}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full border border-cream/25 px-4 py-2 text-sm font-semibold text-cream transition hover:border-amber hover:text-amber"
@@ -250,180 +530,14 @@ export default async function TransparencyPage() {
                 Адрес (расходов нет ни одного) ↗
               </a>
             </div>
-            <p className="mt-3 break-all text-[11px] text-cream/40">{blackHole.address}</p>
+            <p className="mt-3 break-all text-[11px] text-cream/40">{дыра.address}</p>
           </div>
         )}
       </section>
 
-      {/* РАСПРЕДЕЛЕНИЕ И СЖИГАНИЕ */}
-      <section className="mt-14">
-        <h2 className="display text-3xl font-bold text-cream-soft sm:text-4xl">Распределение и сжигание</h2>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <div className="card rounded-2xl p-6">
-            <p className="text-xs font-semibold uppercase tracking-wider text-cream/45">Ориентировочное распределение награды</p>
-            <div className="mt-3 flex items-center gap-4">
-              <span className="display text-2xl font-extrabold text-cream-soft">{ECOSYSTEM.reward.playerPercent}%</span>
-              <span className="text-sm text-cream/60">игроку</span>
-            </div>
-            <div className="mt-1.5 flex items-center gap-4">
-              <span className="display text-xl font-bold text-copper">{ECOSYSTEM.reward.burnPercent}%</span>
-              <span className="text-sm text-cream/60">на сжигание</span>
-            </div>
-            <p className="mt-3 text-[11px] text-cream/45">Значения берутся из конфигурации и могут меняться.</p>
-          </div>
-          <div className="card rounded-2xl p-6">
-            <div className="flex items-center gap-3">
-              <p className="text-xs font-semibold uppercase tracking-wider text-cream/45">Сжигание</p>
-              <StatusBadge status={burnStatus} />
-            </div>
-            {/* Сожжено считается как разница заявленной эмиссии и текущей по
-                данным сети: у SPL-токена сжигание уменьшает supply, а выпустить
-                новые нельзя — право mint отозвано. */}
-            {burned !== null && burned > 0 ? (
-              <>
-                <p className="display mt-3 text-3xl font-extrabold text-copper">
-                  {amount(burned)} $DOFFA
-                </p>
-                <p className="mt-2 text-xs text-cream/55">
-                  Сожжено навсегда. Считается по эмиссии в сети: было{" "}
-                  {ECOSYSTEM.token.totalSupply.toLocaleString("ru-RU")}, сейчас {amount(supply!.total)}.
-                </p>
-              </>
-            ) : (
-              <>
-                <p className="mt-3 text-sm leading-relaxed text-cream/70">
-                  Сжигание выполняется проектом отдельной on-chain-операцией. Сожжённые
-                  токены не поступают игрокам или в пул.
-                </p>
-                <p className="mt-3 text-[11px] leading-relaxed text-cream/50">
-                  {supply
-                    ? `Эмиссия в сети сейчас ${amount(supply.total)} — она равна первоначальной, значит подтверждённых сжиганий пока нет.`
-                    : "Прочитать эмиссию из сети сейчас не удалось, поэтому объём сжигания не показываем."}{" "}
-                  Статус — «{STATUS_LABEL_RU[burnStatus]}». Мы не обещаем, что сжигание уже активно.
-                </p>
-              </>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* СТАТУСЫ */}
-      <section className="mt-14">
-        <h2 className="display text-3xl font-bold text-cream-soft sm:text-4xl">Статусы функций</h2>
-        <div className="mt-6 divide-y divide-white/10 overflow-hidden rounded-2xl border border-white/10">
-          {[
-            { label: "Выплата наград (claims)", status: rewardsStatus },
-            { label: "Reward Vault (публичный адрес)", status: vaultStatus },
-            { label: "Сжигание (on-chain burn)", status: burnStatus },
-            { label: "DEX-пул DOFFA/SOL", status: dexStatus },
-            { label: "Android APK", status: ECOSYSTEM.status.android },
-          ].map((r) => (
-            <div key={r.label} className="flex items-center justify-between bg-white/[0.02] px-5 py-3">
-              <span className="text-sm text-cream/75">{r.label}</span>
-              <StatusBadge status={r.status} />
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ТОКЕН */}
-      <section className="mt-14">
-        <h2 className="display text-3xl font-bold text-cream-soft sm:text-4xl">Токен $DOFFA</h2>
-        <p className="mt-4 text-sm leading-relaxed text-cream/70">
-          Mint токена открыт в Solscan — проверить можно в любой момент.
-        </p>
-        <a
-          href={ECOSYSTEM.token.solscanUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-4 inline-flex w-fit items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-5 py-2 text-sm font-semibold text-gold transition hover:bg-gold/20"
-        >
-          Открыть $DOFFA в Solscan ↗
-        </a>
-        <p className="mt-3 break-all text-[11px] text-cream/40">mint: {mint}</p>
-
-        {/* Данные из сети: эмиссия и права на выпуск/заморозку. Раньше сайт
-            просто утверждал, что права отозваны, — теперь это подтверждается. */}
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <div className="card rounded-2xl p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-cream/45">
-              Эмиссия в сети
-            </p>
-            {supply ? (
-              <>
-                <p className="display mt-2 text-2xl font-extrabold text-cream-soft">
-                  {amount(supply.total)} $DOFFA
-                </p>
-                <p className="mt-2 text-[11px] text-cream/45">
-                  Прочитано из блокчейна, {supply.decimals} знаков после запятой.
-                </p>
-              </>
-            ) : (
-              <p className="mt-2 text-sm text-cream/60">
-                Сейчас не удалось прочитать эмиссию из сети.
-              </p>
-            )}
-          </div>
-          <div className="card rounded-2xl p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-cream/45">
-              Права на токен
-            </p>
-            {authorities === null ? (
-              <p className="mt-2 text-sm text-cream/60">
-                Сейчас не удалось проверить права через сеть.
-              </p>
-            ) : authoritiesRevoked ? (
-              <>
-                <p className="mt-2 text-sm font-semibold text-teal">
-                  Выпуск и заморозка отозваны
-                </p>
-                <p className="mt-2 text-[11px] leading-relaxed text-cream/45">
-                  Новые токены выпустить нельзя, заморозить чужие — тоже. Проверено
-                  в сети, а не заявлено на словах.
-                </p>
-              </>
-            ) : (
-              <>
-                <p className="mt-2 text-sm font-semibold text-amber">Права ещё не отозваны</p>
-                <p className="mt-2 break-all text-[11px] leading-relaxed text-cream/45">
-                  {authorities.mintAuthority && <>выпуск: {authorities.mintAuthority}<br /></>}
-                  {authorities.freezeAuthority && <>заморозка: {authorities.freezeAuthority}</>}
-                </p>
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Рыночная котировка. У $DOFFA она появится только когда будет создан
-            пул ликвидности; до тех пор пишем об этом прямо, а не рисуем ноль
-            или прочерк, который можно принять за цену. */}
-        <div className="card mt-6 rounded-2xl p-5">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-cream/45">
-            Рыночная цена
-          </p>
-          {prices.doffaUsd !== null ? (
-            <p className="display mt-2 text-2xl font-extrabold text-cream-soft">
-              {formatUsd(prices.doffaUsd)}{" "}
-              <span className="text-sm font-semibold text-cream/45">за $DOFFA</span>
-            </p>
-          ) : (
-            <p className="mt-2 text-sm leading-relaxed text-cream/70">
-              У $DOFFA пока нет рыночной цены: пул ликвидности на DEX не создан
-              (статус — «{STATUS_LABEL_RU[dexStatus]}»). Как только пул
-              появится, котировка будет подтягиваться сюда автоматически.
-            </p>
-          )}
-          {prices.solUsd !== null && (
-            <p className="mt-3 text-[11px] text-cream/40">
-              Для ориентира, SOL: {formatUsd(prices.solUsd)} · источник Jupiter, обновление раз в 5 минут
-            </p>
-          )}
-        </div>
-      </section>
-
       <div className="mt-16 flex flex-wrap justify-center gap-6 text-center">
         <Link href="/game" className="text-sm font-semibold text-gold transition hover:text-amber">
-          ← DOFFA Heroes
+          ← {ECOSYSTEM.primaryGameName}
         </Link>
         <Link href="/" className="text-sm font-semibold text-gold transition hover:text-amber">
           На главную doffa.coffee
