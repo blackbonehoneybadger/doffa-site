@@ -3,27 +3,32 @@ import Link from "next/link";
 import { ECOSYSTEM, STATUS_LABEL_RU, type FeatureStatus } from "../config/ecosystem";
 
 export const metadata: Metadata = {
-  title: "DOFFA Heroes — DOFFA Games",
+  title: "DOFFA DRAKA — DOFFA Games",
   description:
-    "DOFFA Heroes — динамичный соло-забег. Собирай зёрна, проходи волны врагов движением, уклонением и способностями и забирай подтверждённые награды $DOFFA. Без ставок.",
+    "DOFFA DRAKA — боковой файтинг в Telegram. Одиннадцать бойцов, десять арен, бои с живыми игроками и турниры. Зёрна собираются в игре, DOFF в сети TON — награда экосистемы.",
   alternates: { canonical: "/game" },
   openGraph: {
-    title: "DOFFA Heroes — DOFFA Games",
+    title: "DOFFA DRAKA — DOFFA Games",
     description:
-      "Соло-забег на реакцию и навык: волны врагов, движение и способности. Зёрна — входной билет, награда $DOFFA — из Reward Vault после подтверждённого прохождения.",
+      "Боковой файтинг в Telegram: одиннадцать бойцов, десять арен, живые соперники и турниры. Зёрна — игровая энергия, DOFF в TON — награда.",
     type: "website",
   },
 };
 
 const GAME = ECOSYSTEM.primaryGameName;
+const ЭК = ECOSYSTEM.economy;
 
-// Арты игры (сгенерированы в фирменной палитре). Пока хостятся на CDN
-// Higgsfield; после добавления файлов в public/brand/game/ пути заменить.
+// Арты игры — настоящие кадры из DOFFA DRAKA, уменьшенные для веба.
+// Не концепт и не превью из нейросети: это то же, что видит игрок в Telegram.
 const ART = {
-  keyart: "https://d8j0ntlcm91z4.cloudfront.net/user_2wpHpzXpvrW7bw4za2Omx4tlMCc/hf_20260721_160205_cba50725-fd73-42e1-ab09-58afd6d4ec1c.png",
-  mascot: "https://d8j0ntlcm91z4.cloudfront.net/user_2wpHpzXpvrW7bw4za2Omx4tlMCc/hf_20260721_160153_8295c183-6f1f-4215-8c67-0fcc76f68103.png",
-  arena: "https://d8j0ntlcm91z4.cloudfront.net/user_2wpHpzXpvrW7bw4za2Omx4tlMCc/hf_20260721_160228_62089209-64c3-48b4-82d4-f50f8840ff06.png",
-  enemies: "https://d8j0ntlcm91z4.cloudfront.net/user_2wpHpzXpvrW7bw4za2Omx4tlMCc/hf_20260721_160243_0697ba74-848a-4854-89d4-39c1408335a3.png",
+  roastery: "/brand/game/arena-roastery.jpg",
+  plantation: "/brand/game/arena-plantation.jpg",
+  rooftop: "/brand/game/arena-rooftop.jpg",
+  fighters: [
+    { src: "/brand/game/fighter-badger.png", name: "HONEY BADGER" },
+    { src: "/brand/game/fighter-boy.png", name: "BOY" },
+    { src: "/brand/game/fighter-edik.png", name: "EDIK" },
+  ],
 };
 
 // Бейдж честного статуса функции. Не выдаём Planned за Live.
@@ -51,82 +56,69 @@ function Kicker({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Способности показаны как продуктовый preview. Пока функция не реализована в
-// публичной сборке — статус honest (Testing/Planned), а не «работает».
-const ABILITIES: { icon: string; name: string; desc: string; status: FeatureStatus }[] = [
-  { icon: "🫘", name: "Бросок зерна", desc: "Базовая автоатака: персонаж метает зёрна во врагов, пока стоит на месте.", status: "planned" },
-  { icon: "💨", name: "Уклонение", desc: "Короткий рывок, чтобы уйти от снарядов и волн врагов.", status: "planned" },
-  { icon: "☕", name: "Кофейный плеск", desc: "Удар по площади, замедляет врагов вокруг.", status: "planned" },
-  { icon: "🛡️", name: "Щит", desc: "Кратковременная защита от следующей атаки.", status: "planned" },
-];
-
 const MECHANICS: string[] = [
-  "Соло-забег: волны врагов сменяют друг друга, забег короткий.",
-  "Персонаж атакует автоматически, когда стоит на месте — ты управляешь движением и уклонением.",
-  "Между волнами выбираешь усиление — каждый забег складывается по-своему.",
-  "Зёрна используются только как входной билет и списываются системой после входа.",
-  "За подтверждённое прохождение забега можно получить DOFFA из общего фонда наград (Reward Vault).",
-  "Никаких ставок: DOFFA не ставится и не отбирается — награда идёт только из Reward Vault.",
+  "Боковой файтинг: удары, блок, уклонение и приёмы у каждого бойца свои.",
+  "Одиннадцать бойцов с разными характерами боя — это не одна модель в разных шкурах.",
+  "Десять арен: обжарочная, кофейная крыша и горная плантация в разное время суток и в разную погоду.",
+  "Бои с компьютером на трёх уровнях: новичок, воин, мастер.",
+  "Бои с живыми игроками, друзья по ID, общий рейтинг и турниры.",
+  "Повторы боёв: любой поединок можно пересмотреть.",
 ];
 
 const STEPS: { n: string; t: string; d: string }[] = [
-  { n: "1", t: "Тапай", d: "Тапай по фирменной чашке DOFFA во встроенной тапалке." },
-  { n: "2", t: "Собирай зёрна", d: "Зёрна — внутренняя игровая энергия. Их нельзя вывести или напрямую обменять на DOFFA." },
-  { n: "3", t: "Входи в забег", d: "Определённое количество зёрен используется как билет в забег." },
-  { n: "4", t: "Проходи волны", d: "Двигайся, уклоняйся и выбирай способности, чтобы пройти волны врагов." },
-  { n: "5", t: "Забирай DOFFA", d: "После серверного подтверждения нажми «Забрать награду»." },
+  { n: "1", t: "Открой в Telegram", d: `Игра живёт в @${ECOSYSTEM.game.botUsername}. Ставить ничего не нужно — она открывается прямо в мессенджере.` },
+  { n: "2", t: "Собирай зёрна", d: "Тапы, приглашения друзей и победы над компьютером дают зёрна — внутреннюю энергию игры." },
+  { n: "3", t: "Дерись", d: "Против компьютера — на зёрна. Против живого соперника — за место в рейтинге и за банк." },
+  { n: "4", t: "Меняй на DOFF", d: "Зёрна обмениваются на DOFF в сети TON по курсу, который пересчитывается раз в сутки." },
+  { n: "5", t: "Выводи на свой кошелёк", d: "DOFF уходит на твой кошелёк в TON. Каждый перевод виден в сети." },
 ];
 
 export default function GamePage() {
-  const webUrl = ECOSYSTEM.game.webUrl;
-  const burnLive = ECOSYSTEM.status.burn === "live";
-  const player = ECOSYSTEM.reward.playerPercent;
-  const burn = ECOSYSTEM.reward.burnPercent;
+  const telegram = ECOSYSTEM.game.telegramUrl;
+  const бой = ЭК.fight;
+  const вывод = ЭК.withdrawal;
 
   return (
     <main className="mx-auto min-h-screen max-w-5xl px-5 pb-24 pt-28">
       {/* HERO */}
-      <Kicker>{ECOSYSTEM.productName} · BEAN DUEL</Kicker>
+      <div className="flex flex-wrap items-center gap-4">
+        <Kicker>{ECOSYSTEM.productName} · FIGHTING</Kicker>
+        <StatusBadge status={ECOSYSTEM.status.game} />
+      </div>
       <h1 className="display mt-4 text-5xl font-extrabold leading-[0.98] tracking-tight text-cream-soft sm:text-6xl">
         <span className="bg-gradient-to-r from-gold via-amber to-copper bg-clip-text text-transparent">{GAME}</span>
       </h1>
       <p className="mt-6 max-w-2xl text-lg leading-relaxed text-cream/75">
-        Динамичный соло-забег: волны врагов, движение, уклонение и
-        способности фирменного персонажа DOFFA — <b className="text-cream-soft">без ставок</b>.
+        Боковой файтинг прямо в Telegram. Одиннадцать бойцов, десять арен, живые
+        соперники и турниры — <b className="text-cream-soft">без установки и без регистрации</b>.
       </p>
       <div className="mt-8 flex flex-wrap items-center gap-4">
-        {webUrl ? (
-          <a
-            href={webUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold to-copper px-7 py-3 font-bold text-ink shadow-lg shadow-gold/10 transition hover:brightness-110"
-          >
-            🏹 Играть в браузере ↗
-          </a>
-        ) : (
-          <span className="inline-flex items-center gap-2 rounded-full border border-cream/20 px-7 py-3 font-semibold text-cream/50">
-            🏹 Игра готовится
-          </span>
-        )}
+        <a
+          href={telegram}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold to-copper px-7 py-3 font-bold text-ink shadow-lg shadow-gold/10 transition hover:brightness-110"
+        >
+          ⚔️ Играть в Telegram ↗
+        </a>
         <Link
-          href="/download"
+          href="/transparency"
           className="rounded-full border border-cream/30 px-7 py-3 font-semibold text-cream transition hover:border-gold hover:text-gold"
         >
-          Скачать {ECOSYSTEM.productName}
+          Экономика и проверка
         </Link>
       </div>
 
-      {/* KEY ART */}
+      {/* АРЕНА */}
       <div className="mt-10 overflow-hidden rounded-3xl ring-1 ring-gold/20">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={ART.keyart} alt={`${GAME} — арт: маскот-чашка отбивается от волн врагов на арене`} className="w-full" loading="lazy" />
+        <img src={ART.roastery} alt={`${GAME} — арена «Медная обжарочная»`} className="w-full" loading="lazy" />
       </div>
 
       {/* МЕХАНИКА */}
       <section className="mt-20">
         <Kicker>Механика</Kicker>
-        <h2 className="display mt-4 text-3xl font-bold text-cream-soft sm:text-4xl">Как устроен забег</h2>
+        <h2 className="display mt-4 text-3xl font-bold text-cream-soft sm:text-4xl">Как устроен бой</h2>
         <ul className="mt-6 grid gap-3 sm:grid-cols-2">
           {MECHANICS.map((m) => (
             <li key={m} className="card flex items-start gap-3 rounded-2xl p-4 text-sm leading-relaxed text-cream/75">
@@ -135,74 +127,71 @@ export default function GamePage() {
             </li>
           ))}
         </ul>
-        <div className="mt-6 overflow-hidden rounded-3xl ring-1 ring-white/10">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={ART.arena} alt="Арена забега: деревянный помост кофейни с мешками зёрен и горами на фоне" className="w-full" loading="lazy" />
-        </div>
       </section>
 
-      {/* СПОСОБНОСТИ */}
+      {/* БОЙЦЫ */}
       <section className="mt-20">
-        <Kicker>Способности</Kicker>
-        <h2 className="display mt-4 text-3xl font-bold text-cream-soft sm:text-4xl">Продуктовый preview</h2>
+        <Kicker>Состав</Kicker>
+        <h2 className="display mt-4 text-3xl font-bold text-cream-soft sm:text-4xl">Одиннадцать бойцов</h2>
         <p className="mt-3 max-w-2xl text-sm text-cream/60">
-          Набор способностей в разработке. Статусы показаны честно — это превью, а не
-          обещание, что функция уже работает в публичной сборке.
+          У каждого своя дистанция, свой темп и свои приёмы. Трое из состава — ниже.
         </p>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {ABILITIES.map((a) => (
-            <div key={a.name} className="card rounded-2xl p-5">
-              <div className="flex items-center justify-between">
-                <span className="text-3xl">{a.icon}</span>
-                <StatusBadge status={a.status} />
-              </div>
-              <h3 className="display mt-3 text-lg font-bold text-cream-soft">{a.name}</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-cream/65">{a.desc}</p>
-            </div>
+        <div className="mt-6 grid gap-4 sm:grid-cols-3">
+          {ART.fighters.map((f) => (
+            <figure key={f.name} className="card overflow-hidden rounded-3xl">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={f.src} alt={`Боец ${f.name} из ${GAME}`} className="w-full" loading="lazy" />
+              <figcaption className="display px-4 py-3 text-center text-sm font-bold tracking-wide text-cream-soft">
+                {f.name}
+              </figcaption>
+            </figure>
           ))}
         </div>
       </section>
 
-      {/* ТАПАЛКА / ЗЁРНА */}
+      {/* АРЕНЫ */}
       <section className="mt-20">
-        <Kicker>Накопить зёрна</Kicker>
-        <div className="card mt-4 grid items-center gap-8 rounded-3xl p-8 sm:grid-cols-2">
-          <div>
-            <h2 className="display text-3xl font-bold text-cream-soft sm:text-4xl">Тапай по чашке</h2>
-            <ul className="mt-5 space-y-2 text-sm leading-relaxed text-cream/75">
-              <li>• Тап даёт зёрна; энергия ограничивает количество тапов.</li>
-              <li>• Зёрна нужны для входа в {GAME}.</li>
-              <li>• Зёрна нельзя вывести и нельзя напрямую поменять на DOFFA.</li>
-            </ul>
-            <Link
-              href="/download"
-              className="mt-7 inline-flex w-fit items-center gap-2 rounded-full border border-cream/30 px-6 py-2.5 text-sm font-semibold text-cream transition hover:border-gold hover:text-gold"
-            >
-              Открыть тапалку
-            </Link>
-            <p className="mt-3 text-[11px] text-cream/40">
-              Полная тапалка — в приложении {ECOSYSTEM.productName}. На сайте это облегчённое превью.
-            </p>
-          </div>
-          <div className="flex items-center justify-center">
-            <div className="relative h-56 w-56 overflow-hidden rounded-3xl ring-1 ring-gold/25 sm:h-64 sm:w-64">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={ART.mascot} alt="Маскот DOFFA — чашка с ножками в кедах метает кофейное зерно" className="h-full w-full object-cover" loading="lazy" />
-            </div>
-          </div>
+        <Kicker>Арены</Kicker>
+        <h2 className="display mt-4 text-3xl font-bold text-cream-soft sm:text-4xl">Десять мест для драки</h2>
+        <p className="mt-3 max-w-2xl text-sm text-cream/60">
+          Три места кофейни в разное время суток и в разную погоду: ночь, рассвет,
+          гроза, туман, дым, закат, снег. Настроение задаёт свет, а не другая картинка.
+        </p>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={ART.plantation} alt="Арена «Горная плантация»" className="w-full rounded-3xl ring-1 ring-white/10" loading="lazy" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={ART.rooftop} alt="Арена «Кофейная крыша»" className="w-full rounded-3xl ring-1 ring-white/10" loading="lazy" />
         </div>
       </section>
 
-      {/* ПРОТИВНИКИ */}
+      {/* ЗЁРНА */}
       <section className="mt-20">
-        <Kicker>Противники</Kicker>
-        <h2 className="display mt-4 text-3xl font-bold text-cream-soft sm:text-4xl">Кто встретится в забеге</h2>
-        <p className="mt-3 max-w-2xl text-sm text-cream/60">
-          Сахарные кубики, злые стаканчики и пережаренные зёрна — концепт-превью противников.
-        </p>
-        <div className="mt-6 overflow-hidden rounded-3xl ring-1 ring-white/10">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={ART.enemies} alt="Концепт врагов: сахарный кубик, злой бумажный стаканчик и пережаренное зерно" className="w-full" loading="lazy" />
+        <Kicker>Зёрна</Kicker>
+        <h2 className="display mt-4 text-3xl font-bold text-cream-soft sm:text-4xl">Внутренняя энергия игры</h2>
+        <div className="mt-6 grid gap-6 lg:grid-cols-2">
+          <ul className="space-y-2.5 text-sm leading-relaxed text-cream/75">
+            <li>• Зёрна дают тапы, приглашения друзей и победы над компьютером.</li>
+            <li>
+              • За сутки один аккаунт может создать не больше{" "}
+              <b className="text-cream-soft">{ЭК.dailyBeanCap.toLocaleString("ru-RU")} зёрен</b>. Потолок
+              проверяется до боя, а не после.
+            </li>
+            <li>
+              • Ставка против компьютера ограничена уровнем: 1 000 у новичка, 5 000 у воина,
+              10 000 у мастера. Компьютер повторяет ставку, и без потолка выигрыш удваивался бы
+              бесконечно.
+            </li>
+            <li>• Против живого соперника потолка нет: там зёрна не создаются, а переходят.</li>
+          </ul>
+          <div className="card rounded-3xl border border-copper/25 p-6">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-copper">Правило без исключений</p>
+            <p className="mt-3 text-sm leading-relaxed text-cream/80">
+              <b className="text-cream-soft">Компьютер никогда не источник DOFF.</b> Победа над ботом
+              даёт зёрна и только зёрна. Иначе фонд наград стал бы банкоматом для того, кто
+              научился обыгрывать бота, — и кончился бы за недели.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -219,58 +208,63 @@ export default function GamePage() {
             </div>
           ))}
         </div>
+        <p className="mt-5 flex flex-wrap items-center gap-3 text-xs text-cream/50">
+          Шаги 4 и 5 <StatusBadge status={ECOSYSTEM.status.exchange} /> — обмен и вывод откроются,
+          когда к фонду наград будет подключён отправитель выплат. До этого зёрна не списываются.
+        </p>
       </section>
 
-      {/* НАГРАДНАЯ МОДЕЛЬ */}
+      {/* ДЕЛЁЖ */}
       <section className="mt-20">
-        <Kicker>Награды</Kicker>
-        <h2 className="display mt-4 text-3xl font-bold text-cream-soft sm:text-4xl">Наградная модель</h2>
-        <div className="mt-6 grid gap-6 lg:grid-cols-2">
-          <ul className="space-y-2.5 text-sm leading-relaxed text-cream/75">
-            <li>• Размер награды может зависеть от текущего бюджета Reward Vault.</li>
-            <li>• И от количества активных игроков и подтверждённых прохождений.</li>
-            <li>• Действуют дневной бюджет и персональные дневные лимиты.</li>
-            <li>• Подозрительные забеги могут направляться на проверку.</li>
-            <li>• Награда всегда показывается до нажатия «Забрать».</li>
-            <li>• DOFFA не выдаётся за простой тап или тренировочный режим.</li>
-          </ul>
-
-          {/* Демонстрация интерфейса — НЕ гарантированная фиксированная сумма. */}
+        <Kicker>Куда уходит DOFF</Kicker>
+        <h2 className="display mt-4 text-3xl font-bold text-cream-soft sm:text-4xl">
+          Сжигание и призовой фонд
+        </h2>
+        <p className="mt-3 max-w-2xl text-sm text-cream/60">
+          Часть каждой суммы сгорает навсегда, часть возвращается игрокам через призы. Это не
+          сбор в чью-то пользу: сожжённое исчезает из сети, призовое уходит победителям.
+        </p>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <div className="card rounded-3xl p-6">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-cream/40">
-              Пример интерфейса — демонстрация механики
-            </p>
-            <div className="mt-3 rounded-2xl border border-teal/25 bg-teal/5 p-5">
-              <p className="text-sm font-bold text-teal">Забег подтверждён</p>
-              <div className="mt-4 flex items-end justify-between">
-                <span className="text-sm text-cream/60">Награда игроку</span>
-                <span className="display text-2xl font-extrabold text-cream-soft">4 DOFFA</span>
+            <h3 className="display text-lg font-bold text-cream-soft">Бой на DOFF</h3>
+            <p className="mt-1 text-xs text-cream/50">Банк — это две равные ставки.</p>
+            <dl className="mt-4 space-y-2 text-sm">
+              <div className="flex justify-between">
+                <dt className="text-cream/60">Победителю</dt>
+                <dd className="display font-bold text-teal">{бой.winner} %</dd>
               </div>
-              <div className="mt-2 flex items-end justify-between">
-                <span className="text-sm text-cream/60">Сжигание</span>
-                <span className="display text-lg font-bold text-copper">1 DOFFA</span>
+              <div className="flex justify-between">
+                <dt className="text-cream/60">Сгорает</dt>
+                <dd className="display font-bold text-copper">{бой.burn} %</dd>
               </div>
-              <button
-                type="button"
-                disabled
-                className="mt-5 w-full cursor-not-allowed rounded-full bg-gradient-to-r from-gold to-copper px-6 py-2.5 text-sm font-bold text-ink opacity-60"
-              >
-                Забрать награду
-              </button>
-            </div>
-            <p className="mt-3 text-[11px] leading-relaxed text-cream/45">
-              Числа выше — пример, а не гарантированная сумма. Ориентировочное распределение
-              наградной суммы: {player}% игроку, {burn}% на сжигание (значения из конфигурации).
-            </p>
-            <p className="mt-2 text-[11px] font-semibold text-cream/55">
-              Статус сжигания: {burnLive ? STATUS_LABEL_RU.live : STATUS_LABEL_RU[ECOSYSTEM.status.burn]}
-              {!burnLive && " — активируется отдельной on-chain-операцией"}
-            </p>
+              <div className="flex justify-between">
+                <dt className="text-cream/60">В призовой фонд</dt>
+                <dd className="display font-bold text-gold">{бой.prize} %</dd>
+              </div>
+            </dl>
+          </div>
+          <div className="card rounded-3xl p-6">
+            <h3 className="display text-lg font-bold text-cream-soft">Вывод на свой кошелёк</h3>
+            <p className="mt-1 text-xs text-cream/50">Держится нарочно маленьким.</p>
+            <dl className="mt-4 space-y-2 text-sm">
+              <div className="flex justify-between">
+                <dt className="text-cream/60">Игроку</dt>
+                <dd className="display font-bold text-teal">{вывод.player} %</dd>
+              </div>
+              <div className="flex justify-between">
+                <dt className="text-cream/60">Сгорает</dt>
+                <dd className="display font-bold text-copper">{вывод.burn} %</dd>
+              </div>
+              <div className="flex justify-between">
+                <dt className="text-cream/60">В призовой фонд</dt>
+                <dd className="display font-bold text-gold">{вывод.prize} %</dd>
+              </div>
+            </dl>
           </div>
         </div>
         <div className="mt-8 text-center">
           <Link href="/transparency" className="text-sm font-semibold text-gold transition hover:text-amber">
-            Прозрачность: Reward Vault и сжигание →
+            Почему фонд наград не кончается — с цифрами →
           </Link>
         </div>
       </section>

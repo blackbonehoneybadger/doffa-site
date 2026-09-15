@@ -1,10 +1,13 @@
 import { isAuthed } from "../../../lib/adminAuth";
 import { query } from "../../../lib/db";
-import { REAL, fetchSupply } from "../../../solana";
+import { ECOSYSTEM } from "../../../config/ecosystem";
+import { getJetton, getJettonBalance } from "../../../lib/ton/chain";
 
 export const dynamic = "force-dynamic";
 
-// Дашборд админа: посетители (из БД), объём в обороте и сожжено (с блокчейна).
+// Дашборд админа: посетители (из БД), эмиссия, сожжено и остаток фонда наград —
+// всё из сети TON. Раньше здесь читалась прежняя монета в Solana; теперь ею не
+// пользуемся, и владельцу нужны цифры его настоящей монеты.
 export async function GET() {
   // isAuthed() ходит в БД (admin_sessions). Если хранилище сессий недоступно —
   // отдаём контролируемый 503, а не необработанный 500. Авторизация fail-closed.
@@ -31,15 +34,28 @@ export async function GET() {
     console.error("admin/stats: запрос visits упал", err);
   }
 
+  // null = сеть не ответила, клиент покажет «—». Ноль здесь означал бы «в
+  // обороте ничего нет», а это совсем другое утверждение.
+  const выпущено = ECOSYSTEM.token.totalSupply;
   let circulating: number | null = null;
   let burned: number | null = null;
+  let vault: number | null = null;
   try {
-    circulating = await fetchSupply();
-    burned = Math.max(0, REAL.initialSupply - circulating);
+    const [жетон, фонд] = await Promise.all([
+      getJetton(ECOSYSTEM.token.master),
+      getJettonBalance(ECOSYSTEM.rewardVault.address, ECOSYSTEM.token.master, ECOSYSTEM.token.decimals),
+    ]);
+    if (жетон) {
+      circulating = жетон.totalSupply;
+      // Сожжённое — разница между выпущенным и тем, что осталось в сети.
+      // Отрицательная разница означала бы, что наши числа не сходятся с сетью:
+      // тогда честнее не показывать ничего, чем показать минус.
+      burned = жетон.totalSupply <= выпущено ? выпущено - жетон.totalSupply : null;
+    }
+    vault = фонд;
   } catch (err) {
-    // RPC недоступен — отдадим null, клиент покажет «—»
-    console.error("admin/stats: чтение supply с блокчейна упало", err);
+    console.error("admin/stats: чтение из сети TON упало", err);
   }
 
-  return Response.json({ ok: true, visits, circulating, burned, initialSupply: REAL.initialSupply });
+  return Response.json({ ok: true, visits, circulating, burned, vault, initialSupply: выпущено });
 }

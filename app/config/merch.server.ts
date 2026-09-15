@@ -38,8 +38,6 @@ export const MERCH_SERVER = {
   /** Ключ провайдера цены DOFFA (котировки). */
   doffaPriceProviderApiKey: envStr(process.env.DOFFA_PRICE_PROVIDER_API_KEY),
 
-  /** RPC для серверной проверки Solana-транзакций. */
-  solanaRpc: envStr(process.env.SOLANA_RPC) ?? "https://api.mainnet-beta.solana.com",
 } as const;
 
 /** Готовность интеграций (сервер сам решает, что реально работает). */

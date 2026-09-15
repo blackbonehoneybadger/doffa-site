@@ -7,7 +7,6 @@ import assert from "node:assert/strict";
 
 import { parseWeather, weatherLabelRu, weatherIcon } from "../app/lib/external/weather";
 import { parseRates, convertMinor, type Rates } from "../app/lib/external/fx";
-import { parseTokenPrice, formatUsd, SOL_MINT } from "../app/lib/external/price";
 
 // --- Погода ---------------------------------------------------------------
 
@@ -96,41 +95,4 @@ test("convertMinor: неизвестная валюта → null, а не при
   assert.equal(convertMinor(5000, "RUB", "JPY", RATES), null);
   assert.equal(convertMinor(5000, "GBP", "USD", RATES), null);
   assert.equal(convertMinor(Number.NaN, "RUB", "USD", RATES), null);
-});
-
-// --- Котировки токенов ----------------------------------------------------
-
-const DOFFA_MINT = "57aAfCuXx7uuc8g8P9kTxR65TKQtZsFDJeKhdD5xu6uo";
-
-test("parseTokenPrice: плоский формат v3", () => {
-  const json = { [SOL_MINT]: { usdPrice: 152.31 } };
-  assert.equal(parseTokenPrice(json, SOL_MINT), 152.31);
-});
-
-test("parseTokenPrice: вложенный формат v2", () => {
-  const json = { data: { [SOL_MINT]: { id: SOL_MINT, price: "152.31" } } };
-  assert.equal(parseTokenPrice(json, SOL_MINT), 152.31);
-});
-
-test("parseTokenPrice: у $DOFFA пула нет — источник молчит, получаем null", () => {
-  // Ключевой случай: SOL в ответе есть, DOFFA — нет. Нельзя ни упасть, ни
-  // показать ноль: на витрине ноль читался бы как «токен ничего не стоит».
-  const json = { [SOL_MINT]: { usdPrice: 152.31 } };
-  assert.equal(parseTokenPrice(json, DOFFA_MINT), null);
-});
-
-test("parseTokenPrice: ноль и отрицательная цена котировкой не считаются", () => {
-  assert.equal(parseTokenPrice({ [DOFFA_MINT]: { usdPrice: 0 } }, DOFFA_MINT), null);
-  assert.equal(parseTokenPrice({ [DOFFA_MINT]: { usdPrice: -5 } }, DOFFA_MINT), null);
-});
-
-test("parseTokenPrice: битый ответ → null", () => {
-  assert.equal(parseTokenPrice(null, SOL_MINT), null);
-  assert.equal(parseTokenPrice({ error: "rate limited" }, SOL_MINT), null);
-  assert.equal(parseTokenPrice({ [SOL_MINT]: { usdPrice: "дорого" } }, SOL_MINT), null);
-});
-
-test("formatUsd: у дешёвых токенов больше знаков после запятой", () => {
-  assert.match(formatUsd(152.31), /152,31/);
-  assert.match(formatUsd(0.00004212), /0,00004212/);
 });

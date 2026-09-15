@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 
 // Карта сайта doffa.coffee. Публичные маршруты игрового направления DOFFA Games
-// (DOFFA Heroes) и кофейни. Прежней карточной игры в карте нет.
+// (DOFFA DRAKA) и кофейни. Прежних игр в карте нет.
 const BASE = "https://doffa.coffee";
 
 export default function sitemap(): MetadataRoute.Sitemap {

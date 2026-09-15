@@ -1,11 +1,11 @@
-import { issueNonce } from "../../../lib/userAuth";
-import { parseJson, nonceRequestSchema } from "../../../lib/validation";
+import { issueProofPayload } from "../../../lib/userAuth";
 
-export async function POST(request: Request) {
-  const parsed = await parseJson(request, nonceRequestSchema);
-  if (!parsed.ok) {
-    return Response.json({ error: parsed.error }, { status: 400 });
-  }
-  const { message, token } = issueNonce(parsed.data.wallet);
-  return Response.json({ message, token });
+// Код входа не зависит от кошелька: какой адрес подключит человек, решается
+// уже в кошельке. Поэтому тело запроса здесь не читается вовсе — читать было
+// бы нечего, а лишнее поле в запросе только создаёт видимость проверки.
+export const dynamic = "force-dynamic";
+
+export async function POST() {
+  const { payload, exp } = issueProofPayload();
+  return Response.json({ payload, exp });
 }

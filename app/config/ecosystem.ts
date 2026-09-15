@@ -1,10 +1,20 @@
 // Централизованная конфигурация экосистемы DOFFA.
-// Единственный источник правды для: mint токена, Reward Vault, ссылок на игру/
-// APK/DEX/Solscan и СТАТУСОВ функций. Реальные значения приходят из env
-// (NEXT_PUBLIC_*). Пока функция не подключена — её статус honestly = "planned"
-// или "testing", а UI обязан показывать это, а не выдавать демо за живую фичу.
+// Единственный источник правды для: адреса токена, фонда наград, ссылок на
+// игру и обозреватель, чисел экономики и СТАТУСОВ функций. Реальные значения
+// приходят из env (NEXT_PUBLIC_*). Пока функция не подключена — её статус
+// honestly = "planned" или "testing", а UI обязан показывать это, а не выдавать
+// демонстрацию за живую фичу.
 //
 // ВАЖНО: приватные ключи здесь не хранятся и не читаются. Только публичные данные.
+//
+// РЕШЕНИЕ ВЛАДЕЛЬЦА 15.09.2026. Монета экосистемы — DOFF в сети TON. Главная
+// игра — DOFFA DRAKA, живая, в Telegram.
+//
+// Прежняя $DOFFA в сети Solana с сайта убрана полностью и намеренно: владелец
+// решил ею не пользоваться. Контракт в сети остался — удалить его нельзя
+// никому, — но сайт про него больше не рассказывает и ничего от него не
+// показывает. Ни адреса, ни эмиссии, ни баланса, ни чёрной дыры. Нужна будет
+// история — она в git и в docs/, а не на странице.
 
 export type FeatureStatus = "live" | "testing" | "planned" | "paused";
 
@@ -18,41 +28,6 @@ function envStr(v: string | undefined): string | null {
   return s ? s : null;
 }
 
-const DEFAULT_MINT = "57aAfCuXx7uuc8g8P9kTxR65TKQtZsFDJeKhdD5xu6uo";
-
-// Полная эмиссия $DOFFA. Подтверждается в сети (getTokenSupply) и не может
-// вырасти: право mint отозвано.
-const TOTAL_SUPPLY = 100_000_000;
-
-// Чёрная дыра $DOFFA — адрес, из которого токены не возвращаются.
-//
-// 2026-07-01 с кошелька проекта было переведено ровно 1 000 000 $DOFFA на
-// Hk6X6qb32RD8N5DgMv17wiR8aj88v1h8BShSEHJGKcLV — задумывался как фонд наград.
-// Приватный ключ к нему утерян: его искали в файлах, в истории git, во всех
-// аккаунтах Phantom и в переменных Railway — нигде. 2026-07-29 признан
-// утраченным, и этот адрес объявлен чёрной дырой проекта.
-//
-// ⚠️ ЧЕСТНАЯ ГРАНИЦА УТВЕРЖДЕНИЯ. Две вещи, которые нельзя смешивать:
-//
-// 1. Это НЕ сжигание. Сжигание (SPL burn) уменьшает supply в сети; здесь
-//    supply по-прежнему 100 000 000. Токены лежат на адресе, а не уничтожены.
-//    Поэтому сайт обязан показывать обе цифры и объяснять разницу.
-// 2. Адрес лежит НА кривой ed25519 — значит приватный ключ математически
-//    существует, просто им никто не владеет. Это отличает его от канонического
-//    инсинератора 1nc1nerator11111111111111111111111111111111, который вне
-//    кривой и ключа не имеет в принципе. Наша необратимость — утверждение о
-//    потере ключа, а не математическая гарантия, и формулировать надо так.
-//
-// Практический вывод: для БУДУЩИХ сжиганий использовать реальный SPL burn — он
-// уменьшает supply и проверяется в сети без доверия к нам. Досылать сюда новые
-// токены смысла нет: это слабее burn по проверяемости.
-const BLACK_HOLE_ADDRESS = "Hk6X6qb32RD8N5DgMv17wiR8aj88v1h8BShSEHJGKcLV";
-const BLACK_HOLE_AMOUNT = 1_000_000;
-// Подпись самой транзакции перевода 2026-07-01. Ссылка на неё — главное
-// доказательство: любой открывает и видит ровно то, что написано на сайте.
-const BLACK_HOLE_TX =
-  "v8NitwxyDKsySiSUPc9evfRLt6Yh3Jj4pC5wJpamyDZ8cU484zdCosa9A4wRkfarmxZMf5xMsqmMsKipKdL9kYA";
-
 /** Неотрицательное число из env. Пусто → дефолт; 0 задать можно явно. */
 function amountEnv(v: string | undefined, fallback: number): number {
   const s = (v ?? "").trim();
@@ -60,94 +35,202 @@ function amountEnv(v: string | undefined, fallback: number): number {
   const n = Number(s);
   return Number.isFinite(n) && n >= 0 ? n : fallback;
 }
-const mint = envStr(process.env.NEXT_PUBLIC_DOFFA_MINT) ?? DEFAULT_MINT;
-const vaultAddress = envStr(process.env.NEXT_PUBLIC_REWARD_VAULT_ADDRESS);
-const apkUrl = envStr(process.env.NEXT_PUBLIC_ANDROID_APK_URL);
 
-// Доля награды: игроку / на сжигание. Берётся из env, дефолт 80/20.
 function pct(v: string | undefined, fallback: number): number {
   const s = (v ?? "").trim();
   if (!s) return fallback; // пусто → дефолт (Number("") === 0 иначе прошёл бы проверку)
   const n = Number(s);
   return Number.isFinite(n) && n >= 0 && n <= 100 ? n : fallback;
 }
-const playerRewardPercent = pct(process.env.NEXT_PUBLIC_PLAYER_REWARD_PERCENT, 80);
-const burnPercent = pct(process.env.NEXT_PUBLIC_BURN_PERCENT, 20);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ГЛАВНАЯ МОНЕТА: DOFF в TON
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Мастер-контракт Jetton. Выпущен 15.09.2026 в основной сети TON и сверен
+// чтением из сети: адрес, эмиссия, отсутствие допечатки и адрес метаданных
+// совпали с тем, что записано здесь. Это единственный адрес, по которому
+// кошелёк отличает настоящую DOFF от подделки с тем же тикером.
+const DOFF_MASTER = "EQDJEC9EOYnVSUjNPsAXfLaRDNlm9wDYMKr3iM2IdhPqgQgh";
+
+// Полная эмиссия DOFF. Выпущена вся и сразу; допечатки нет — право админа
+// снимается, и после этого выпустить ещё одну DOFF невозможно никому,
+// включая владельца.
+const DOFF_SUPPLY = 1_000_000_000;
+const DOFF_DECIMALS = 9;
+
+// Фонд наград: кошелёк, с которого игра платит за обменянные зёрна. Публичный
+// адрес — чтобы любой мог посмотреть остаток и убедиться, что он реальный.
+// Приватный ключ к нему живёт только в секретах и никогда в репозитории.
+const DOFF_TREASURY = "UQCnClctLMcB1xBoHETl-Dzp6cLRv9oWUmz_nqz6IBYepJLH";
+
+const doffMaster = envStr(process.env.NEXT_PUBLIC_DOFF_MASTER) ?? DOFF_MASTER;
+const doffTreasury = envStr(process.env.NEXT_PUBLIC_DOFF_TREASURY) ?? DOFF_TREASURY;
+
+// Холодное хранение эмиссии. Адрес публикуется только если владелец сам
+// задал переменную: пока он этого не сделал, сайт говорит, что эмиссия на
+// холодном хранении, но адрес не называет. Умолчания тут нет намеренно —
+// решение «показывать основное хранилище публично» принимает владелец, а не
+// файл конфигурации.
+const doffColdStorage = envStr(process.env.NEXT_PUBLIC_DOFF_COLD_STORAGE);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ЭКОНОМИКА: числа, посчитанные кодом игры (server/emission.mjs, token-split.mjs)
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Доля фонда, уходящая в дневной пул. Одна тысячная в сутки.
+//
+// Отсюда главное свойство экономики: Ф(n) = Ф₀·(1−p)ⁿ строго больше нуля при
+// любом n — фонд не кончается, а не «надолго хватает». Постоянный курс этого
+// не даёт: при 25 000 зёрен в сутки на аккаунт тысяча игроков вынесла бы фонд
+// в миллион за сорок суток.
+const POOL_DENOMINATOR = amountEnv(process.env.NEXT_PUBLIC_POOL_DENOMINATOR, 1000);
+
+// Дележ банка боя на DOFF и суммы вывода. Доли сервер считает сам: контракт
+// типового Jetton переделать нельзя, и это не обход, а единственный путь.
+const FIGHT_BURN = pct(process.env.NEXT_PUBLIC_FIGHT_BURN_PERCENT, 5);
+const FIGHT_PRIZE = pct(process.env.NEXT_PUBLIC_FIGHT_PRIZE_PERCENT, 5);
+const WITHDRAW_BURN = pct(process.env.NEXT_PUBLIC_WITHDRAW_BURN_PERCENT, 1);
+const WITHDRAW_PRIZE = pct(process.env.NEXT_PUBLIC_WITHDRAW_PRIZE_PERCENT, 1);
+
+// Сколько зёрен аккаунт может создать за сутки (server/economy.mjs) и базовый
+// курс, от которого начинается пересчёт.
+const DAILY_BEAN_CAP = amountEnv(process.env.NEXT_PUBLIC_DAILY_BEAN_CAP, 25_000);
+const BASE_BEANS_PER_DOFF = amountEnv(process.env.NEXT_PUBLIC_BASE_BEANS_PER_DOFF, 1000);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ИГРА: DOFFA DRAKA
+// ─────────────────────────────────────────────────────────────────────────────
+
+const TELEGRAM_BOT_USERNAME = "doffadrakabot";
+const botUsername = envStr(process.env.NEXT_PUBLIC_TELEGRAM_BOT) ?? TELEGRAM_BOT_USERNAME;
+
+/**
+ * Реферальный код владельца в формате игры. Назван им самим 15.09.2026:
+ * https://t.me/doffadrakabot?start=ref_DF-000001 — первый аккаунт в игре.
+ *
+ * Стоит здесь, а не только в переменной окружения, нарочно: ссылка публичная по
+ * своей природе (её для того и раздают), а лишний шаг в настройках Vercel —
+ * лишний способ забыть его сделать и месяц не понимать, почему список
+ * приглашённых пуст.
+ *
+ * Подставлять сюда чужой или выдуманный код нельзя: приглашение привязывается к
+ * аккаунту навсегда, и переиграть его нечем.
+ */
+const OWNER_REFERRAL = "DF-000001";
+const referralCode = envStr(process.env.NEXT_PUBLIC_GAME_REFERRAL_CODE) ?? OWNER_REFERRAL;
+
+/**
+ * Ссылка в игру. Формат повторяет game/public/telegram.mjs слово в слово:
+ * ?start=ref_DF-000123 для приглашения и ?startapp для обычного входа. Разойтись
+ * им нельзя — бот разбирает именно эти две формы.
+ *
+ * Проверка кода здесь не украшение: ссылка с мусором вместо кода молча уводила
+ * бы игроков мимо приглашения, и заметить это можно было бы только по пустому
+ * списку приглашённых через месяц.
+ */
+export function ссылкаВИгру(username: string | null, код: string | null): string {
+  const имя = /^[A-Za-z][A-Za-z0-9_]{4,31}$/.test(username ?? "") ? username! : TELEGRAM_BOT_USERNAME;
+  const совпало = /^DF-?([0-9]{1,16})$/i.exec((код ?? "").trim());
+  return совпало
+    ? `https://t.me/${имя}?start=ref_DF-${совпало[1].padStart(6, "0")}`
+    : `https://t.me/${имя}?startapp`;
+}
+
+const gameTelegram = envStr(process.env.NEXT_PUBLIC_GAME_TELEGRAM_URL) ?? ссылкаВИгру(botUsername, referralCode);
+
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 export const ECOSYSTEM = {
   // Публичное название игрового направления и главной игры.
   productName: envStr(process.env.NEXT_PUBLIC_GAMES_NAME) ?? "DOFFA Games",
-  primaryGameName: envStr(process.env.NEXT_PUBLIC_PRIMARY_GAME_NAME) ?? "DOFFA Heroes",
+  primaryGameName: envStr(process.env.NEXT_PUBLIC_PRIMARY_GAME_NAME) ?? "DOFFA DRAKA",
+
+  /** Главная монета экосистемы: DOFF в TON. */
   token: {
-    symbol: "$DOFFA",
-    mint,
-    solscanUrl:
-      envStr(process.env.NEXT_PUBLIC_SOLSCAN_TOKEN_URL) ?? `https://solscan.io/token/${mint}`,
-    /** Полная эмиссия по данным сети. */
-    totalSupply: TOTAL_SUPPLY,
-    /**
-     * Фактически доступный объём: эмиссия за вычетом того, что ушло в чёрную
-     * дыру. Именно этой цифрой корректно описывать живой запас проекта.
-     */
-    effectiveSupply: TOTAL_SUPPLY - amountEnv(process.env.NEXT_PUBLIC_BLACK_HOLE_AMOUNT, BLACK_HOLE_AMOUNT),
+    symbol: "DOFF",
+    network: "TON",
+    standard: "TEP-74 Jetton",
+    master: doffMaster,
+    decimals: DOFF_DECIMALS,
+    explorerUrl:
+      envStr(process.env.NEXT_PUBLIC_DOFF_EXPLORER_URL) ?? `https://tonviewer.com/${doffMaster}`,
+    /** Полная эмиссия. Выпущена вся; допечатки нет. */
+    totalSupply: DOFF_SUPPLY,
+    /** Право допечатки. false — выпустить новые DOFF нельзя никому. */
+    mintable: false,
+    /** Эмиссия лежит на холодном хранении; адрес публикуется только по решению владельца. */
+    coldStorage: doffColdStorage,
   },
-  /**
-   * Чёрная дыра проекта: адрес, с которого токены не возвращаются.
-   * amount = 0 → в дыре ничего нет, блок на сайте не показывается.
-   *
-   * ВАЖНО: это не сжигание (supply в сети не меняется) и не математическая
-   * невозвратность (адрес на кривой, ключ существует, но утерян). Подробности
-   * и границы утверждения — в комментарии к BLACK_HOLE_ADDRESS выше.
-   */
-  blackHole: {
-    address: envStr(process.env.NEXT_PUBLIC_BLACK_HOLE_ADDRESS) ?? BLACK_HOLE_ADDRESS,
-    amount: amountEnv(process.env.NEXT_PUBLIC_BLACK_HOLE_AMOUNT, BLACK_HOLE_AMOUNT),
-    /** Транзакция перевода — прямое доказательство, ссылку даём на сайте. */
-    txSignature: envStr(process.env.NEXT_PUBLIC_BLACK_HOLE_TX) ?? BLACK_HOLE_TX,
-    /**
-     * Ключ существует математически (адрес на кривой ed25519), но утерян.
-     * false означало бы адрес вне кривой — там ключа нет в принципе.
-     * Сайт использует это, чтобы не обещать больше, чем может доказать.
-     */
-    keyExistsButLost: true,
-  },
+
+  /** Фонд наград: из него игра платит за обменянные зёрна. */
   rewardVault: {
-    /**
-     * Размер назначенного фонда наград. 0 — фонд не назначен: прежний утерян,
-     * новый пока не выделен. Заполняется через NEXT_PUBLIC_REWARD_POOL_INITIAL
-     * одновременно с NEXT_PUBLIC_REWARD_VAULT_ADDRESS.
-     */
+    address: doffTreasury,
+    explorerUrl:
+      envStr(process.env.NEXT_PUBLIC_DOFF_TREASURY_EXPLORER_URL) ??
+      `https://tonviewer.com/${doffTreasury}`,
+    /** Рабочий остаток фонда, если владелец решил его назвать. null — читать из сети. */
     initial: amountEnv(process.env.NEXT_PUBLIC_REWARD_POOL_INITIAL, 0),
-    /** Публичный адрес фонда. null — ещё не назначен (показывать «Planned»). */
-    address: vaultAddress,
   },
-  game: {
-    /** URL веб-версии игры. null — не показывать фальшивую ссылку. */
-    webUrl: envStr(process.env.NEXT_PUBLIC_GAME_WEB_URL),
-    apk: {
-      url: apkUrl,
-      version: envStr(process.env.NEXT_PUBLIC_ANDROID_VERSION),
-      size: envStr(process.env.NEXT_PUBLIC_ANDROID_SIZE),
-      sha256: envStr(process.env.NEXT_PUBLIC_ANDROID_SHA256),
+
+  /**
+   * Числа экономики. Все до одного посчитаны кодом игры и проверены тестами:
+   * server/emission.mjs, server/token-split.mjs, server/economy.mjs.
+   */
+  economy: {
+    /** Пул = фонд / poolDenominator в сутки. Отсюда «фонд не кончается». */
+    poolDenominator: POOL_DENOMINATOR,
+    /** Бой на DOFF: банк из двух ставок делится так. */
+    fight: { burn: FIGHT_BURN, prize: FIGHT_PRIZE, winner: 100 - FIGHT_BURN - FIGHT_PRIZE },
+    /** Вывод на свой кошелёк. Держится нарочно маленьким. */
+    withdrawal: {
+      burn: WITHDRAW_BURN,
+      prize: WITHDRAW_PRIZE,
+      player: 100 - WITHDRAW_BURN - WITHDRAW_PRIZE,
     },
+    /** Сколько зёрен аккаунт может создать за сутки. Проверяется до боя. */
+    dailyBeanCap: DAILY_BEAN_CAP,
+    /** Курс, с которого начинается ежесуточный пересчёт. */
+    baseBeansPerToken: BASE_BEANS_PER_DOFF,
   },
+
+  game: {
+    /** Имя бота — для текста «найди @doffadrakabot в поиске». */
+    botUsername,
+    /** Реферальный код владельца. null — ссылка ведёт в бота без приглашения. */
+    referralCode,
+    /** Игра живёт в Telegram. Это и есть настоящая ссылка, а не заглушка. */
+    telegramUrl: gameTelegram,
+    /** Прямой веб-адрес мини-приложения. Открывать вне Telegram смысла нет. */
+    webUrl: envStr(process.env.NEXT_PUBLIC_GAME_WEB_URL),
+  },
+
   dex: {
-    /** URL стороннего DEX-пула DOFFA/SOL. null — «Пул пока не запущен». */
+    /** URL стороннего DEX-пула DOFF. null — «Пул пока не запущен». */
     url: envStr(process.env.NEXT_PUBLIC_DEX_URL),
   },
-  // Наградная модель DOFFA Heroes. Доли берутся из конфигурации, не из «воздуха».
-  reward: {
-    playerPercent: playerRewardPercent,
-    burnPercent,
-  },
-  // Честные статусы функций. UI обязан показывать их, а не выдавать Planned за Live.
+
+  /**
+   * Честные статусы. UI обязан показывать их, а не выдавать Planned за Live.
+   *
+   * Почему обмен и вывод — не "live", хотя токен выпущен. Игра списывает зёрна
+   * и ставит заявку в очередь, а платит по ней отправитель, который подписывает
+   * перевод ключом фонда. Ключ в репозиторий не попадает, и пока владелец не
+   * положил его в секреты, платить некому: включить флаг значило бы копить
+   * заявки, по которым никто не платит. Обмен открывают четыре условия сразу
+   * (server/token-policy.mjs), а не правка этой строки.
+   */
   status: {
-    claims: parseStatus(process.env.NEXT_PUBLIC_CLAIMS_STATUS, "testing"),
-    dex: parseStatus(process.env.NEXT_PUBLIC_DEX_STATUS, "planned"),
+    token: parseStatus(process.env.NEXT_PUBLIC_TOKEN_STATUS, "live"),
+    game: parseStatus(process.env.NEXT_PUBLIC_GAME_STATUS, "live"),
+    exchange: parseStatus(process.env.NEXT_PUBLIC_EXCHANGE_STATUS, "planned"),
+    claims: parseStatus(process.env.NEXT_PUBLIC_CLAIMS_STATUS, "planned"),
     burn: parseStatus(process.env.NEXT_PUBLIC_BURN_STATUS, "planned"),
-    android: (apkUrl ? "live" : "planned") as FeatureStatus,
-    rewardVault: (vaultAddress ? "live" : "planned") as FeatureStatus,
+    dex: parseStatus(process.env.NEXT_PUBLIC_DEX_STATUS, "planned"),
+    rewardVault: (doffTreasury ? "live" : "planned") as FeatureStatus,
   },
+
   ads: {
     enabled: (process.env.NEXT_PUBLIC_ADS_ENABLED ?? "").trim() === "true",
   },
@@ -160,3 +243,8 @@ export const STATUS_LABEL_RU: Record<FeatureStatus, string> = {
   planned: "Готовится",
   paused: "Приостановлено",
 };
+
+/** Сокращение адреса для показа: начало…конец. Полный адрес даёт копирование. */
+export function shortAddress(address: string, head = 6, tail = 6): string {
+  return address.length <= head + tail + 1 ? address : `${address.slice(0, head)}…${address.slice(-tail)}`;
+}

@@ -1,9 +1,13 @@
-// Вход пользователя по Solana-кошельку, без пароля.
+// Вход пользователя по кошельку TON, без пароля.
 //
-// Challenge (nonce): сервер выдаёт подписанный HMAC-токен {wallet, nonce, exp}.
-// Сам токен остаётся stateless — подделать его нельзя без SESSION_SECRET, — но
-// одноразовость обеспечивается на этапе verify: хэш nonce записывается в БД
-// (used_nonces), и повторная отправка того же токена+подписи отклоняется.
+// Код входа: сервер выдаёт подписанный HMAC-токен {nonce, exp} и отдаёт его
+// кошельку как payload в ton_proof. Токен остаётся stateless — подделать его
+// нельзя без SESSION_SECRET, — а одноразовость обеспечивается при проверке:
+// хэш nonce пишется в БД (used_nonces), и повтор того же кода отклоняется.
+//
+// Кошелёк заранее неизвестен: какой именно адрес подключит человек, решается
+// уже в кошельке. Поэтому в код он не зашивается — адрес приходит вместе с
+// подписью и проверяется отдельно (app/lib/ton/proof.ts).
 //
 // Сессия: в cookie кладётся только случайный opaque id, а вся суть сессии
 // (кошелёк, время создания, срок годности) хранится в таблице sessions. Это
@@ -31,41 +35,31 @@ function safeEqual(a: string, b: string): boolean {
   return timingSafeEqual(bufA, bufB);
 }
 
-function buildMessage(wallet: string, nonce: string, exp: number): string {
-  return [
-    "doffa.coffee просит подтвердить вход.",
-    "",
-    `Кошелёк: ${wallet}`,
-    `Код: ${nonce}`,
-    `Действителен до: ${new Date(exp).toISOString()}`,
-  ].join("\n");
-}
-
-/** Выдаёт сообщение для подписи и токен с зашитым nonce (без записи в БД). */
-export function issueNonce(wallet: string): { message: string; token: string } {
+/**
+ * Выдаёт код входа. Это же значение уходит кошельку как payload в ton_proof,
+ * поэтому оно должно быть коротким и без точек-разделителей внутри частей.
+ */
+export function issueProofPayload(): { payload: string; exp: number } {
   const nonce = randomBytes(12).toString("hex");
   const exp = Date.now() + NONCE_TTL_MS;
-  const payload = `${wallet}.${nonce}.${exp}`;
-  const token = `${payload}.${sign(payload)}`;
-  return { message: buildMessage(wallet, nonce, exp), token };
+  const тело = `${nonce}.${exp}`;
+  return { payload: `${тело}.${sign(тело)}`, exp };
 }
 
-export type VerifiedNonce = { wallet: string; message: string; nonce: string; exp: number };
+export type VerifiedNonce = { nonce: string; exp: number };
 
 /**
- * Проверяет токен nonce (подпись и срок годности) и возвращает кошелёк,
- * ожидаемый текст сообщения (пересобирается на сервере), сам nonce и его срок.
+ * Проверяет код входа: нашей ли подписью он выдан и не просрочен ли.
  * Одноразовость проверяется отдельно — через consumeNonce().
  */
-export function verifyNonceToken(token: string): VerifiedNonce | null {
-  const parts = token.split(".");
-  if (parts.length !== 4) return null;
-  const [wallet, nonce, expStr, sig] = parts;
-  const payload = `${wallet}.${nonce}.${expStr}`;
-  if (!safeEqual(sig, sign(payload))) return null;
+export function verifyProofPayload(payload: string, nowMs = Date.now()): VerifiedNonce | null {
+  const части = (payload ?? "").split(".");
+  if (части.length !== 3) return null;
+  const [nonce, expStr, sig] = части;
+  if (!safeEqual(sig, sign(`${nonce}.${expStr}`))) return null;
   const exp = Number(expStr);
-  if (!Number.isFinite(exp) || Date.now() > exp) return null;
-  return { wallet, message: buildMessage(wallet, nonce, exp), nonce, exp };
+  if (!Number.isFinite(exp) || nowMs > exp) return null;
+  return { nonce, exp };
 }
 
 /**

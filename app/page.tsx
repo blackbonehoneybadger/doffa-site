@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { dict, LANGS, TOKEN, CONTACT, GALLERY, VIDEOS, type Lang } from "./content";
 import { ECOSYSTEM } from "./config/ecosystem";
-import { REAL, solscanToken, solscanTokenOf, solscanHolders, fetchBalance, connectWalletById, disconnectWalletById } from "./solana";
 import { SmoothScroll, CursorGlow, MouseParallax, TiltCard, Magnetic, ScrollProgressBar } from "./cinematic";
 import { ThemeToggle } from "./theme-toggle";
 import { Assistant } from "./assistant";
@@ -22,10 +21,11 @@ const WeatherChip = dynamic(() => import("./WeatherChip").then((m) => m.WeatherC
 // Дефолтный ролик в hero, пока владелец кофейни не загрузил свои через /admin.
 const DEFAULT_HERO_VIDEO = "/brand/doffa-clip.mp4";
 
-// Reward Vault — назначенный запас $DOFFA на игровые награды. Берётся из
-// централизованной конфигурации, а не из отдельной константы: прежний фонд
-// утерян, и хардкод «1 000 000» здесь показывал бы несуществующий запас.
-// 0 означает «фонд не назначен» — тогда вместо цифр ставим прочерк.
+// Фонд наград — рабочий запас DOFF на игровые награды. Берётся из
+// централизованной конфигурации, а не из отдельной константы. 0 означает
+// «рабочий остаток здесь не назван» — тогда вместо цифры ставим прочерк, а
+// настоящий остаток читается из сети на странице прозрачности. Хардкод суммы
+// показывал бы запас, которого может не быть на кошельке.
 const REWARD_VAULT = ECOSYSTEM.rewardVault.initial;
 
 /** Доля фонда в эмиссии. «—», пока фонд не назначен. */
@@ -34,10 +34,9 @@ function vaultSharePct(loc: string): string {
   const pct = (REWARD_VAULT / ECOSYSTEM.token.totalSupply) * 100;
   return `${pct.toLocaleString(loc, { maximumFractionDigits: 2 })}%`;
 }
-// Публичная игра — DOFFA Heroes. Ссылка на веб-версию берётся из
-// централизованной конфигурации (env NEXT_PUBLIC_GAME_WEB_URL). Пока не задана —
-// не показываем фальшивую ссылку, кнопка ведёт на /game со статусом.
-const GAME_URL = ECOSYSTEM.game.webUrl;
+// Публичная игра — DOFFA DRAKA. Она живёт в Telegram, и ссылка на неё есть
+// всегда: заглушки «игра готовится» здесь больше нет, потому что игра работает.
+const GAME_URL = ECOSYSTEM.game.telegramUrl;
 
 // Локализованная подпись для вкладки «Прозрачность» (fallback — английский).
 const TRANSPARENCY_LABEL: Partial<Record<Lang, string>> = {
@@ -169,36 +168,6 @@ export default function Home() {
   }, [lang, t.dir]);
 
 
-  // Кошелёк — Phantom, Solflare, Trust Wallet, Backpack (+ Ledger через Phantom/Solflare).
-  const [wallet, setWallet] = useState<string | null>(null);
-  const [walletBal, setWalletBal] = useState<number | null>(null);
-  const [walletId, setWalletId] = useState<string | null>(null);
-  const [walletModal, setWalletModal] = useState(false);
-
-  const WALLET_OPTS = [
-    { id: "phantom",  name: "Phantom",      note: "Ledger ✓" },
-    { id: "solflare", name: "Solflare",     note: "Ledger ✓" },
-    { id: "trust",    name: "Trust Wallet", note: null },
-    { id: "backpack", name: "Backpack",     note: null },
-  ] as const;
-
-  const connectWallet = async (id: string) => {
-    setWalletModal(false);
-    const addr = await connectWalletById(id);
-    if (!addr) return;
-    setWallet(addr);
-    setWalletId(id);
-    setWalletBal(null);
-    fetchBalance(addr).then(setWalletBal).catch(() => setWalletBal(0));
-  };
-
-  const disconnectWallet = async () => {
-    if (walletId) await disconnectWalletById(walletId);
-    setWallet(null);
-    setWalletBal(null);
-    setWalletId(null);
-    setWalletModal(false);
-  };
 
   const tabs: { id: typeof activeTab; label: string }[] = [
     { id: "story",     label: t.tabs.story },
@@ -259,66 +228,16 @@ export default function Home() {
             </Link>
           </nav>
           <div className="flex shrink-0 items-center gap-3 sm:gap-2">
-            {/* Wallet connect button */}
-            <div className="relative hidden sm:block">
-              {wallet ? (
-                <>
-                  <button
-                    onClick={() => setWalletModal((v) => !v)}
-                    className="flex items-center gap-1.5 rounded-full border border-teal/40 bg-teal/10 px-3 py-1.5 text-xs font-semibold text-teal transition hover:border-teal/60"
-                  >
-                    <span className="h-1.5 w-1.5 rounded-full bg-teal" />
-                    {wallet.slice(0, 4)}…{wallet.slice(-4)}
-                  </button>
-                  {walletModal && (
-                    <>
-                      <div className="fixed inset-0 z-40" onClick={() => setWalletModal(false)} />
-                      <div className="absolute right-0 top-10 z-50 w-52 rounded-xl border border-white/10 bg-ink/95 p-3 shadow-xl backdrop-blur-md">
-                        <p className="mb-1 text-[10px] uppercase tracking-wider text-cream/40">{WALLET_OPTS.find((w) => w.id === walletId)?.name}</p>
-                        <p className="mb-3 font-mono text-[11px] text-cream/50 break-all">{wallet.slice(0, 8)}…{wallet.slice(-8)}</p>
-                        {walletBal !== null && (
-                          <p className="mb-3 text-xs font-semibold text-gold">{walletBal.toLocaleString(loc)} $DOFFA</p>
-                        )}
-                        <button onClick={disconnectWallet} className="w-full rounded-lg bg-white/5 px-3 py-2 text-xs text-cream/70 hover:bg-white/10">
-                          {t.buy.disconnect}
-                        </button>
-                      </div>
-                    </>
-                  )}
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={() => setWalletModal((v) => !v)}
-                    className="flex items-center gap-1.5 rounded-full border border-gold/40 bg-gold/10 px-3 py-1.5 text-xs font-semibold text-gold transition hover:border-gold/60"
-                  >
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-80"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
-                    {t.buy.connect}
-                  </button>
-                  {walletModal && (
-                    <>
-                      <div className="fixed inset-0 z-40" onClick={() => setWalletModal(false)} />
-                      <div className="absolute right-0 top-10 z-50 w-52 rounded-xl border border-white/10 bg-ink/95 p-3 shadow-xl backdrop-blur-md">
-                        <p className="mb-2 text-[10px] uppercase tracking-wider text-cream/40">Выбери кошелёк</p>
-                        <div className="flex flex-col gap-1">
-                          {WALLET_OPTS.map((w) => (
-                            <button
-                              key={w.id}
-                              onClick={() => connectWallet(w.id)}
-                              className="flex items-center justify-between rounded-lg bg-white/5 px-3 py-2 text-left text-sm text-cream transition hover:bg-white/10"
-                            >
-                              <span>{w.name}</span>
-                              {w.note && <span className="text-[10px] text-teal">{w.note}</span>}
-                            </button>
-                          ))}
-                        </div>
-                        <p className="mt-2 text-[10px] text-cream/30">Аппаратный кошелёк (Ledger) работает через Phantom или Solflare</p>
-                      </div>
-                    </>
-                  )}
-                </>
-              )}
-            </div>
+            {/* Кнопка в игру. Раньше здесь подключался кошелёк — но покупать
+                на сайте нечего, а играть есть где. */}
+            <a
+              href={ECOSYSTEM.game.telegramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden items-center gap-1.5 rounded-full border border-gold/40 bg-gold/10 px-3 py-1.5 text-xs font-semibold text-gold transition hover:border-gold/60 sm:flex"
+            >
+              ⚔️ {ECOSYSTEM.primaryGameName}
+            </a>
             <label className="relative flex items-center">
               <span className="sr-only">Language</span>
               <svg className="pointer-events-none absolute left-2.5 h-3.5 w-3.5 text-cream/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -512,10 +431,10 @@ export default function Home() {
         <div className="marquee-track">
           {[0, 1].map((i) => (
             <span key={i} className="display inline-flex shrink-0 items-center gap-10 px-10 text-sm uppercase tracking-[0.3em] text-cream/40">
-              <span>Tap · Run · Claim</span><span className="text-teal">·</span>
+              <span>Tap · Fight · Claim</span><span className="text-teal">·</span>
               <span>Since 2021</span><span className="text-teal">·</span>
-              <span>Solana SPL</span><span className="text-teal">·</span>
-              <span>DOFFA Heroes</span><span className="text-teal">·</span>
+              <span>TON Jetton</span><span className="text-teal">·</span>
+              <span>DOFFA DRAKA</span><span className="text-teal">·</span>
               <span>Halal spirit</span><span className="text-teal">·</span>
               <span>DOFFA Games</span><span className="text-teal">·</span>
             </span>
@@ -579,7 +498,7 @@ export default function Home() {
                 </div>
               </Section>
 
-              {/* FLOW: Tap → Зёрна → Game → $DOFFA */}
+              {/* FLOW: тап → зёрна → драка → DOFF */}
               <Section id="flow">
                 <Reveal>
                   <div className="text-center">
@@ -672,7 +591,7 @@ export default function Home() {
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <span className="text-sm font-bold text-cream-soft">{t.flow.vaultTag} · mainnet</span>
                       <span className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-gradient-to-r from-gold/20 to-copper/20 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-gold">
-                        $DOFFA · SOLANA
+                        {ECOSYSTEM.token.symbol} · {ECOSYSTEM.token.network.toUpperCase()}
                       </span>
                     </div>
                     <div className="mt-6 grid gap-5 sm:grid-cols-3">
@@ -685,13 +604,13 @@ export default function Home() {
                         unit={REWARD_VAULT > 0 ? TOKEN.symbol : undefined}
                         accent
                       />
-                      <Stat label={t.flow.vaultSupplyLabel} value={REAL.initialSupply.toLocaleString(loc)} unit={TOKEN.symbol} />
+                      <Stat label={t.flow.vaultSupplyLabel} value={ECOSYSTEM.token.totalSupply.toLocaleString(loc)} unit={TOKEN.symbol} />
                       <Stat label={t.flow.vaultShareLabel} value={vaultSharePct(loc)} />
                     </div>
                     <p className="mt-6 text-center text-xs leading-relaxed text-cream/50">{t.flow.vaultNote}</p>
                     <div className="mt-3 text-center">
                       <a
-                        href={solscanTokenOf(REAL)}
+                        href={ECOSYSTEM.token.explorerUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1.5 text-xs font-semibold text-gold transition hover:text-amber"
@@ -753,8 +672,8 @@ export default function Home() {
                   <Reveal>
                     <VerifyCard
                       label={t.verify.mintLabel}
-                      value={REAL.mint ?? ""}
-                      href={solscanToken()}
+                      value={ECOSYSTEM.token.master}
+                      href={ECOSYSTEM.token.explorerUrl}
                       cta={t.verify.viewToken}
                       copiedLabel={t.ui.copied}
                       copyLabel={t.ui.copy}
@@ -764,7 +683,7 @@ export default function Home() {
                     <VerifyCard
                       label={t.verify.reserveLabel}
                       value={t.verify.reserveNote}
-                      href={solscanHolders()}
+                      href={ECOSYSTEM.rewardVault.explorerUrl}
                       cta={t.verify.viewHolders}
                       mono={false}
                       copiedLabel={t.ui.copied}
@@ -960,34 +879,18 @@ export default function Home() {
                     <Tag>{t.buy.tag}</Tag>
                     <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.buy.title}</h2>
                     <p className="mt-4 text-cream/70">{t.buy.sub}</p>
+                    {/* Единственный способ получить DOFF — играть, поэтому
+                        здесь одна кнопка, ведущая в игру, а не подключение
+                        кошелька: покупать на сайте нечего. */}
                     <div className="mt-7">
-                      {wallet ? (
-                        <div className="space-y-3">
-                          <div className="flex flex-wrap items-center gap-3">
-                            <span className="inline-flex items-center gap-2 rounded-full border border-teal/40 bg-teal/10 px-4 py-2 text-sm font-semibold text-teal">
-                              <span className="h-2 w-2 rounded-full bg-teal" />
-                              {t.buy.connected}: {wallet.slice(0, 4)}…{wallet.slice(-4)}
-                            </span>
-                            <button onClick={disconnectWallet} className="text-xs text-cream/50 underline transition hover:text-cream">
-                              {t.buy.disconnect}
-                            </button>
-                          </div>
-                          <div className="rounded-xl border border-white/10 bg-white/[0.02] px-5 py-4">
-                            <div className="text-xs uppercase tracking-wider text-cream/50">{t.buy.balanceLabel}</div>
-                            <div className="display mt-1 text-2xl font-extrabold text-cream-soft">
-                              {walletBal === null ? "…" : walletBal.toLocaleString(loc)}{" "}
-                              <span className="text-gold">{TOKEN.symbol}</span>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => setWalletModal(true)}
-                          className="inline-flex items-center gap-2 rounded-full bg-gold px-7 py-3 font-bold text-ink transition hover:brightness-110"
-                        >
-                          {t.buy.connect}
-                        </button>
-                      )}
+                      <a
+                        href={ECOSYSTEM.game.telegramUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold to-copper px-7 py-3 font-bold text-ink shadow-lg shadow-gold/10 transition hover:brightness-110"
+                      >
+                        ⚔️ {t.flow.playCta} ↗
+                      </a>
                       <p className="mt-3 max-w-md text-xs text-cream/50">{t.buy.walletNote}</p>
                     </div>
                   </Reveal>
