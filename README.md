@@ -138,7 +138,7 @@ Storage). Сессии серверные (таблица `sessions`), код в
 NEXT_PUBLIC_GAMES_NAME=DOFFA Games
 NEXT_PUBLIC_PRIMARY_GAME_NAME=DOFFA DRAKA
 NEXT_PUBLIC_TELEGRAM_BOT=doffadrakabot
-NEXT_PUBLIC_GAME_REFERRAL_CODE=       # DF-000123 — код владельца; пусто → ссылка без приглашения
+NEXT_PUBLIC_GAME_REFERRAL_CODE=       # перебивает код владельца DF-000001 из ecosystem.ts
 NEXT_PUBLIC_GAME_TELEGRAM_URL=        # полностью своя ссылка; перебивает две строки выше
 NEXT_PUBLIC_DOFF_MASTER=              # адрес контракта DOFF в TON
 NEXT_PUBLIC_DOFF_TREASURY=            # публичный адрес фонда наград

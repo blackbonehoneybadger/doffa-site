@@ -47,7 +47,11 @@ test("своё имя бота используется, если оно год�
   assert.equal(ссылкаВИгру("doffa_test_bot", "DF-9"), "https://t.me/doffa_test_bot?start=ref_DF-000009");
 });
 
-test("сайт по умолчанию ведёт в настоящего бота", () => {
-  assert.ok(ECOSYSTEM.game.telegramUrl.startsWith(`https://t.me/${БОТ}?`));
+test("сайт ведёт по реферальной ссылке владельца слово в слово", () => {
+  // Ссылку прислал владелец. Если она разойдётся с тем, что собирает сайт,
+  // приглашённые перестанут засчитываться — и заметить это можно будет только
+  // по пустому списку приглашённых через месяц.
+  assert.equal(ECOSYSTEM.game.telegramUrl, "https://t.me/doffadrakabot?start=ref_DF-000001");
+  assert.equal(ECOSYSTEM.game.referralCode, "DF-000001");
   assert.equal(ECOSYSTEM.game.botUsername, БОТ);
 });
