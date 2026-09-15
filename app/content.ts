@@ -32,7 +32,7 @@ export const LANGS: { code: Lang; label: string }[] = [
 
 // Главная монета сайта. Полные данные и статусы — в app/config/ecosystem.ts;
 // здесь только то, что нужно текстам: тикер, сеть и эмиссия для подписей.
-// Прежняя $DOFFA в Solana живёт отдельным разделом и здесь не дублируется.
+// Прежней монеты проекта на сайте больше нет: владелец решил ею не пользоваться.
 export const TOKEN = {
   symbol: "DOFF",
   network: "TON",
@@ -110,7 +110,10 @@ export type Dict = {
   videos: { tag: string; title: string; sub: string };
   gallery: { tag: string; title: string; sub: string };
   merch: { tag: string; title: string; sub: string; comingSoon: string; items: { name: string; desc: string }[] };
-  buy: { tag: string; title: string; sub: string; connect: string; points: string[]; connected: string; balanceLabel: string; walletNote: string; disconnect: string };
+  // Вкладка «получить»: кнопка ведёт в игру, подключать кошелёк здесь нечего —
+  // купить DOFF негде, его зарабатывают. Подпись кнопки берётся из flow.playCta,
+  // чтобы две кнопки «играть» на сайте не разъехались переводом.
+  buy: { tag: string; title: string; sub: string; points: string[]; walletNote: string };
   profile: {
     tag: string;
     title: string;
@@ -124,7 +127,6 @@ export type Dict = {
     nicknamePlaceholder: string;
     saveCta: string;
     saved: string;
-    balanceLabel: string;
     loyaltyTitle: string;
     loyaltyPoints: string;
     loyaltyEmpty: string;
@@ -285,21 +287,17 @@ export const dict: Record<Lang, Dict> = {
       tag: "Купить и хранить",
       title: "Получить DOFF",
       sub: "DOFF не продаётся на бирже: пула ликвидности пока нет, и рисовать вместо него цену мы не будем. Единственный способ получить DOFF — заработать его в игре.",
-      connect: "Подключить кошелёк",
       points: [
         "DOFF зарабатывается в DOFFA DRAKA и хранится в вашем кошельке в TON, не у нас.",
         "Пул на бирже не создан — честный статус открыт на странице прозрачности.",
-        "Ниже — баланс прежней монеты $DOFFA в Solana: она остаётся в сети, но наградой в игре больше не служит.",
+        "Пригласи друга — за его первый бой с живым соперником тебе начислится 1 000 зёрен.",
       ],
-      connected: "Кошелёк",
-      balanceLabel: "Ваш баланс $DOFFA",
-      walletNote: "Показан баланс прежней монеты $DOFFA в сети Solana — подключи Phantom, чтобы увидеть свой.",
-      disconnect: "Отключить",
+      walletNote: "Кнопка открывает игру прямо в Telegram: ставить и регистрироваться ничего не нужно.",
     },
     profile: {
       tag: "Личный кабинет",
       title: "Профиль DOFFA",
-      sub: "Войди по Solana-кошельку — без пароля, только подпись сообщения.",
+      sub: "Вход по кошельку — без пароля, только подпись сообщения. Это ключ от кабинета кофейни: ник и бонусы. Монеты DOFF живут в игре, а не здесь.",
       connectCta: "Подключить кошелёк",
       chooseWallet: "Выбери кошелёк",
       signCta: "Войти (подписать сообщение)",
@@ -309,7 +307,6 @@ export const dict: Record<Lang, Dict> = {
       nicknamePlaceholder: "Как к тебе обращаться?",
       saveCta: "Сохранить",
       saved: "Сохранено",
-      balanceLabel: "$DOFFA на кошельке — прежняя монета",
       loyaltyTitle: "Бонусы кофейни",
       loyaltyPoints: "Баллов",
       loyaltyEmpty: "Пока нет истории покупок — баллы появятся здесь после первой покупки в кофейне.",
@@ -321,7 +318,7 @@ export const dict: Record<Lang, Dict> = {
       tag: "План",
       title: "Дорожная карта",
       phases: [
-        { n: "Q3 2026", t: "Кофейня и первая монета", d: "Эспрессо-бар в горах с 2021 года и прежняя $DOFFA в Solana. Фонд на 1 000 000 $DOFFA ушёл в чёрную дыру проекта: ключ утерян, токены вне обращения.", done: true },
+        { n: "2021–2026", t: "Кофейня", d: "Эспрессо-бар в ауле Псаучье-Дахе работает с 2021 года: построен своими руками, тёплый свет, кот у входа. Всё остальное выросло отсюда.", done: true },
         { n: "Сентябрь 2026", t: "DOFFA DRAKA и DOFF", d: "Боковой файтинг в Telegram: одиннадцать бойцов, десять арен, живые соперники и турниры. 15 сентября выпущен DOFF в TON — миллиард, допечатка закрыта.", done: true },
         { n: "Q4 2026", t: "Обмен и вывод", d: "Подключение отправителя выплат, обмен зёрен на DOFF по суточному курсу, вывод на кошелёк в TON и настоящее сжигание в сети." },
         { n: "2027", t: "Экосистема", d: "DOFF в других приложениях и сайтах проекта, пул на бирже, программа лояльности кофейни." },
@@ -358,7 +355,7 @@ export const dict: Record<Lang, Dict> = {
       copy: "копировать",
     },
     legal:
-      "DOFF — экспериментальная комьюнити/утилити-монета экосистемы кофейни DOFFA в сети TON. Это НЕ инвестиция и НЕ обещание прибыли. Монета не является ценной бумагой, инвестиционным продуктом или предложением о покупке ценных бумаг. Мы не гарантируем никакого дохода и не даём финансовых советов. Игровые награды выплачиваются из ограниченного фонда наград и не гарантируют цену монеты; Зёрна — внутриигровая энергия, не имеющая денежной стоимости. Прежняя монета проекта $DOFFA в сети Solana остаётся в обращении, но наградой в игре не служит. Криптоактивы крайне волатильны и рискованны: можно потерять все вложенные средства. Материалы сайта носят информационный характер и не являются финансовой, юридической или налоговой консультацией. Участвуйте ответственно и в рамках законов вашей юрисдикции.",
+      "DOFF — экспериментальная комьюнити/утилити-монета экосистемы кофейни DOFFA в сети TON. Это НЕ инвестиция и НЕ обещание прибыли. Монета не является ценной бумагой, инвестиционным продуктом или предложением о покупке ценных бумаг. Мы не гарантируем никакого дохода и не даём финансовых советов. Игровые награды выплачиваются из ограниченного фонда наград и не гарантируют цену монеты; Зёрна — внутриигровая энергия, не имеющая денежной стоимости. Криптоактивы крайне волатильны и рискованны: можно потерять все вложенные средства. Материалы сайта носят информационный характер и не являются финансовой, юридической или налоговой консультацией. Участвуйте ответственно и в рамках законов вашей юрисдикции.",
   },
   en: {
     locale: "en-US",
@@ -499,21 +496,17 @@ export const dict: Record<Lang, Dict> = {
       tag: "Buy & hold",
       title: "Get DOFF",
       sub: "DOFF is not sold on an exchange: there is no liquidity pool yet, and we will not draw a price where there is none. The only way to get DOFF is to earn it in the game.",
-      connect: "Connect wallet",
       points: [
         "DOFF is earned in DOFFA DRAKA and kept in your own TON wallet, never with us.",
         "No exchange pool has been created — the honest status is on the transparency page.",
-        "Below is the balance of the earlier $DOFFA on Solana: it remains on-chain but is no longer the game's reward.",
+        "Invite a friend — their first fight against a live opponent earns you 1,000 Beans.",
       ],
-      connected: "Wallet",
-      balanceLabel: "Your $DOFFA balance",
-      walletNote: "This shows the balance of the earlier $DOFFA coin on Solana — connect Phantom to see yours.",
-      disconnect: "Disconnect",
+      walletNote: "The button opens the game right inside Telegram: nothing to install, nothing to sign up for.",
     },
     profile: {
       tag: "Account",
       title: "DOFFA Profile",
-      sub: "Sign in with your Solana wallet — no password, just a message signature.",
+      sub: "Sign in with your wallet — no password, just a message signature. It is the key to your coffee-bar account: nickname and points. DOFF lives in the game, not here.",
       connectCta: "Connect wallet",
       chooseWallet: "Choose a wallet",
       signCta: "Sign in (sign message)",
@@ -523,7 +516,6 @@ export const dict: Record<Lang, Dict> = {
       nicknamePlaceholder: "What should we call you?",
       saveCta: "Save",
       saved: "Saved",
-      balanceLabel: "$DOFFA in wallet — the earlier coin",
       loyaltyTitle: "Coffee shop rewards",
       loyaltyPoints: "Points",
       loyaltyEmpty: "No purchase history yet — points will show up here after your first purchase at the coffee shop.",
@@ -535,7 +527,7 @@ export const dict: Record<Lang, Dict> = {
       tag: "Plan",
       title: "Roadmap",
       phases: [
-        { n: "Q3 2026", t: "The coffee bar and the first coin", d: "An espresso bar in the mountains since 2021 and the earlier $DOFFA on Solana. A 1,000,000 $DOFFA vault fell into the project's black hole: the key was lost and those tokens are out of circulation.", done: true },
+        { n: "2021–2026", t: "The coffee bar", d: "An espresso bar in the village of Psauchye-Dakhe, running since 2021: built by hand, warm light, a cat at the door. Everything else grew out of it.", done: true },
         { n: "September 2026", t: "DOFFA DRAKA and DOFF", d: "A side-scrolling fighter inside Telegram: eleven fighters, ten arenas, live opponents and tournaments. On 15 September DOFF was issued on TON — one billion, minting closed.", done: true },
         { n: "Q4 2026", t: "Swap and withdrawal", d: "Connecting the payout sender, swapping Beans for DOFF at the daily rate, withdrawal to a TON wallet, and real on-chain burning." },
         { n: "2027", t: "Ecosystem", d: "DOFF across the project's other apps and sites, a pool on an exchange, and a coffee-bar loyalty programme." },
@@ -572,7 +564,7 @@ export const dict: Record<Lang, Dict> = {
       copy: "copy",
     },
     legal:
-      "DOFF is an experimental community/utility token of the DOFFA coffee bar ecosystem. It is NOT an investment and NOT a promise of profit. The token is not a security, an investment product or an offer to buy securities. We guarantee no income and give no financial advice. Game rewards are paid from a limited reward vault and do not guarantee the token price; Beans are in-game energy with no monetary value. Crypto assets are highly volatile and risky: you can lose everything you put in. This site is informational and is not financial, legal or tax advice. Participate responsibly and within the laws of your jurisdiction. The project’s earlier coin $DOFFA on Solana remains in circulation but is no longer the game’s reward.",
+      "DOFF is an experimental community/utility token of the DOFFA coffee bar ecosystem. It is NOT an investment and NOT a promise of profit. The token is not a security, an investment product or an offer to buy securities. We guarantee no income and give no financial advice. Game rewards are paid from a limited reward vault and do not guarantee the token price; Beans are in-game energy with no monetary value. Crypto assets are highly volatile and risky: you can lose everything you put in. This site is informational and is not financial, legal or tax advice. Participate responsibly and within the laws of your jurisdiction.",
   },
   ar: {
     locale: "ar",
@@ -714,21 +706,17 @@ export const dict: Record<Lang, Dict> = {
       tag: "اشترِ واحتفظ",
       title: "احصل على DOFF",
       sub: "DOFF لا تُباع في منصات التداول: لا توجد سيولة بعد، ولن نرسم سعراً حيث لا سعر. الطريق الوحيد للحصول عليها هو كسبها في اللعبة.",
-      connect: "اربط المحفظة",
       points: [
         "تُكتسب DOFF في DOFFA DRAKA وتُحفظ في محفظتك على TON، لا لدينا.",
         "لم تُنشأ أي سيولة في منصات التداول — والحالة الصادقة معلنة في صفحة الشفافية.",
-        "أدناه رصيد عملة $DOFFA السابقة على سولانا: ما زالت على الشبكة لكنها لم تعد مكافأة اللعبة.",
+        "ادعُ صديقاً — أول نزال له ضد خصم حيّ يمنحك 1000 حبة.",
       ],
-      connected: "المحفظة",
-      balanceLabel: "رصيدك من $DOFFA",
-      walletNote: "يعرض هذا رصيد عملة $DOFFA السابقة على سولانا — اربط Phantom لرؤية رصيدك.",
-      disconnect: "قطع الاتصال",
+      walletNote: "يفتح الزر اللعبة داخل تيليجرام مباشرة: لا تثبيت ولا تسجيل.",
     },
     profile: {
       tag: "الحساب",
       title: "ملف DOFFA الشخصي",
-      sub: "سجّل الدخول بمحفظة Solana — بلا كلمة مرور، فقط توقيع رسالة.",
+      sub: "سجّل الدخول بمحفظتك — بلا كلمة مرور، فقط توقيع رسالة. إنها مفتاح حسابك في المقهى: الاسم والنقاط. أما DOFF فتعيش في اللعبة، لا هنا.",
       connectCta: "ربط المحفظة",
       chooseWallet: "اختر محفظة",
       signCta: "تسجيل الدخول (توقيع الرسالة)",
@@ -738,7 +726,6 @@ export const dict: Record<Lang, Dict> = {
       nicknamePlaceholder: "كيف نناديك؟",
       saveCta: "حفظ",
       saved: "تم الحفظ",
-      balanceLabel: "$DOFFA في المحفظة — العملة السابقة",
       loyaltyTitle: "مكافآت المقهى",
       loyaltyPoints: "نقاط",
       loyaltyEmpty: "لا يوجد سجل مشتريات بعد — ستظهر النقاط هنا بعد أول عملية شراء من المقهى.",
@@ -750,7 +737,7 @@ export const dict: Record<Lang, Dict> = {
       tag: "الخطة",
       title: "خارطة الطريق",
       phases: [
-        { n: "الربع الثالث 2026", t: "المقهى والعملة الأولى", d: "بار إسبريسو في الجبال منذ 2021، وعملة $DOFFA السابقة على سولانا. صندوق بمليون $DOFFA سقط في ثقب المشروع الأسود: ضاع مفتاحه وخرجت تلك العملات من التداول.", done: true },
+        { n: "2021–2026", t: "المقهى", d: "بار إسبريسو في قرية بسافتشيي-داخه يعمل منذ 2021: بُني باليد، إضاءة دافئة، وقطّ عند الباب. كل ما عداه نما من هنا.", done: true },
         { n: "سبتمبر 2026", t: "DOFFA DRAKA وDOFF", d: "لعبة قتال جانبية داخل تيليجرام: أحد عشر مقاتلاً، عشر ساحات، خصوم أحياء وبطولات. وفي 15 سبتمبر صدرت DOFF على TON — مليار، والسكّ مغلق.", done: true },
         { n: "الربع الرابع 2026", t: "التبديل والسحب", d: "ربط مُرسِل الدفعات، وتبديل الحبوب بـDOFF بالسعر اليومي، والسحب إلى محفظة TON، والحرق الحقيقي على الشبكة." },
         { n: "2027", t: "المنظومة", d: "DOFF في بقية تطبيقات المشروع ومواقعه، وسيولة في منصة تداول، وبرنامج ولاء للمقهى." },
@@ -787,7 +774,7 @@ export const dict: Record<Lang, Dict> = {
       copy: "نسخ",
     },
     legal:
-      "DOFF عملة مجتمعية/خدمية تجريبية لنظام مقهى DOFFA. هي ليست استثماراً ولا وعداً بالربح. العملة ليست ورقة مالية ولا منتجاً استثمارياً ولا عرضاً لشراء أوراق مالية. لا نضمن أي دخل ولا نقدم نصائح مالية. تُدفع مكافآت اللعبة من خزينة محدودة ولا تضمن سعر العملة؛ الحبوب طاقة داخل اللعبة بلا قيمة نقدية. الأصول المشفرة شديدة التقلب والمخاطر: قد تخسر كل ما تضعه. محتوى الموقع معلوماتي وليس نصيحة مالية أو قانونية أو ضريبية. شارك بمسؤولية ووفق قوانين بلدك. وتبقى عملة المشروع السابقة $DOFFA على شبكة سولانا متداولة، لكنها لم تعد مكافأة اللعبة.",
+      "DOFF عملة مجتمعية/خدمية تجريبية لنظام مقهى DOFFA. هي ليست استثماراً ولا وعداً بالربح. العملة ليست ورقة مالية ولا منتجاً استثمارياً ولا عرضاً لشراء أوراق مالية. لا نضمن أي دخل ولا نقدم نصائح مالية. تُدفع مكافآت اللعبة من خزينة محدودة ولا تضمن سعر العملة؛ الحبوب طاقة داخل اللعبة بلا قيمة نقدية. الأصول المشفرة شديدة التقلب والمخاطر: قد تخسر كل ما تضعه. محتوى الموقع معلوماتي وليس نصيحة مالية أو قانونية أو ضريبية. شارك بمسؤولية ووفق قوانين بلدك.",
   },
   tr: {
     locale: "tr-TR",
@@ -928,21 +915,17 @@ export const dict: Record<Lang, Dict> = {
       tag: "Al & sakla",
       title: "DOFF edin",
       sub: "DOFF borsada satılmıyor: henüz likidite havuzu yok ve olmayan bir fiyatı çizmeyeceğiz. DOFF edinmenin tek yolu oyunda kazanmaktır.",
-      connect: "Cüzdanı bağla",
       points: [
         "DOFF, DOFFA DRAKA'da kazanılır ve kendi TON cüzdanında durur, bizde asla.",
         "Borsada havuz açılmadı — dürüst durum şeffaflık sayfasında.",
-        "Aşağıda Solana'daki önceki $DOFFA bakiyesi: zincirde duruyor ama artık oyunun ödülü değil.",
+        "Bir arkadaşını davet et — canlı rakibe karşı ilk dövüşü sana 1 000 Çekirdek kazandırır.",
       ],
-      connected: "Cüzdan",
-      balanceLabel: "$DOFFA bakiyeniz",
-      walletNote: "Bu, Solana'daki önceki $DOFFA coininin bakiyesini gösterir — kendinizinkini görmek için Phantom'u bağlayın.",
-      disconnect: "Bağlantıyı kes",
+      walletNote: "Düğme oyunu doğrudan Telegram içinde açar: kurulum da kayıt da gerekmez.",
     },
     profile: {
       tag: "Hesap",
       title: "DOFFA Profili",
-      sub: "Solana cüzdanınla giriş yap — şifre yok, sadece mesaj imzası.",
+      sub: "Cüzdanınla giriş yap — şifre yok, sadece mesaj imzası. Bu, kafe hesabının anahtarı: takma ad ve puanlar. DOFF ise burada değil, oyunda yaşar.",
       connectCta: "Cüzdanı bağla",
       chooseWallet: "Cüzdan seç",
       signCta: "Giriş yap (mesajı imzala)",
@@ -952,7 +935,6 @@ export const dict: Record<Lang, Dict> = {
       nicknamePlaceholder: "Sana nasıl hitap edelim?",
       saveCta: "Kaydet",
       saved: "Kaydedildi",
-      balanceLabel: "Cüzdandaki $DOFFA — önceki coin",
       loyaltyTitle: "Kafe ödülleri",
       loyaltyPoints: "Puan",
       loyaltyEmpty: "Henüz alışveriş geçmişi yok — puanlar kafeden ilk alışverişten sonra burada görünecek.",
@@ -964,7 +946,7 @@ export const dict: Record<Lang, Dict> = {
       tag: "Plan",
       title: "Yol haritası",
       phases: [
-        { n: "Ç3 2026", t: "Kafe ve ilk coin", d: "2021'den beri dağlarda bir espresso barı ve Solana'daki önceki $DOFFA. 1 000 000 $DOFFA'lık fon projenin kara deliğine düştü: anahtar kayboldu, o tokenler dolaşımdan çıktı.", done: true },
+        { n: "2021–2026", t: "Kafe", d: "Psauçye-Dahe köyündeki espresso barı 2021'den beri çalışıyor: elle inşa edildi, sıcak ışık, kapıda bir kedi. Geri kalan her şey buradan büyüdü.", done: true },
         { n: "Eylül 2026", t: "DOFFA DRAKA ve DOFF", d: "Telegram içinde yandan dövüş oyunu: on bir dövüşçü, on arena, canlı rakipler ve turnuvalar. 15 Eylül'de DOFF TON'da çıkarıldı — bir milyar, ek basım kapalı.", done: true },
         { n: "Ç4 2026", t: "Çevirme ve çekim", d: "Ödeme göndericisinin bağlanması, Çekirdeğin günlük kurla DOFF'a çevrilmesi, TON cüzdanına çekim ve zincirde gerçek yakma." },
         { n: "2027", t: "Ekosistem", d: "Projenin diğer uygulama ve sitelerinde DOFF, borsada havuz ve kafe sadakat programı." },
@@ -1001,7 +983,7 @@ export const dict: Record<Lang, Dict> = {
       copy: "kopyala",
     },
     legal:
-      "DOFF, DOFFA kahve ekosisteminin deneysel topluluk/fayda tokenidir. Yatırım DEĞİLDİR ve kâr vaadi DEĞİLDİR. Token menkul kıymet, yatırım ürünü veya menkul kıymet alım teklifi değildir. Hiçbir gelir garanti etmiyor, finansal tavsiye vermiyoruz. Oyun ödülleri sınırlı sınırlı bir ödül fonundan’tan ödenir ve token fiyatını garanti etmez; Çekirdek parasal değeri olmayan oyun içi enerjidir. Kripto varlıklar son derece oynak ve risklidir: yatırdığınız her şeyi kaybedebilirsiniz. Site içeriği bilgilendirme amaçlıdır; finansal, hukuki veya vergisel danışmanlık değildir. Sorumlu ve ülkenizin yasalarına uygun katılın. Projenin önceki coini Solana ağındaki $DOFFA dolaşımda kalır, ancak artık oyunun ödülü değildir.",
+      "DOFF, DOFFA kahve ekosisteminin deneysel topluluk/fayda tokenidir. Yatırım DEĞİLDİR ve kâr vaadi DEĞİLDİR. Token menkul kıymet, yatırım ürünü veya menkul kıymet alım teklifi değildir. Hiçbir gelir garanti etmiyor, finansal tavsiye vermiyoruz. Oyun ödülleri sınırlı sınırlı bir ödül fonundan’tan ödenir ve token fiyatını garanti etmez; Çekirdek parasal değeri olmayan oyun içi enerjidir. Kripto varlıklar son derece oynak ve risklidir: yatırdığınız her şeyi kaybedebilirsiniz. Site içeriği bilgilendirme amaçlıdır; finansal, hukuki veya vergisel danışmanlık değildir. Sorumlu ve ülkenizin yasalarına uygun katılın.",
   },
   es: {
     locale: "es-ES",
@@ -1142,21 +1124,17 @@ export const dict: Record<Lang, Dict> = {
       tag: "Compra y guarda",
       title: "Conseguir DOFF",
       sub: "DOFF no se vende en un exchange: todavía no hay pool de liquidez, y no vamos a dibujar un precio donde no lo hay. La única forma de conseguir DOFF es ganarlo en el juego.",
-      connect: "Conectar billetera",
       points: [
         "DOFF se gana en DOFFA DRAKA y se guarda en tu propia billetera de TON, nunca con nosotros.",
         "No se ha creado ningún pool en un exchange — el estado honesto está en la página de transparencia.",
-        "Abajo, el saldo de la anterior $DOFFA en Solana: sigue en la cadena, pero ya no es la recompensa del juego.",
+        "Invita a un amigo: su primera pelea contra un rival vivo te da 1 000 Granos.",
       ],
-      connected: "Billetera",
-      balanceLabel: "Tu saldo de $DOFFA",
-      walletNote: "Esto muestra el saldo de la anterior moneda $DOFFA en Solana — conecta Phantom para ver el tuyo.",
-      disconnect: "Desconectar",
+      walletNote: "El botón abre el juego dentro de Telegram: no hay que instalar ni registrarse.",
     },
     profile: {
       tag: "Cuenta",
       title: "Perfil DOFFA",
-      sub: "Inicia sesión con tu billetera Solana — sin contraseña, solo una firma de mensaje.",
+      sub: "Inicia sesión con tu billetera: sin contraseña, solo una firma de mensaje. Es la llave de tu cuenta de la cafetería: apodo y puntos. DOFF vive en el juego, no aquí.",
       connectCta: "Conectar billetera",
       chooseWallet: "Elige una billetera",
       signCta: "Iniciar sesión (firmar mensaje)",
@@ -1166,7 +1144,6 @@ export const dict: Record<Lang, Dict> = {
       nicknamePlaceholder: "¿Cómo te llamamos?",
       saveCta: "Guardar",
       saved: "Guardado",
-      balanceLabel: "$DOFFA en la billetera — la moneda anterior",
       loyaltyTitle: "Recompensas de la cafetería",
       loyaltyPoints: "Puntos",
       loyaltyEmpty: "Aún no hay historial de compras — los puntos aparecerán aquí tras tu primera compra en la cafetería.",
@@ -1178,7 +1155,7 @@ export const dict: Record<Lang, Dict> = {
       tag: "Plan",
       title: "Hoja de ruta",
       phases: [
-        { n: "T3 2026", t: "La cafetería y la primera moneda", d: "Un bar de espresso en las montañas desde 2021 y la anterior $DOFFA en Solana. Un fondo de 1 000 000 $DOFFA cayó en el agujero negro del proyecto: se perdió la clave y esos tokens quedaron fuera de circulación.", done: true },
+        { n: "2021–2026", t: "La cafetería", d: "El bar de espresso del pueblo de Psauchie-Dajé funciona desde 2021: construido a mano, luz cálida, un gato en la puerta. Todo lo demás creció de ahí.", done: true },
         { n: "Septiembre 2026", t: "DOFFA DRAKA y DOFF", d: "Un juego de pelea lateral dentro de Telegram: once luchadores, diez arenas, rivales vivos y torneos. El 15 de septiembre se emitió DOFF en TON — mil millones, emisión cerrada.", done: true },
         { n: "T4 2026", t: "Cambio y retiro", d: "Conexión del emisor de pagos, cambio de Granos por DOFF a la tasa diaria, retiro a una billetera TON y quema real en la cadena." },
         { n: "2027", t: "Ecosistema", d: "DOFF en las demás apps y sitios del proyecto, un pool en un exchange y un programa de fidelidad de la cafetería." },
@@ -1215,7 +1192,7 @@ export const dict: Record<Lang, Dict> = {
       copy: "copiar",
     },
     legal:
-      "DOFF es un token experimental comunitario/utilitario del ecosistema de la cafetería DOFFA. NO es una inversión ni una promesa de ganancias. El token no es un valor, un producto de inversión ni una oferta de compra de valores. No garantizamos ingresos ni damos consejos financieros. Las recompensas del juego se pagan desde un un fondo de recompensas limitado limitado y no garantizan el precio del token; Granos es energía dentro del juego sin valor monetario. Los criptoactivos son muy volátiles y arriesgados: puedes perder todo lo aportado. El contenido del sitio es informativo y no constituye asesoría financiera, legal o fiscal. Participa con responsabilidad y conforme a las leyes de tu jurisdicción. La moneda anterior del proyecto, $DOFFA en Solana, sigue en circulación, pero ya no es la recompensa del juego.",
+      "DOFF es un token experimental comunitario/utilitario del ecosistema de la cafetería DOFFA. NO es una inversión ni una promesa de ganancias. El token no es un valor, un producto de inversión ni una oferta de compra de valores. No garantizamos ingresos ni damos consejos financieros. Las recompensas del juego se pagan desde un un fondo de recompensas limitado limitado y no garantizan el precio del token; Granos es energía dentro del juego sin valor monetario. Los criptoactivos son muy volátiles y arriesgados: puedes perder todo lo aportado. El contenido del sitio es informativo y no constituye asesoría financiera, legal o fiscal. Participa con responsabilidad y conforme a las leyes de tu jurisdicción.",
   },
   fr: {
     locale: "fr-FR",
@@ -1356,21 +1333,17 @@ export const dict: Record<Lang, Dict> = {
       tag: "Acheter et garder",
       title: "Obtenir du DOFF",
       sub: "Le DOFF ne se vend pas sur un échange : il n'y a pas encore de pool de liquidité, et nous ne dessinerons pas un prix là où il n'y en a pas. Le seul moyen d'obtenir du DOFF est de le gagner dans le jeu.",
-      connect: "Connecter le portefeuille",
       points: [
         "Le DOFF se gagne dans DOFFA DRAKA et reste dans votre propre portefeuille TON, jamais chez nous.",
         "Aucune pool n'a été créée sur un échange — le statut honnête est sur la page de transparence.",
-        "Ci-dessous, le solde de l'ancien $DOFFA sur Solana : il reste sur la chaîne, mais n'est plus la récompense du jeu.",
+        "Invite un ami : son premier combat contre un adversaire vivant te rapporte 1 000 Grains.",
       ],
-      connected: "Portefeuille",
-      balanceLabel: "Votre solde de $DOFFA",
-      walletNote: "Ceci affiche le solde de l'ancienne pièce $DOFFA sur Solana — connectez Phantom pour voir le vôtre.",
-      disconnect: "Déconnecter",
+      walletNote: "Le bouton ouvre le jeu directement dans Telegram : rien à installer, rien à créer.",
     },
     profile: {
       tag: "Compte",
       title: "Profil DOFFA",
-      sub: "Connecte-toi avec ton portefeuille Solana — pas de mot de passe, juste une signature de message.",
+      sub: "Connecte-toi avec ton portefeuille : pas de mot de passe, juste une signature de message. C'est la clé de ton compte café — pseudo et points. Le DOFF, lui, vit dans le jeu.",
       connectCta: "Connecter le portefeuille",
       chooseWallet: "Choisis un portefeuille",
       signCta: "Se connecter (signer le message)",
@@ -1380,7 +1353,6 @@ export const dict: Record<Lang, Dict> = {
       nicknamePlaceholder: "Comment t'appeler ?",
       saveCta: "Enregistrer",
       saved: "Enregistré",
-      balanceLabel: "$DOFFA dans le portefeuille — l'ancienne pièce",
       loyaltyTitle: "Récompenses du café",
       loyaltyPoints: "Points",
       loyaltyEmpty: "Pas encore d'historique d'achats — les points apparaîtront ici après ton premier achat au café.",
@@ -1392,7 +1364,7 @@ export const dict: Record<Lang, Dict> = {
       tag: "Plan",
       title: "Feuille de route",
       phases: [
-        { n: "T3 2026", t: "Le café et la première pièce", d: "Un bar à espresso dans les montagnes depuis 2021 et l'ancien $DOFFA sur Solana. Un fonds de 1 000 000 $DOFFA est tombé dans le trou noir du projet : la clé a été perdue et ces jetons sont hors circulation.", done: true },
+        { n: "2021–2026", t: "Le café", d: "Le bar à espresso du village de Psaoutchié-Dakhé tourne depuis 2021 : construit à la main, lumière chaude, un chat à la porte. Tout le reste en est sorti.", done: true },
         { n: "Septembre 2026", t: "DOFFA DRAKA et DOFF", d: "Un jeu de combat en vue latérale dans Telegram : onze combattants, dix arènes, adversaires vivants et tournois. Le 15 septembre, DOFF a été émis sur TON — un milliard, frappe fermée.", done: true },
         { n: "T4 2026", t: "Échange et retrait", d: "Branchement de l'émetteur de paiements, échange des Grains contre du DOFF au taux du jour, retrait vers un portefeuille TON et véritable destruction sur la chaîne." },
         { n: "2027", t: "Écosystème", d: "DOFF dans les autres applications et sites du projet, une pool sur un échange et un programme de fidélité du café." },
@@ -1429,7 +1401,7 @@ export const dict: Record<Lang, Dict> = {
       copy: "copier",
     },
     legal:
-      "DOFF est un jeton communautaire/utilitaire expérimental de l’écosystème du café DOFFA. Ce n’est PAS un investissement ni une promesse de profit. Le jeton n’est ni une valeur mobilière, ni un produit d’investissement, ni une offre d’achat de titres. Nous ne garantissons aucun revenu et ne donnons aucun conseil financier. Les récompenses du jeu sont payées depuis un un fonds de récompenses limité limité et ne garantissent pas le prix du jeton ; les Grains sont une énergie de jeu sans valeur monétaire. Les crypto-actifs sont très volatils et risqués : vous pouvez tout perdre. Le contenu du site est informatif et ne constitue pas un conseil financier, juridique ou fiscal. Participez de façon responsable et dans le respect des lois de votre juridiction. L’ancienne pièce du projet, le $DOFFA sur Solana, reste en circulation mais n’est plus la récompense du jeu.",
+      "DOFF est un jeton communautaire/utilitaire expérimental de l’écosystème du café DOFFA. Ce n’est PAS un investissement ni une promesse de profit. Le jeton n’est ni une valeur mobilière, ni un produit d’investissement, ni une offre d’achat de titres. Nous ne garantissons aucun revenu et ne donnons aucun conseil financier. Les récompenses du jeu sont payées depuis un un fonds de récompenses limité limité et ne garantissent pas le prix du jeton ; les Grains sont une énergie de jeu sans valeur monétaire. Les crypto-actifs sont très volatils et risqués : vous pouvez tout perdre. Le contenu du site est informatif et ne constitue pas un conseil financier, juridique ou fiscal. Participez de façon responsable et dans le respect des lois de votre juridiction.",
   },
   de: {
     locale: "de-DE",
@@ -1570,21 +1542,17 @@ export const dict: Record<Lang, Dict> = {
       tag: "Kaufen & halten",
       title: "DOFF bekommen",
       sub: "DOFF wird an keiner Börse verkauft: einen Liquiditätspool gibt es noch nicht, und wir malen keinen Preis, wo keiner ist. Der einzige Weg zu DOFF führt über das Spiel.",
-      connect: "Wallet verbinden",
       points: [
         "DOFF wird in DOFFA DRAKA verdient und liegt in deiner eigenen TON-Wallet, niemals bei uns.",
         "An einer Börse wurde kein Pool angelegt — der ehrliche Status steht auf der Transparenzseite.",
-        "Unten der Bestand der früheren $DOFFA auf Solana: sie bleibt on-chain, ist aber nicht mehr die Belohnung des Spiels.",
+        "Lade einen Freund ein — sein erster Kampf gegen einen lebenden Gegner bringt dir 1 000 Bohnen.",
       ],
-      connected: "Wallet",
-      balanceLabel: "Dein $DOFFA-Guthaben",
-      walletNote: "Dies zeigt den Bestand der früheren Münze $DOFFA auf Solana — verbinde Phantom, um deinen zu sehen.",
-      disconnect: "Trennen",
+      walletNote: "Der Knopf öffnet das Spiel direkt in Telegram: nichts zu installieren, nichts anzumelden.",
     },
     profile: {
       tag: "Konto",
       title: "DOFFA-Profil",
-      sub: "Melde dich mit deiner Solana-Wallet an — kein Passwort, nur eine Nachrichtensignatur.",
+      sub: "Melde dich mit deiner Wallet an — kein Passwort, nur eine Nachrichtensignatur. Sie ist der Schlüssel zu deinem Café-Konto: Name und Punkte. DOFF lebt im Spiel, nicht hier.",
       connectCta: "Wallet verbinden",
       chooseWallet: "Wallet wählen",
       signCta: "Anmelden (Nachricht signieren)",
@@ -1594,7 +1562,6 @@ export const dict: Record<Lang, Dict> = {
       nicknamePlaceholder: "Wie sollen wir dich nennen?",
       saveCta: "Speichern",
       saved: "Gespeichert",
-      balanceLabel: "$DOFFA in der Wallet — die frühere Münze",
       loyaltyTitle: "Café-Prämien",
       loyaltyPoints: "Punkte",
       loyaltyEmpty: "Noch keine Kaufhistorie — Punkte erscheinen hier nach deinem ersten Kauf im Café.",
@@ -1606,7 +1573,7 @@ export const dict: Record<Lang, Dict> = {
       tag: "Plan",
       title: "Roadmap",
       phases: [
-        { n: "Q3 2026", t: "Das Café und die erste Münze", d: "Eine Espressobar in den Bergen seit 2021 und die frühere $DOFFA auf Solana. Ein Fonds über 1 000 000 $DOFFA fiel ins schwarze Loch des Projekts: der Schlüssel ging verloren, diese Token sind aus dem Umlauf.", done: true },
+        { n: "2021–2026", t: "Das Café", d: "Die Espressobar im Dorf Psautschje-Dache läuft seit 2021: von Hand gebaut, warmes Licht, eine Katze an der Tür. Alles andere ist daraus gewachsen.", done: true },
         { n: "September 2026", t: "DOFFA DRAKA und DOFF", d: "Ein Seitscroller-Kampfspiel in Telegram: elf Kämpfer, zehn Arenen, lebende Gegner und Turniere. Am 15. September wurde DOFF auf TON ausgegeben — eine Milliarde, Nachprägung geschlossen.", done: true },
         { n: "Q4 2026", t: "Tausch und Auszahlung", d: "Anschluss des Auszahlungs-Senders, Tausch von Bohnen in DOFF zum Tageskurs, Auszahlung auf eine TON-Wallet und echtes Verbrennen on-chain." },
         { n: "2027", t: "Ökosystem", d: "DOFF in den übrigen Apps und Seiten des Projekts, ein Pool an einer Börse und ein Treueprogramm des Cafés." },
@@ -1643,7 +1610,7 @@ export const dict: Record<Lang, Dict> = {
       copy: "kopieren",
     },
     legal:
-      "DOFF ist ein experimenteller Community-/Utility-Token des DOFFA-Kaffee-Ökosystems. Er ist KEINE Investition und KEIN Gewinnversprechen. Der Token ist kein Wertpapier, kein Anlageprodukt und kein Angebot zum Kauf von Wertpapieren. Wir garantieren kein Einkommen und geben keine Finanzberatung. Spielbelohnungen werden aus einem begrenzten einem begrenzten Belohnungsfonds gezahlt und garantieren keinen Tokenpreis; Bohnen sind Spielenergie ohne Geldwert. Kryptowerte sind hochvolatil und riskant: Ein Totalverlust ist möglich. Die Inhalte der Website dienen der Information und sind keine Finanz-, Rechts- oder Steuerberatung. Beteilige dich verantwortungsvoll und im Rahmen der Gesetze deiner Jurisdiktion. Die frühere Münze des Projekts, $DOFFA auf Solana, bleibt im Umlauf, ist aber nicht mehr die Belohnung des Spiels.",
+      "DOFF ist ein experimenteller Community-/Utility-Token des DOFFA-Kaffee-Ökosystems. Er ist KEINE Investition und KEIN Gewinnversprechen. Der Token ist kein Wertpapier, kein Anlageprodukt und kein Angebot zum Kauf von Wertpapieren. Wir garantieren kein Einkommen und geben keine Finanzberatung. Spielbelohnungen werden aus einem begrenzten einem begrenzten Belohnungsfonds gezahlt und garantieren keinen Tokenpreis; Bohnen sind Spielenergie ohne Geldwert. Kryptowerte sind hochvolatil und riskant: Ein Totalverlust ist möglich. Die Inhalte der Website dienen der Information und sind keine Finanz-, Rechts- oder Steuerberatung. Beteilige dich verantwortungsvoll und im Rahmen der Gesetze deiner Jurisdiktion.",
   },
   zh: {
     locale: "zh-CN",
@@ -1784,21 +1751,17 @@ export const dict: Record<Lang, Dict> = {
       tag: "购买与持有",
       title: "获得 DOFF",
       sub: "DOFF 不在交易所出售：目前没有流动性池，我们也不会在没有价格的地方画出一个价格。获得 DOFF 的唯一途径是在游戏中赚取。",
-      connect: "连接钱包",
       points: [
         "DOFF 在 DOFFA DRAKA 中赚取，存放在你自己的 TON 钱包里，绝不在我们这里。",
         "交易所资金池尚未建立——真实状态公布在透明页面。",
-        "下面是 Solana 上早前 $DOFFA 的余额：它仍在链上，但已不再是游戏的奖励。",
+        "邀请一位朋友——他与真人打完第一场，你就得到 1 000 颗咖啡豆。",
       ],
-      connected: "钱包",
-      balanceLabel: "你的 $DOFFA 余额",
-      walletNote: "这里显示 Solana 上早前 $DOFFA 币的余额——连接 Phantom 即可查看你的。",
-      disconnect: "断开连接",
+      walletNote: "按钮直接在 Telegram 里打开游戏：无需安装，无需注册。",
     },
     profile: {
       tag: "账户",
       title: "DOFFA 个人主页",
-      sub: "用 Solana 钱包登录——无需密码，只需签名一条消息。",
+      sub: "用钱包登录——无需密码，只需签名一条消息。它是你咖啡馆账号的钥匙：昵称和积分。DOFF 住在游戏里，不在这里。",
       connectCta: "连接钱包",
       chooseWallet: "选择钱包",
       signCta: "登录（签名消息）",
@@ -1808,7 +1771,6 @@ export const dict: Record<Lang, Dict> = {
       nicknamePlaceholder: "怎么称呼你？",
       saveCta: "保存",
       saved: "已保存",
-      balanceLabel: "钱包中的 $DOFFA——早前的币",
       loyaltyTitle: "咖啡馆积分",
       loyaltyPoints: "积分",
       loyaltyEmpty: "暂无购买记录——首次在咖啡馆消费后积分会显示在这里。",
@@ -1820,7 +1782,7 @@ export const dict: Record<Lang, Dict> = {
       tag: "计划",
       title: "路线图",
       phases: [
-        { n: "2026 三季度", t: "咖啡馆与第一枚币", d: "山中自 2021 年营业的浓缩咖啡馆，以及 Solana 上早前的 $DOFFA。一笔 1 000 000 $DOFFA 的基金掉进了项目的黑洞：密钥遗失，这些代币退出流通。", done: true },
+        { n: "2021–2026", t: "咖啡馆", d: "普绍奇耶-达赫村的浓缩咖啡馆自 2021 年开门：一砖一瓦亲手搭起，暖光，门口有只猫。其余的一切都从这里长出来。", done: true },
         { n: "2026 年 9 月", t: "DOFFA DRAKA 与 DOFF", d: "Telegram 内的横版格斗游戏：十一名格斗者、十座擂台、真人对手与锦标赛。9 月 15 日 DOFF 在 TON 上发行——十亿枚，增发关闭。", done: true },
         { n: "2026 四季度", t: "兑换与提现", d: "接入支付发送端、按每日汇率把咖啡豆换成 DOFF、提到 TON 钱包，以及链上真实销毁。" },
         { n: "2027", t: "生态", d: "DOFF 接入项目的其他应用与网站、交易所资金池，以及咖啡馆会员计划。" },
@@ -1857,7 +1819,7 @@ export const dict: Record<Lang, Dict> = {
       copy: "复制",
     },
     legal:
-      "DOFF 是 DOFFA 咖啡生态的实验性社区/实用型代币。它不是投资，也不是收益承诺。该代币不是证券、投资产品或证券购买要约。我们不保证任何收入，也不提供理财建议。游戏奖励从限量 有限的奖励基金 支付，不保证代币价格；咖啡豆 是无货币价值的游戏内能量。加密资产波动大、风险高：可能损失全部投入。本站内容仅供参考，不构成财务、法律或税务建议。请负责任地并在所在司法辖区法律允许范围内参与。 项目早前的币 $DOFFA 仍在 Solana 上流通，但已不再是游戏的奖励。",
+      "DOFF 是 DOFFA 咖啡生态的实验性社区/实用型代币。它不是投资，也不是收益承诺。该代币不是证券、投资产品或证券购买要约。我们不保证任何收入，也不提供理财建议。游戏奖励从限量 有限的奖励基金 支付，不保证代币价格；咖啡豆 是无货币价值的游戏内能量。加密资产波动大、风险高：可能损失全部投入。本站内容仅供参考，不构成财务、法律或税务建议。请负责任地并在所在司法辖区法律允许范围内参与。",
   },
   hi: {
     locale: "hi-IN",
@@ -1998,21 +1960,17 @@ export const dict: Record<Lang, Dict> = {
       tag: "खरीदें और रखें",
       title: "DOFF पाएँ",
       sub: "DOFF एक्सचेंज पर नहीं बिकता: अभी कोई लिक्विडिटी पूल नहीं है, और जहाँ क़ीमत नहीं है वहाँ हम क़ीमत नहीं गढ़ेंगे। DOFF पाने का एक ही रास्ता है — गेम में कमाना।",
-      connect: "वॉलेट कनेक्ट करें",
       points: [
         "DOFF, DOFFA DRAKA में कमाया जाता है और आपके अपने TON वॉलेट में रहता है, हमारे पास कभी नहीं।",
         "एक्सचेंज पर कोई पूल नहीं बना — सच्ची स्थिति पारदर्शिता पृष्ठ पर है।",
-        "नीचे Solana पर पुराने $DOFFA का बैलेंस है: वह चेन पर बना हुआ है, पर अब गेम का इनाम नहीं।",
+        "किसी दोस्त को बुलाओ — ज़िंदा प्रतिद्वंद्वी के साथ उसकी पहली लड़ाई पर तुम्हें 1 000 बीन्स मिलते हैं।",
       ],
-      connected: "वॉलेट",
-      balanceLabel: "आपका $DOFFA बैलेंस",
-      walletNote: "यह Solana पर पुराने $DOFFA सिक्के का बैलेंस दिखाता है — अपना देखने के लिए Phantom कनेक्ट करें।",
-      disconnect: "डिस्कनेक्ट करें",
+      walletNote: "बटन गेम को सीधे Telegram में खोलता है: न कुछ इंस्टॉल करना है, न रजिस्टर।",
     },
     profile: {
       tag: "खाता",
       title: "DOFFA प्रोफ़ाइल",
-      sub: "अपने Solana वॉलेट से साइन इन करें — कोई पासवर्ड नहीं, बस एक मैसेज सिग्नेचर।",
+      sub: "अपने वॉलेट से साइन इन करें — कोई पासवर्ड नहीं, बस एक मैसेज सिग्नेचर। यह आपके कैफ़े अकाउंट की चाबी है: निकनेम और पॉइंट्स। DOFF गेम में रहता है, यहाँ नहीं।",
       connectCta: "वॉलेट कनेक्ट करें",
       chooseWallet: "वॉलेट चुनें",
       signCta: "साइन इन करें (मैसेज साइन करें)",
@@ -2022,7 +1980,6 @@ export const dict: Record<Lang, Dict> = {
       nicknamePlaceholder: "तुम्हें क्या कहकर बुलाएं?",
       saveCta: "सहेजें",
       saved: "सहेजा गया",
-      balanceLabel: "वॉलेट में $DOFFA — पुराना सिक्का",
       loyaltyTitle: "कैफ़े रिवॉर्ड्स",
       loyaltyPoints: "पॉइंट्स",
       loyaltyEmpty: "अभी कोई खरीद इतिहास नहीं — कैफ़े में पहली खरीद के बाद पॉइंट्स यहाँ दिखेंगे।",
@@ -2034,7 +1991,7 @@ export const dict: Record<Lang, Dict> = {
       tag: "योजना",
       title: "रोडमैप",
       phases: [
-        { n: "Q3 2026", t: "कैफ़े और पहला सिक्का", d: "2021 से पहाड़ों में एक एस्प्रेसो बार और Solana पर पुराना $DOFFA। 1 000 000 $DOFFA का फंड प्रोजेक्ट के ब्लैक होल में गिर गया: चाबी खो गई और वे टोकन चलन से बाहर हो गए।", done: true },
+        { n: "2021–2026", t: "कैफ़े", d: "प्साउच्ये-दाख़े गाँव का एस्प्रेसो बार 2021 से चल रहा है: अपने हाथों से बनाया, गर्म रोशनी, दरवाज़े पर एक बिल्ली। बाकी सब यहीं से उगा।", done: true },
         { n: "सितंबर 2026", t: "DOFFA DRAKA और DOFF", d: "Telegram के भीतर साइड-व्यू फ़ाइटिंग गेम: ग्यारह लड़ाके, दस अखाड़े, ज़िंदा प्रतिद्वंद्वी और टूर्नामेंट। 15 सितंबर को TON पर DOFF जारी हुआ — एक अरब, ढलाई बंद।", done: true },
         { n: "Q4 2026", t: "बदलाव और निकासी", d: "भुगतान भेजने वाले को जोड़ना, दैनिक दर पर बीन्स को DOFF में बदलना, TON वॉलेट में निकासी और चेन पर असली बर्निंग।" },
         { n: "2027", t: "इकोसिस्टम", d: "प्रोजेक्ट के बाकी ऐप्स और साइटों में DOFF, एक्सचेंज पर पूल और कैफ़े का लॉयल्टी प्रोग्राम।" },
@@ -2071,7 +2028,7 @@ export const dict: Record<Lang, Dict> = {
       copy: "कॉपी करें",
     },
     legal:
-      "DOFF, DOFFA कॉफ़ी इकोसिस्टम का प्रयोगात्मक कम्युनिटी/यूटिलिटी टोकन है। यह निवेश नहीं है और मुनाफ़े का वादा नहीं है। टोकन प्रतिभूति, निवेश उत्पाद या प्रतिभूतियों की खरीद का प्रस्ताव नहीं है। हम किसी आय की गारंटी नहीं देते और वित्तीय सलाह नहीं देते। गेम इनाम सीमित एक सीमित इनाम फंड से चुकाए जाते हैं और टोकन की क़ीमत की गारंटी नहीं देते; बीन्स बिना मौद्रिक मूल्य की इन-गेम ऊर्जा है। क्रिप्टो संपत्तियाँ अत्यधिक अस्थिर और जोखिम भरी हैं: पूरा निवेश डूब सकता है। साइट की सामग्री सूचना हेतु है; यह वित्तीय, क़ानूनी या कर सलाह नहीं है। ज़िम्मेदारी से और अपने क्षेत्र के क़ानूनों के भीतर भाग लें। प्रोजेक्ट का पुराना सिक्का $DOFFA Solana पर चलन में बना हुआ है, पर अब गेम का इनाम नहीं है।",
+      "DOFF, DOFFA कॉफ़ी इकोसिस्टम का प्रयोगात्मक कम्युनिटी/यूटिलिटी टोकन है। यह निवेश नहीं है और मुनाफ़े का वादा नहीं है। टोकन प्रतिभूति, निवेश उत्पाद या प्रतिभूतियों की खरीद का प्रस्ताव नहीं है। हम किसी आय की गारंटी नहीं देते और वित्तीय सलाह नहीं देते। गेम इनाम सीमित एक सीमित इनाम फंड से चुकाए जाते हैं और टोकन की क़ीमत की गारंटी नहीं देते; बीन्स बिना मौद्रिक मूल्य की इन-गेम ऊर्जा है। क्रिप्टो संपत्तियाँ अत्यधिक अस्थिर और जोखिम भरी हैं: पूरा निवेश डूब सकता है। साइट की सामग्री सूचना हेतु है; यह वित्तीय, क़ानूनी या कर सलाह नहीं है। ज़िम्मेदारी से और अपने क्षेत्र के क़ानूनों के भीतर भाग लें।",
   },
   pt: {
     locale: "pt-BR",
@@ -2212,21 +2169,17 @@ export const dict: Record<Lang, Dict> = {
       tag: "Compre e guarde",
       title: "Obter DOFF",
       sub: "O DOFF não é vendido em exchange: ainda não há pool de liquidez, e não vamos desenhar um preço onde não existe. O único jeito de obter DOFF é ganhá-lo no jogo.",
-      connect: "Conectar carteira",
       points: [
         "O DOFF é ganho no DOFFA DRAKA e fica na sua própria carteira TON, nunca conosco.",
         "Nenhum pool foi criado em exchange — o status honesto está na página de transparência.",
-        "Abaixo, o saldo do antigo $DOFFA na Solana: ele continua on-chain, mas não é mais a recompensa do jogo.",
+        "Convide um amigo: a primeira luta dele contra um adversário vivo te rende 1 000 Grãos.",
       ],
-      connected: "Carteira",
-      balanceLabel: "Seu saldo de $DOFFA",
-      walletNote: "Isto mostra o saldo da antiga moeda $DOFFA na Solana — conecte a Phantom para ver o seu.",
-      disconnect: "Desconectar",
+      walletNote: "O botão abre o jogo dentro do Telegram: nada para instalar, nada para cadastrar.",
     },
     profile: {
       tag: "Conta",
       title: "Perfil DOFFA",
-      sub: "Entre com sua carteira Solana — sem senha, apenas uma assinatura de mensagem.",
+      sub: "Entre com sua carteira — sem senha, apenas uma assinatura de mensagem. É a chave da sua conta da cafeteria: apelido e pontos. O DOFF mora no jogo, não aqui.",
       connectCta: "Conectar carteira",
       chooseWallet: "Escolha uma carteira",
       signCta: "Entrar (assinar mensagem)",
@@ -2236,7 +2189,6 @@ export const dict: Record<Lang, Dict> = {
       nicknamePlaceholder: "Como te chamamos?",
       saveCta: "Salvar",
       saved: "Salvo",
-      balanceLabel: "$DOFFA na carteira — a moeda antiga",
       loyaltyTitle: "Recompensas da cafeteria",
       loyaltyPoints: "Pontos",
       loyaltyEmpty: "Ainda sem histórico de compras — os pontos aparecerão aqui após sua primeira compra na cafeteria.",
@@ -2248,7 +2200,7 @@ export const dict: Record<Lang, Dict> = {
       tag: "Plano",
       title: "Roteiro",
       phases: [
-        { n: "T3 2026", t: "A cafeteria e a primeira moeda", d: "Um bar de espresso nas montanhas desde 2021 e o antigo $DOFFA na Solana. Um fundo de 1 000 000 $DOFFA caiu no buraco negro do projeto: a chave se perdeu e aqueles tokens saíram de circulação.", done: true },
+        { n: "2021–2026", t: "A cafeteria", d: "O bar de espresso da vila de Psautchie-Dakhe funciona desde 2021: construído à mão, luz quente, um gato na porta. Todo o resto cresceu daí.", done: true },
         { n: "Setembro 2026", t: "DOFFA DRAKA e DOFF", d: "Um jogo de luta lateral dentro do Telegram: onze lutadores, dez arenas, adversários vivos e torneios. Em 15 de setembro o DOFF foi emitido na TON — um bilhão, emissão fechada.", done: true },
         { n: "T4 2026", t: "Troca e saque", d: "Conexão do emissor de pagamentos, troca de Grãos por DOFF pela taxa do dia, saque para uma carteira TON e queima real on-chain." },
         { n: "2027", t: "Ecossistema", d: "DOFF nos demais apps e sites do projeto, um pool em uma exchange e um programa de fidelidade da cafeteria." },
@@ -2285,7 +2237,7 @@ export const dict: Record<Lang, Dict> = {
       copy: "copiar",
     },
     legal:
-      "DOFF é um token experimental comunitário/utilitário do ecossistema da cafeteria DOFFA. NÃO é investimento nem promessa de lucro. O token não é valor mobiliário, produto de investimento ou oferta de compra de valores mobiliários. Não garantimos renda nem damos conselhos financeiros. As recompensas do jogo são pagas de um um fundo de recompensas limitado limitado e não garantem o preço do token; Grãos é energia de jogo sem valor monetário. Criptoativos são muito voláteis e arriscados: você pode perder tudo o que aportar. O conteúdo do site é informativo e não constitui aconselhamento financeiro, jurídico ou fiscal. Participe com responsabilidade e conforme as leis da sua jurisdição. A moeda anterior do projeto, o $DOFFA na Solana, continua em circulação, mas não é mais a recompensa do jogo.",
+      "DOFF é um token experimental comunitário/utilitário do ecossistema da cafeteria DOFFA. NÃO é investimento nem promessa de lucro. O token não é valor mobiliário, produto de investimento ou oferta de compra de valores mobiliários. Não garantimos renda nem damos conselhos financeiros. As recompensas do jogo são pagas de um um fundo de recompensas limitado limitado e não garantem o preço do token; Grãos é energia de jogo sem valor monetário. Criptoativos são muito voláteis e arriscados: você pode perder tudo o que aportar. O conteúdo do site é informativo e não constitui aconselhamento financeiro, jurídico ou fiscal. Participe com responsabilidade e conforme as leis da sua jurisdição.",
   },
   it: {
     locale: "it-IT",
@@ -2426,21 +2378,17 @@ export const dict: Record<Lang, Dict> = {
       tag: "Compra e conserva",
       title: "Ottieni DOFF",
       sub: "Il DOFF non si vende su un exchange: una pool di liquidità non c'è ancora, e non disegneremo un prezzo dove non ce n'è. L'unico modo di ottenere DOFF è guadagnarlo nel gioco.",
-      connect: "Connetti il wallet",
       points: [
         "Il DOFF si guadagna in DOFFA DRAKA e resta nel tuo wallet TON, mai da noi.",
         "Nessuna pool è stata creata su un exchange — lo stato onesto è nella pagina di trasparenza.",
-        "Qui sotto il saldo del precedente $DOFFA su Solana: resta on-chain, ma non è più il premio del gioco.",
+        "Invita un amico: il suo primo scontro contro un avversario vivo ti frutta 1 000 Chicchi.",
       ],
-      connected: "Wallet",
-      balanceLabel: "Il tuo saldo di $DOFFA",
-      walletNote: "Questo mostra il saldo della precedente moneta $DOFFA su Solana — connetti Phantom per vedere il tuo.",
-      disconnect: "Disconnetti",
+      walletNote: "Il pulsante apre il gioco dentro Telegram: niente da installare, niente da registrare.",
     },
     profile: {
       tag: "Account",
       title: "Profilo DOFFA",
-      sub: "Accedi con il tuo portafoglio Solana — niente password, solo una firma del messaggio.",
+      sub: "Accedi con il tuo portafoglio: niente password, solo una firma del messaggio. È la chiave del tuo account della caffetteria: nome e punti. Il DOFF vive nel gioco, non qui.",
       connectCta: "Collega portafoglio",
       chooseWallet: "Scegli un portafoglio",
       signCta: "Accedi (firma messaggio)",
@@ -2450,7 +2398,6 @@ export const dict: Record<Lang, Dict> = {
       nicknamePlaceholder: "Come ti chiamiamo?",
       saveCta: "Salva",
       saved: "Salvato",
-      balanceLabel: "$DOFFA nel portafoglio — la moneta precedente",
       loyaltyTitle: "Premi del bar",
       loyaltyPoints: "Punti",
       loyaltyEmpty: "Ancora nessuno storico acquisti — i punti appariranno qui dopo il tuo primo acquisto al bar.",
@@ -2462,7 +2409,7 @@ export const dict: Record<Lang, Dict> = {
       tag: "Piano",
       title: "Roadmap",
       phases: [
-        { n: "T3 2026", t: "La caffetteria e la prima moneta", d: "Un espresso bar in montagna dal 2021 e il precedente $DOFFA su Solana. Un fondo da 1 000 000 $DOFFA è finito nel buco nero del progetto: la chiave è andata persa e quei token sono fuori circolazione.", done: true },
+        { n: "2021–2026", t: "La caffetteria", d: "L'espresso bar del villaggio di Psauč'e-Dache è aperto dal 2021: costruito a mano, luce calda, un gatto sulla porta. Tutto il resto è nato da lì.", done: true },
         { n: "Settembre 2026", t: "DOFFA DRAKA e DOFF", d: "Un picchiaduro a scorrimento dentro Telegram: undici lottatori, dieci arene, avversari in carne e ossa e tornei. Il 15 settembre DOFF è stato emesso su TON — un miliardo, conio chiuso.", done: true },
         { n: "T4 2026", t: "Cambio e prelievo", d: "Collegamento del mittente dei pagamenti, cambio dei Chicchi in DOFF al tasso del giorno, prelievo su un wallet TON e vera distruzione on-chain." },
         { n: "2027", t: "Ecosistema", d: "DOFF nelle altre app e nei siti del progetto, una pool su un exchange e un programma fedeltà della caffetteria." },
@@ -2499,7 +2446,7 @@ export const dict: Record<Lang, Dict> = {
       copy: "copia",
     },
     legal:
-      "DOFF è un token sperimentale community/utility dell’ecosistema della caffetteria DOFFA. NON è un investimento né una promessa di profitto. Il token non è uno strumento finanziario, un prodotto d’investimento o un’offerta di acquisto di titoli. Non garantiamo alcun reddito e non forniamo consulenza finanziaria. Le ricompense di gioco sono pagate da un un fondo premi limitato limitato e non garantiscono il prezzo del token; i Chicchi sono energia di gioco senza valore monetario. Le cripto-attività sono estremamente volatili e rischiose: puoi perdere tutto. I contenuti del sito sono informativi e non costituiscono consulenza finanziaria, legale o fiscale. Partecipa responsabilmente e nel rispetto delle leggi della tua giurisdizione. La moneta precedente del progetto, $DOFFA su Solana, resta in circolazione, ma non è più il premio del gioco.",
+      "DOFF è un token sperimentale community/utility dell’ecosistema della caffetteria DOFFA. NON è un investimento né una promessa di profitto. Il token non è uno strumento finanziario, un prodotto d’investimento o un’offerta di acquisto di titoli. Non garantiamo alcun reddito e non forniamo consulenza finanziaria. Le ricompense di gioco sono pagate da un un fondo premi limitato limitato e non garantiscono il prezzo del token; i Chicchi sono energia di gioco senza valore monetario. Le cripto-attività sono estremamente volatili e rischiose: puoi perdere tutto. I contenuti del sito sono informativi e non costituiscono consulenza finanziaria, legale o fiscale. Partecipa responsabilmente e nel rispetto delle leggi della tua giurisdizione.",
   },
   ja: {
     locale: "ja-JP",
@@ -2640,21 +2587,17 @@ export const dict: Record<Lang, Dict> = {
       tag: "買って保有",
       title: "DOFF を手に入れる",
       sub: "DOFF は取引所で売られていません。流動性プールはまだなく、価格のないところに価格を描くことはしません。DOFF を手に入れる唯一の方法はゲームで稼ぐことです。",
-      connect: "ウォレットを接続",
       points: [
         "DOFF は DOFFA DRAKA で稼ぎ、あなた自身の TON ウォレットに入ります。私たちが預かることはありません。",
         "取引所のプールは作られていません——正直な状態は透明性ページにあります。",
-        "下は Solana 上の以前のコイン $DOFFA の残高です。チェーン上には残っていますが、もうゲームの報酬ではありません。",
+        "友だちを誘おう——その人が生身の相手と初めて戦うと、あなたに 1 000 ビーンズが入ります。",
       ],
-      connected: "ウォレット",
-      balanceLabel: "あなたの $DOFFA 残高",
-      walletNote: "Solana 上の以前のコイン $DOFFA の残高を表示します——ご自分の残高を見るには Phantom を接続してください。",
-      disconnect: "切断",
+      walletNote: "ボタンは Telegram の中でそのままゲームを開きます。インストールも登録も要りません。",
     },
     profile: {
       tag: "アカウント",
       title: "DOFFA プロフィール",
-      sub: "Solanaウォレットでサインイン——パスワード不要、メッセージ署名だけ。",
+      sub: "ウォレットでサインイン——パスワード不要、メッセージ署名だけ。これはカフェのアカウントの鍵です（ニックネームとポイント）。DOFF が住んでいるのはゲームの中で、ここではありません。",
       connectCta: "ウォレットを接続",
       chooseWallet: "ウォレットを選択",
       signCta: "サインイン（メッセージに署名）",
@@ -2664,7 +2607,6 @@ export const dict: Record<Lang, Dict> = {
       nicknamePlaceholder: "呼び方を教えてください",
       saveCta: "保存",
       saved: "保存しました",
-      balanceLabel: "ウォレット内の $DOFFA——以前のコイン",
       loyaltyTitle: "カフェの特典",
       loyaltyPoints: "ポイント",
       loyaltyEmpty: "購入履歴はまだありません——カフェでの初回購入後にポイントが表示されます。",
@@ -2676,7 +2618,7 @@ export const dict: Record<Lang, Dict> = {
       tag: "計画",
       title: "ロードマップ",
       phases: [
-        { n: "2026 Q3", t: "カフェと最初のコイン", d: "2021 年から山にあるエスプレッソバーと、Solana 上の以前の $DOFFA。1 000 000 $DOFFA の基金はプロジェクトのブラックホールに落ちました。鍵を失い、それらのトークンは流通から外れています。", done: true },
+        { n: "2021–2026", t: "カフェ", d: "プサウチエ・ダヘ村のエスプレッソバーは 2021 年から続いています。手づくりの店、あたたかな灯り、扉のところに猫。ほかのすべてはここから育ちました。", done: true },
         { n: "2026 年 9 月", t: "DOFFA DRAKA と DOFF", d: "Telegram 内の横スクロール格闘ゲーム。11 人のファイター、10 のアリーナ、生身の対戦相手とトーナメント。9 月 15 日、DOFF を TON 上で発行——10 億枚、追加発行は終了。", done: true },
         { n: "2026 Q4", t: "交換と出金", d: "支払い送信側の接続、日次レートでのビーンズから DOFF への交換、TON ウォレットへの出金、そしてチェーン上での本物の焼却。" },
         { n: "2027", t: "エコシステム", d: "プロジェクトの他のアプリやサイトでの DOFF、取引所のプール、カフェのロイヤルティプログラム。" },
@@ -2713,6 +2655,6 @@ export const dict: Record<Lang, Dict> = {
       copy: "コピー",
     },
     legal:
-      "DOFF は DOFFA コーヒーエコシステムの実験的なコミュニティ／ユーティリティトークンです。投資ではなく、利益の約束でもありません。本トークンは有価証券・投資商品・証券購入の申し出ではありません。いかなる収益も保証せず、金融アドバイスも行いません。ゲーム報酬は限定の 上限のある報酬基金 から支払われ、トークン価格を保証しません。ビーンズ は金銭的価値のないゲーム内エネルギーです。暗号資産は非常に変動が大きくリスクが高く、投入したすべてを失う可能性があります。本サイトの内容は情報提供であり、金融・法務・税務の助言ではありません。責任を持って、お住まいの法域の法律の範囲内でご参加ください。 プロジェクトの以前のコイン $DOFFA は Solana 上で流通し続けていますが、もはやゲームの報酬ではありません。",
+      "DOFF は DOFFA コーヒーエコシステムの実験的なコミュニティ／ユーティリティトークンです。投資ではなく、利益の約束でもありません。本トークンは有価証券・投資商品・証券購入の申し出ではありません。いかなる収益も保証せず、金融アドバイスも行いません。ゲーム報酬は限定の 上限のある報酬基金 から支払われ、トークン価格を保証しません。ビーンズ は金銭的価値のないゲーム内エネルギーです。暗号資産は非常に変動が大きくリスクが高く、投入したすべてを失う可能性があります。本サイトの内容は情報提供であり、金融・法務・税務の助言ではありません。責任を持って、お住まいの法域の法律の範囲内でご参加ください。",
   },
 };

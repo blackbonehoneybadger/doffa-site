@@ -1,122 +1,12 @@
-// Лёгкая интеграция с Solana без тяжёлых библиотек:
-// читаем данные токена через публичный JSON-RPC и подключаем Phantom через
-// встроенный в браузер провайдер.
+// Подключение Solana-кошелька — и только оно.
 //
-// ВНИМАНИЕ: здесь ПРЕЖНЯЯ монета проекта — $DOFFA в Solana. Главная монета
-// экосистемы с 15.09.2026 — DOFF в сети TON (app/config/ecosystem.ts), и
-// награды игры платятся в ней. $DOFFA осталась в сети, у неё есть держатели, и
-// вход в личный кабинет по Solana-кошельку работает именно на ней — поэтому
-// этот модуль не удалён и не переписан. Наградой в игре $DOFFA не служит.
-//
-// $DOFFA выпущен на mainnet: эмиссия 100 000 000, mint/freeze authority
-// отозваны навсегда.
-//
-// Переменные окружения Vercel (NEXT_PUBLIC_*):
-//   NEXT_PUBLIC_REAL_MINT   = адрес mint (обязательна)
-//   NEXT_PUBLIC_REAL_RPC    = RPC mainnet (по умолчанию публичный)
-//   NEXT_PUBLIC_REAL_WALLET = кошелёк-держатель (для отображения до выпуска)
+// ЗАЧЕМ ЭТО ЗДЕСЬ, если монета проекта в TON. Вход в личный кабинет сделан по
+// подписи Solana-кошелька, и по нему уже вошли живые люди: их ник и бонусы
+// кофейни привязаны к адресу. Сломать этот вход значило бы выкинуть их
+// аккаунты. Поэтому кошелёк остаётся ключом от кабинета — но ни монеты, ни
+// балансы, ни ссылки в Solscan сайт больше не показывает.
 
-export type Cluster = "devnet" | "mainnet-beta";
-
-export type TokenInfo = {
-  cluster: Cluster;
-  rpc: string;
-  /** Адрес mint. null — токен ещё не создан. */
-  mint: string | null;
-  /** Кошелёк-держатель токена (treasury). */
-  wallet: string | null;
-  /** Полная эмиссия токена — для отображения общего выпуска на сайте. */
-  initialSupply: number;
-};
-
-/** $DOFFA на mainnet — боевой токен экосистемы (игровые награды из Reward Vault). */
-export const REAL: TokenInfo = {
-  cluster: "mainnet-beta",
-  rpc: process.env.NEXT_PUBLIC_REAL_RPC || "https://api.mainnet-beta.solana.com",
-  mint: process.env.NEXT_PUBLIC_REAL_MINT?.trim() || "57aAfCuXx7uuc8g8P9kTxR65TKQtZsFDJeKhdD5xu6uo",
-  // Phantom-кошелёк проекта — держатель основной эмиссии.
-  wallet: process.env.NEXT_PUBLIC_REAL_WALLET?.trim() || "6cAtKTM8ZPUgRgmzsgkRfZsq4jZTXymA7cLqjz9qYMFS",
-  initialSupply: 100_000_000,
-};
-
-function clusterSuffix(cluster: Cluster): string {
-  return cluster === "devnet" ? "?cluster=devnet" : "";
-}
-
-export function solscanTokenOf(token: TokenInfo): string {
-  if (!token.mint) return "https://solscan.io/";
-  return `https://solscan.io/token/${token.mint}${clusterSuffix(token.cluster)}`;
-}
-
-export function solscanHoldersOf(token: TokenInfo): string {
-  if (!token.mint) return "https://solscan.io/";
-  return `https://solscan.io/token/${token.mint}${clusterSuffix(token.cluster)}#holders`;
-}
-
-/** Ссылка на кошелёк-держатель (account) в нужной сети. */
-export function solscanWalletOf(token: TokenInfo): string {
-  if (!token.wallet) return "https://solscan.io/";
-  return `https://solscan.io/account/${token.wallet}${clusterSuffix(token.cluster)}`;
-}
-
-export function solscanToken(): string {
-  return solscanTokenOf(REAL);
-}
-
-/** По умолчанию ссылка на mainnet (REAL) — тот же токен, что жжёт бот в проде. */
-export function solscanTx(sig: string, cluster: Cluster = REAL.cluster): string {
-  return `https://solscan.io/tx/${sig}${clusterSuffix(cluster)}`;
-}
-
-/** Ссылка на держателей REAL-токена. */
-export function solscanHolders(): string {
-  return solscanHoldersOf(REAL);
-}
-
-async function rpc<T>(method: string, params: unknown[], endpoint: string = REAL.rpc): Promise<T> {
-  const res = await fetch(endpoint, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
-  });
-  const json = await res.json();
-  if (json.error) throw new Error(json.error.message ?? "RPC error");
-  return json.result as T;
-}
-
-/** Текущий объём токена в обороте (uiAmount), напрямую из блокчейна. */
-export async function fetchSupplyOf(token: TokenInfo): Promise<number> {
-  if (!token.mint) throw new Error("mint не задан");
-  const r = await rpc<{ value: { uiAmount: number | null } }>("getTokenSupply", [token.mint], token.rpc);
-  return r.value.uiAmount ?? 0;
-}
-
-/** Текущий объём REAL-токена в обороте (uiAmount). */
-export async function fetchSupply(): Promise<number> {
-  return fetchSupplyOf(REAL);
-}
-
-/** Баланс токена $DOFFA у адреса (суммарно по его токен-аккаунтам). По умолчанию REAL. */
-export async function fetchBalanceOf(owner: string, token: TokenInfo): Promise<number> {
-  if (!token.mint) return 0;
-  const r = await rpc<{ value: { account: { data: { parsed: { info: { tokenAmount: { uiAmount: number | null } } } } } }[] }>(
-    "getTokenAccountsByOwner",
-    [owner, { mint: token.mint }, { encoding: "jsonParsed" }],
-    token.rpc,
-  );
-  let total = 0;
-  for (const acc of r.value ?? []) {
-    total += acc.account.data.parsed.info.tokenAmount.uiAmount ?? 0;
-  }
-  return total;
-}
-
-export async function fetchBalance(owner: string): Promise<number> {
-  return fetchBalanceOf(owner, REAL);
-}
-
-
-/* ---------- Wallet providers ---------- */
+/* ---------- Провайдеры кошельков ---------- */
 
 type SignMessageResult = { signature: Uint8Array } | Uint8Array;
 

@@ -86,27 +86,3 @@ test("getRates: успешный ответ разбирается, эквива
     restoreFetch();
   }
 });
-
-test("getTokenPrices: SOL есть, $DOFFA нет — цена токена остаётся null", async () => {
-  const { getTokenPrices, SOL_MINT } = await import("../app/lib/external/price");
-  // Реальная ситуация проекта: пул ликвидности $DOFFA не создан, поэтому
-  // источник возвращает только SOL. Ноль подставлять нельзя.
-  stubFetch(() => ({ body: { [SOL_MINT]: { usdPrice: 152.31 } } }));
-  try {
-    const prices = await getTokenPrices();
-    assert.equal(prices.solUsd, 152.31);
-    assert.equal(prices.doffaUsd, null);
-  } finally {
-    restoreFetch();
-  }
-});
-
-test("getTokenPrices: источник недоступен — обе цены null, страница не падает", async () => {
-  const { getTokenPrices } = await import("../app/lib/external/price");
-  stubFetch(() => "throw");
-  try {
-    assert.deepEqual(await getTokenPrices(), { solUsd: null, doffaUsd: null });
-  } finally {
-    restoreFetch();
-  }
-});

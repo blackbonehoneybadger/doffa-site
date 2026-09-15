@@ -47,16 +47,6 @@ export const MERCH_FLAGS = {
   doffaPaymentsEnabled: flag(process.env.NEXT_PUBLIC_DOFFA_PAYMENTS_ENABLED),
 } as const;
 
-/** Публичные параметры оплаты в DOFFA (никаких секретов и приватных ключей). */
-export const DOFFA_PAYMENT_PUBLIC = {
-  /** Официальный mint из env или дефолт. */
-  mint: envStr(process.env.NEXT_PUBLIC_DOFFA_MINT) ?? "57aAfCuXx7uuc8g8P9kTxR65TKQtZsFDJeKhdD5xu6uo",
-  decimals: 6,
-  /** Котировка цены в DOFFA действует ограниченное время. */
-  quoteTtlMinutes: 10,
-  enabled: flag(process.env.NEXT_PUBLIC_DOFFA_PAYMENTS_ENABLED),
-} as const;
-
 /** Статусы товара продавца (публично не показываем hidden/moderation). */
 export type ProductStatus =
   | "in_stock" | "made_to_order" | "preorder" | "out_of_stock" | "hidden" | "moderation";

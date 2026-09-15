@@ -7,7 +7,6 @@ import {
   connectWalletDetailed,
   disconnectWalletById,
   signMessageById,
-  fetchBalance,
   peekPendingWallet,
   clearPendingWallet,
   type WalletId,
@@ -41,7 +40,6 @@ export default function ProfileClient() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [loyalty, setLoyalty] = useState<Loyalty | null>(null);
-  const [balance, setBalance] = useState<number | null>(null);
 
   const [walletId, setWalletId] = useState<string | null>(null);
   const [connecting, setConnecting] = useState(false);
@@ -62,7 +60,6 @@ export default function ProfileClient() {
         setUser(data.user);
         setLoyalty(data.loyalty);
         setNickname(data.user.nickname ?? "");
-        fetchBalance(data.user.wallet_address).then(setBalance).catch(() => setBalance(0));
       }
     } catch {
       // тихо — просто останемся на экране входа
@@ -146,7 +143,6 @@ export default function ProfileClient() {
           setUser(data.user);
           setLoyalty(data.loyalty);
           setNickname(data.user.nickname ?? "");
-          fetchBalance(data.user.wallet_address).then(setBalance).catch(() => setBalance(0));
           clearPendingWallet();
           return;
         }
@@ -188,7 +184,6 @@ export default function ProfileClient() {
     if (walletId) await disconnectWalletById(walletId);
     setUser(null);
     setLoyalty(null);
-    setBalance(null);
     setWalletId(null);
     setNickname("");
     clearPendingWallet();
@@ -323,13 +318,6 @@ export default function ProfileClient() {
                   {savedFlash ? t.profile.saved : t.profile.saveCta}
                 </button>
               </div>
-            </div>
-
-            <div className="mt-6 flex items-center justify-between rounded-xl border border-gold/20 bg-gold/5 px-4 py-3">
-              <span className="text-xs uppercase tracking-wider text-cream/50">{t.profile.balanceLabel}</span>
-              <span className="font-mono text-sm font-bold text-gold">
-                {balance === null ? "…" : balance.toLocaleString(t.locale)}
-              </span>
             </div>
 
             <button

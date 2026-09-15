@@ -7,10 +7,14 @@
 //
 // ВАЖНО: приватные ключи здесь не хранятся и не читаются. Только публичные данные.
 //
-// РЕШЕНИЕ ВЛАДЕЛЬЦА 15.09.2026. Главная монета экосистемы — DOFF в сети TON.
-// Главная игра — DOFFA DRAKA, живая, в Telegram. Прежняя $DOFFA на Solana
-// никуда не делась из сети и остаётся на сайте честным историческим разделом:
-// удалить её было бы неправдой, называть продуктом — тоже.
+// РЕШЕНИЕ ВЛАДЕЛЬЦА 15.09.2026. Монета экосистемы — DOFF в сети TON. Главная
+// игра — DOFFA DRAKA, живая, в Telegram.
+//
+// Прежняя $DOFFA в сети Solana с сайта убрана полностью и намеренно: владелец
+// решил ею не пользоваться. Контракт в сети остался — удалить его нельзя
+// никому, — но сайт про него больше не рассказывает и ничего от него не
+// показывает. Ни адреса, ни эмиссии, ни баланса, ни чёрной дыры. Нужна будет
+// история — она в git и в docs/, а не на странице.
 
 export type FeatureStatus = "live" | "testing" | "planned" | "paused";
 
@@ -98,47 +102,37 @@ const BASE_BEANS_PER_DOFF = amountEnv(process.env.NEXT_PUBLIC_BASE_BEANS_PER_DOF
 // ИГРА: DOFFA DRAKA
 // ─────────────────────────────────────────────────────────────────────────────
 
-const TELEGRAM_BOT = "https://t.me/doffadrakabot";
-const gameTelegram = envStr(process.env.NEXT_PUBLIC_GAME_TELEGRAM_URL) ?? TELEGRAM_BOT;
+const TELEGRAM_BOT_USERNAME = "doffadrakabot";
+const botUsername = envStr(process.env.NEXT_PUBLIC_TELEGRAM_BOT) ?? TELEGRAM_BOT_USERNAME;
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ПРЕЖНЯЯ МОНЕТА: $DOFFA в Solana
-// ─────────────────────────────────────────────────────────────────────────────
-// Она в сети, у неё есть держатели, и вход в личный кабинет по Solana-кошельку
-// работает на ней. Поэтому раздел остаётся — но как история, а не как продукт.
+/**
+ * Реферальный код владельца в формате игры: DF-000123.
+ *
+ * Пока он не задан, сайт ведёт в бота обычной ссылкой — без ссылки, которая
+ * приписывает игрока не тому. Подставлять сюда чужой или выдуманный код нельзя:
+ * приглашение привязывается к аккаунту навсегда и переиграть его нечем.
+ */
+const referralCode = envStr(process.env.NEXT_PUBLIC_GAME_REFERRAL_CODE);
 
-const LEGACY_MINT = "57aAfCuXx7uuc8g8P9kTxR65TKQtZsFDJeKhdD5xu6uo";
-const LEGACY_SUPPLY = 100_000_000;
+/**
+ * Ссылка в игру. Формат повторяет game/public/telegram.mjs слово в слово:
+ * ?start=ref_DF-000123 для приглашения и ?startapp для обычного входа. Разойтись
+ * им нельзя — бот разбирает именно эти две формы.
+ *
+ * Проверка кода здесь не украшение: ссылка с мусором вместо кода молча уводила
+ * бы игроков мимо приглашения, и заметить это можно было бы только по пустому
+ * списку приглашённых через месяц.
+ */
+export function ссылкаВИгру(username: string | null, код: string | null): string {
+  const имя = /^[A-Za-z][A-Za-z0-9_]{4,31}$/.test(username ?? "") ? username! : TELEGRAM_BOT_USERNAME;
+  const совпало = /^DF-?([0-9]{1,16})$/i.exec((код ?? "").trim());
+  return совпало
+    ? `https://t.me/${имя}?start=ref_DF-${совпало[1].padStart(6, "0")}`
+    : `https://t.me/${имя}?startapp`;
+}
 
-// Чёрная дыра $DOFFA — адрес, из которого токены не возвращаются.
-//
-// 2026-07-01 с кошелька проекта было переведено ровно 1 000 000 $DOFFA на
-// Hk6X6qb32RD8N5DgMv17wiR8aj88v1h8BShSEHJGKcLV — задумывался как фонд наград.
-// Приватный ключ к нему утерян: его искали в файлах, в истории git, во всех
-// аккаунтах Phantom и в переменных Railway — нигде. 2026-07-29 признан
-// утраченным, и этот адрес объявлен чёрной дырой проекта.
-//
-// ⚠️ ЧЕСТНАЯ ГРАНИЦА УТВЕРЖДЕНИЯ. Две вещи, которые нельзя смешивать:
-//
-// 1. Это НЕ сжигание. Сжигание (SPL burn) уменьшает supply в сети; здесь
-//    supply по-прежнему 100 000 000. Токены лежат на адресе, а не уничтожены.
-//    Поэтому сайт обязан показывать обе цифры и объяснять разницу.
-// 2. Адрес лежит НА кривой ed25519 — значит приватный ключ математически
-//    существует, просто им никто не владеет. Это отличает его от канонического
-//    инсинератора 1nc1nerator11111111111111111111111111111111, который вне
-//    кривой и ключа не имеет в принципе. Наша необратимость — утверждение о
-//    потере ключа, а не математическая гарантия, и формулировать надо так.
-//
-// Практический вывод, и он теперь исполнен: сжигание DOFF в TON — настоящее.
-// Оно уменьшает эмиссию в сети и проверяется без доверия к нам.
-const BLACK_HOLE_ADDRESS = "Hk6X6qb32RD8N5DgMv17wiR8aj88v1h8BShSEHJGKcLV";
-const BLACK_HOLE_AMOUNT = 1_000_000;
-// Подпись самой транзакции перевода 2026-07-01. Ссылка на неё — главное
-// доказательство: любой открывает и видит ровно то, что написано на сайте.
-const BLACK_HOLE_TX =
-  "v8NitwxyDKsySiSUPc9evfRLt6Yh3Jj4pC5wJpamyDZ8cU484zdCosa9A4wRkfarmxZMf5xMsqmMsKipKdL9kYA";
+const gameTelegram = envStr(process.env.NEXT_PUBLIC_GAME_TELEGRAM_URL) ?? ссылкаВИгру(botUsername, referralCode);
 
-const legacyMint = envStr(process.env.NEXT_PUBLIC_DOFFA_MINT) ?? LEGACY_MINT;
 
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -196,6 +190,10 @@ export const ECOSYSTEM = {
   },
 
   game: {
+    /** Имя бота — для текста «найди @doffadrakabot в поиске». */
+    botUsername,
+    /** Реферальный код владельца. null — ссылка ведёт в бота без приглашения. */
+    referralCode,
     /** Игра живёт в Telegram. Это и есть настоящая ссылка, а не заглушка. */
     telegramUrl: gameTelegram,
     /** Прямой веб-адрес мини-приложения. Открывать вне Telegram смысла нет. */
@@ -205,33 +203,6 @@ export const ECOSYSTEM = {
   dex: {
     /** URL стороннего DEX-пула DOFF. null — «Пул пока не запущен». */
     url: envStr(process.env.NEXT_PUBLIC_DEX_URL),
-  },
-
-  /**
-   * Прежняя монета проекта: $DOFFA в Solana. Осталась в сети и на сайте как
-   * история. Продуктом больше не называется, наградой в игре не служит.
-   */
-  legacy: {
-    symbol: "$DOFFA",
-    network: "Solana",
-    mint: legacyMint,
-    totalSupply: LEGACY_SUPPLY,
-    solscanUrl:
-      envStr(process.env.NEXT_PUBLIC_SOLSCAN_TOKEN_URL) ?? `https://solscan.io/token/${legacyMint}`,
-    effectiveSupply:
-      LEGACY_SUPPLY - amountEnv(process.env.NEXT_PUBLIC_BLACK_HOLE_AMOUNT, BLACK_HOLE_AMOUNT),
-    /**
-     * Чёрная дыра: адрес, с которого токены не возвращаются.
-     * ВАЖНО: это не сжигание (supply в сети не меняется) и не математическая
-     * невозвратность (адрес на кривой, ключ существует, но утерян). Границы
-     * утверждения — в комментарии к BLACK_HOLE_ADDRESS выше.
-     */
-    blackHole: {
-      address: envStr(process.env.NEXT_PUBLIC_BLACK_HOLE_ADDRESS) ?? BLACK_HOLE_ADDRESS,
-      amount: amountEnv(process.env.NEXT_PUBLIC_BLACK_HOLE_AMOUNT, BLACK_HOLE_AMOUNT),
-      txSignature: envStr(process.env.NEXT_PUBLIC_BLACK_HOLE_TX) ?? BLACK_HOLE_TX,
-      keyExistsButLost: true,
-    },
   },
 
   /**
