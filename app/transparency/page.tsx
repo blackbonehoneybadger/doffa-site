@@ -10,7 +10,7 @@ import {
 } from "../lib/ton/chain";
 
 export const metadata: Metadata = {
-  title: "Прозрачность — фонд наград и сжигание · DOFFA Games",
+  title: "Прозрачность — фонд наград и сжигание · DOFFA DRAKA",
   description:
     "Как устроена экономика DOFF: фонд наград, дневной пул, сжигание и призовой фонд. Только реальные данные из сети TON и честные статусы — без придуманных адресов и цифр.",
   alternates: { canonical: "/transparency" },
@@ -366,6 +366,7 @@ export default async function TransparencyPage() {
         <div className="mt-6 divide-y divide-white/10 overflow-hidden rounded-2xl border border-white/10">
           {[
             { label: `Игра ${ECOSYSTEM.primaryGameName} в Telegram`, status: ECOSYSTEM.status.game },
+            { label: "Приложение на телефон", status: ECOSYSTEM.status.mobileApp },
             { label: `Токен ${токен.symbol} выпущен в ${токен.network}`, status: ECOSYSTEM.status.token },
             { label: "Фонд наград (публичный адрес)", status: vaultStatus },
             { label: `Обмен зёрен на ${токен.symbol}`, status: ECOSYSTEM.status.exchange },

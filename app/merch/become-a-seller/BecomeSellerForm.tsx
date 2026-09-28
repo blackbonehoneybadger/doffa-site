@@ -133,7 +133,7 @@ export default function BecomeSellerForm() {
         </label>
         <label className="flex items-start gap-3 text-xs leading-relaxed text-cream/60">
           <input type="checkbox" checked={v.wantsDoffa} onChange={(e) => set("wantsDoffa", e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-gold" />
-          <span>Хочу принимать оплату в DOFFA (дополнительно, где доступно).</span>
+          <span>Хочу принимать оплату в DOFF (сеть TON), когда она откроется.</span>
         </label>
         <label className="flex items-start gap-3 text-xs leading-relaxed text-cream/60">
           <input type="checkbox" checked={v.agreeRules} onChange={(e) => set("agreeRules", e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-gold" required />

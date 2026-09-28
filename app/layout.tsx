@@ -15,30 +15,31 @@ const sans = Manrope({
   display: "swap",
 });
 
-// Описание в поиске и в превью ссылки — это первое, что видит человек, и
-// единственное, что он видит, если по ссылке не перейдёт. Поэтому здесь ровно
-// то, что есть на самом деле: работающая игра в Telegram и выпущенная монета
-// в TON. Обещаний про обмен и вывод тут нет — они ещё не включены.
+// Описание в поиске и в превью ссылки — первое, что видит человек, и
+// единственное, что он видит, если по ссылке не перейдёт. С 28.09.2026 сайт
+// строится вокруг игры: DOFFA DRAKA — главная и единственная игра проекта.
+// Здесь ровно то, что есть на самом деле: работающая игра в Telegram и
+// выпущенная монета в TON. Обещаний про обмен и вывод нет — они ещё не включены.
 const ОПИСАНИЕ =
-  "COFFEE DOFFA — кофейня из Карачаево-Черкесии со своей игровой экономикой: боковой файтинг DOFFA DRAKA прямо в Telegram, одиннадцать бойцов и десять арен, зёрна за игру и монета DOFF в сети TON. Честный, прозрачный, халяльный по духу проект.";
+  "DOFFA DRAKA — боковой файтинг прямо в Telegram: одиннадцать бойцов, пятнадцать арен, турниры и бои с живыми соперниками. Зёрна за игру, монета DOFF в сети TON. Игра выросла из горной кофейни DOFFA в Карачаево-Черкесии.";
 const КОРОТКО =
-  "Дерись в DOFFA DRAKA прямо в Telegram, копи зёрна и получай DOFF в сети TON. Since 2021.";
+  "Дерись в DOFFA DRAKA прямо в Telegram: 11 бойцов, 15 арен, турниры. Зёрна за игру, DOFF в сети TON.";
 
 export const metadata: Metadata = {
-  title: "DOFFA — Espresso Bar × DOFFA DRAKA · TON",
+  title: "DOFFA DRAKA — файтинг в Telegram · DOFF в TON",
   description: ОПИСАНИЕ,
   metadataBase: new URL("https://doffa.coffee"),
   openGraph: {
-    title: "DOFFA — Espresso Bar × DOFFA DRAKA",
+    title: "DOFFA DRAKA — файтинг в Telegram",
     description: КОРОТКО,
     type: "website",
     locale: "ru_RU",
     siteName: "DOFFA",
-    images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "DOFFA Espresso Bar × DOFFA DRAKA" }],
+    images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "DOFFA DRAKA — файтинг в Telegram" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "DOFFA — Espresso Bar × DOFFA DRAKA",
+    title: "DOFFA DRAKA — файтинг в Telegram",
     description: КОРОТКО,
     images: ["/og.jpg"],
   },

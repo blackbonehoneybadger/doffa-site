@@ -85,13 +85,13 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             <span className="display text-3xl font-extrabold text-cream-soft">{formatPrice(p.price_cents, p.currency)}</span>
             {p.accepts_doffa && (
               <span className="rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-xs font-semibold text-gold">
-                Можно оплатить в DOFFA
+                Оплата в DOFF — скоро
               </span>
             )}
           </div>
           {p.accepts_doffa && (
             <p className="mt-2 text-[11px] leading-relaxed text-cream/45">
-              Цена в DOFFA рассчитывается по актуальной котировке с ограниченным временем действия при оформлении.
+              Продавец принимает DOFF (сеть TON). Оплата откроется, когда у монеты появится рыночная котировка: цена будет считаться по ней с ограниченным временем действия.
             </p>
           )}
 

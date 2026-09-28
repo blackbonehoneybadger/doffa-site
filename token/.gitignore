@@ -1,6 +1,0 @@
-node_modules/
-# СЕКРЕТЫ — никогда не коммитим:
-.env
-owner.json
-*.keypair.json
-.doffa-mint.json
