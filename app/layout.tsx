@@ -15,24 +15,32 @@ const sans = Manrope({
   display: "swap",
 });
 
+// Описание в поиске и в превью ссылки — первое, что видит человек, и
+// единственное, что он видит, если по ссылке не перейдёт. С 28.09.2026 сайт
+// строится вокруг игры: DOFFA DRAKA — главная и единственная игра проекта.
+// Здесь ровно то, что есть на самом деле: работающая игра в Telegram и
+// выпущенная монета в TON. Обещаний про обмен и вывод нет — они ещё не включены.
+const ОПИСАНИЕ =
+  "DOFFA DRAKA — боковой файтинг прямо в Telegram: одиннадцать бойцов, пятнадцать арен, турниры и бои с живыми соперниками. Зёрна за игру, монета DOFF в сети TON. Игра выросла из горной кофейни DOFFA в Карачаево-Черкесии.";
+const КОРОТКО =
+  "Дерись в DOFFA DRAKA прямо в Telegram: 11 бойцов, 15 арен, турниры. Зёрна за игру, DOFF в сети TON.";
+
 export const metadata: Metadata = {
-  title: "DOFFA — Espresso Bar × DOFFA Games · Solana",
-  description:
-    "COFFEE DOFFA — кофейня из Карачаево-Черкесии со своей игровой экономикой DOFFA Games: тапай и копи зёрна, проходи главы в DOFFA Heroes и забирай подтверждённые награды $DOFFA на Solana. Честный, прозрачный, халяльный проект.",
+  title: "DOFFA DRAKA — файтинг в Telegram · DOFF в TON",
+  description: ОПИСАНИЕ,
   metadataBase: new URL("https://doffa.coffee"),
   openGraph: {
-    title: "DOFFA — Espresso Bar × DOFFA Games",
-    description:
-      "Собирай зёрна, входи в DOFFA Heroes и забирай награды $DOFFA на Solana. Since 2021.",
+    title: "DOFFA DRAKA — файтинг в Telegram",
+    description: КОРОТКО,
     type: "website",
     locale: "ru_RU",
     siteName: "DOFFA",
-    images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "DOFFA Espresso Bar × DOFFA Games" }],
+    images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "DOFFA DRAKA — файтинг в Telegram" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "DOFFA — Espresso Bar × DOFFA Games",
-    description: "Собирай зёрна, входи в DOFFA Heroes и забирай награды $DOFFA на Solana. Since 2021.",
+    title: "DOFFA DRAKA — файтинг в Telegram",
+    description: КОРОТКО,
     images: ["/og.jpg"],
   },
 };

@@ -35,6 +35,7 @@ type Stats = {
   visits: number | null;
   circulating: number | null;
   burned: number | null;
+  vault: number | null;
   initialSupply: number;
 };
 
@@ -66,8 +67,9 @@ function StatsPanel() {
   const placeholder = failed ? "—" : "…";
   const cards = [
     { label: "Посетителей", value: stats ? fmt(stats.visits) : placeholder, sub: "всего заходов на сайт" },
-    { label: "В обороте", value: stats ? fmt(stats.circulating) : placeholder, sub: "$DOFFA на mainnet" },
-    { label: "Сожжено", value: stats ? fmt(stats.burned) : placeholder, sub: "$DOFFA (выпуск − оборот)" },
+    { label: "В обороте", value: stats ? fmt(stats.circulating) : placeholder, sub: "DOFF в сети TON" },
+    { label: "Сожжено", value: stats ? fmt(stats.burned) : placeholder, sub: "DOFF (выпуск − оборот)" },
+    { label: "Фонд наград", value: stats ? fmt(stats.vault) : placeholder, sub: "DOFF на кошельке фонда" },
   ];
 
   return (

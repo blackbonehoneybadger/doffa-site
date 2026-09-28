@@ -2,30 +2,24 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { dict, LANGS, TOKEN, CONTACT, GALLERY, VIDEOS, type Lang } from "./content";
 import { ECOSYSTEM } from "./config/ecosystem";
-import { REAL, solscanToken, solscanTokenOf, solscanHolders, fetchBalance, connectWalletById, disconnectWalletById } from "./solana";
 import { SmoothScroll, CursorGlow, MouseParallax, TiltCard, Magnetic, ScrollProgressBar } from "./cinematic";
 import { ThemeToggle } from "./theme-toggle";
 import { Assistant } from "./assistant";
+import { WeatherChip } from "./WeatherChip";
 
-// three.js + gsap — тяжёлые библиотеки, грузим отдельным чанком только в
-// браузере и только когда компонент реально понадобится (см. hero3d.tsx).
-const Hero3D = dynamic(() => import("./hero3d").then((m) => m.Hero3D), { ssr: false });
+// Фон первого экрана — живой ролик арены «Медная обжарочная» из самой игры.
+// Владелец может подменить его через /admin (api/hero-video), как и раньше.
+const DEFAULT_HERO_VIDEO = "/brand/game/arena-roastery.webm";
 
-// Погода в ауле: сама решает, показываться ли (нет данных — не рисуется).
-const WeatherChip = dynamic(() => import("./WeatherChip").then((m) => m.WeatherChip), { ssr: false });
-
-// Дефолтный ролик в hero, пока владелец кофейни не загрузил свои через /admin.
-const DEFAULT_HERO_VIDEO = "/brand/doffa-clip.mp4";
-
-// Reward Vault — назначенный запас $DOFFA на игровые награды. Берётся из
-// централизованной конфигурации, а не из отдельной константы: прежний фонд
-// утерян, и хардкод «1 000 000» здесь показывал бы несуществующий запас.
-// 0 означает «фонд не назначен» — тогда вместо цифр ставим прочерк.
+// Фонд наград — рабочий запас DOFF на игровые награды. Берётся из
+// централизованной конфигурации, а не из отдельной константы. 0 означает
+// «рабочий остаток здесь не назван» — тогда вместо цифры ставим прочерк, а
+// настоящий остаток читается из сети на странице прозрачности. Хардкод суммы
+// показывал бы запас, которого может не быть на кошельке.
 const REWARD_VAULT = ECOSYSTEM.rewardVault.initial;
 
 /** Доля фонда в эмиссии. «—», пока фонд не назначен. */
@@ -34,10 +28,19 @@ function vaultSharePct(loc: string): string {
   const pct = (REWARD_VAULT / ECOSYSTEM.token.totalSupply) * 100;
   return `${pct.toLocaleString(loc, { maximumFractionDigits: 2 })}%`;
 }
-// Публичная игра — DOFFA Heroes. Ссылка на веб-версию берётся из
-// централизованной конфигурации (env NEXT_PUBLIC_GAME_WEB_URL). Пока не задана —
-// не показываем фальшивую ссылку, кнопка ведёт на /game со статусом.
-const GAME_URL = ECOSYSTEM.game.webUrl;
+// Публичная игра — DOFFA DRAKA. Она живёт в Telegram, и ссылка на неё есть
+// всегда: заглушки «игра готовится» здесь больше нет, потому что игра работает.
+const GAME_URL = ECOSYSTEM.game.telegramUrl;
+
+// Шесть бойцов на первой вкладке; весь состав — на странице «Игра».
+const SPOT_FIGHTERS = [
+  { key: "badger", name: "HONEY BADGER" },
+  { key: "boy", name: "BOY" },
+  { key: "kroo", name: "MR. KROO" },
+  { key: "zama", name: "ZAMA" },
+  { key: "selya", name: "SELYA" },
+  { key: "erik", name: "ERIK" },
+];
 
 // Локализованная подпись для вкладки «Прозрачность» (fallback — английский).
 const TRANSPARENCY_LABEL: Partial<Record<Lang, string>> = {
@@ -169,36 +172,6 @@ export default function Home() {
   }, [lang, t.dir]);
 
 
-  // Кошелёк — Phantom, Solflare, Trust Wallet, Backpack (+ Ledger через Phantom/Solflare).
-  const [wallet, setWallet] = useState<string | null>(null);
-  const [walletBal, setWalletBal] = useState<number | null>(null);
-  const [walletId, setWalletId] = useState<string | null>(null);
-  const [walletModal, setWalletModal] = useState(false);
-
-  const WALLET_OPTS = [
-    { id: "phantom",  name: "Phantom",      note: "Ledger ✓" },
-    { id: "solflare", name: "Solflare",     note: "Ledger ✓" },
-    { id: "trust",    name: "Trust Wallet", note: null },
-    { id: "backpack", name: "Backpack",     note: null },
-  ] as const;
-
-  const connectWallet = async (id: string) => {
-    setWalletModal(false);
-    const addr = await connectWalletById(id);
-    if (!addr) return;
-    setWallet(addr);
-    setWalletId(id);
-    setWalletBal(null);
-    fetchBalance(addr).then(setWalletBal).catch(() => setWalletBal(0));
-  };
-
-  const disconnectWallet = async () => {
-    if (walletId) await disconnectWalletById(walletId);
-    setWallet(null);
-    setWalletBal(null);
-    setWalletId(null);
-    setWalletModal(false);
-  };
 
   const tabs: { id: typeof activeTab; label: string }[] = [
     { id: "story",     label: t.tabs.story },
@@ -225,6 +198,13 @@ export default function Home() {
             </span>
           </a>
           <nav className="hidden flex-1 items-center justify-center gap-3 whitespace-nowrap px-4 xl:gap-4 lg:flex">
+            {/* «Игра» — первая: DOFFA DRAKA главная и единственная игра проекта. */}
+            <Link
+              href="/game"
+              className="rounded-full border border-gold/40 bg-gold/10 px-3 py-1 text-xs font-semibold text-gold transition hover:bg-gold/20 xl:text-sm"
+            >
+              ⚔️ {t.tabs.game}
+            </Link>
             {tabs.map((t) =>
               t.id === "merch" ? (
                 <Link key={t.id} href="/merch" className="text-xs text-cream/70 transition hover:text-gold xl:text-sm">
@@ -246,12 +226,6 @@ export default function Home() {
               {TRANSPARENCY_LABEL[lang] ?? "Transparency"}
             </Link>
             <Link
-              href="/download"
-              className="rounded-full border border-gold/40 bg-gold/10 px-3 py-1 text-xs font-semibold text-gold transition hover:bg-gold/20 xl:text-sm"
-            >
-              {t.tabs.download}
-            </Link>
-            <Link
               href="/profile"
               className="text-xs text-cream/70 transition hover:text-gold xl:text-sm"
             >
@@ -259,66 +233,16 @@ export default function Home() {
             </Link>
           </nav>
           <div className="flex shrink-0 items-center gap-3 sm:gap-2">
-            {/* Wallet connect button */}
-            <div className="relative hidden sm:block">
-              {wallet ? (
-                <>
-                  <button
-                    onClick={() => setWalletModal((v) => !v)}
-                    className="flex items-center gap-1.5 rounded-full border border-teal/40 bg-teal/10 px-3 py-1.5 text-xs font-semibold text-teal transition hover:border-teal/60"
-                  >
-                    <span className="h-1.5 w-1.5 rounded-full bg-teal" />
-                    {wallet.slice(0, 4)}…{wallet.slice(-4)}
-                  </button>
-                  {walletModal && (
-                    <>
-                      <div className="fixed inset-0 z-40" onClick={() => setWalletModal(false)} />
-                      <div className="absolute right-0 top-10 z-50 w-52 rounded-xl border border-white/10 bg-ink/95 p-3 shadow-xl backdrop-blur-md">
-                        <p className="mb-1 text-[10px] uppercase tracking-wider text-cream/40">{WALLET_OPTS.find((w) => w.id === walletId)?.name}</p>
-                        <p className="mb-3 font-mono text-[11px] text-cream/50 break-all">{wallet.slice(0, 8)}…{wallet.slice(-8)}</p>
-                        {walletBal !== null && (
-                          <p className="mb-3 text-xs font-semibold text-gold">{walletBal.toLocaleString(loc)} $DOFFA</p>
-                        )}
-                        <button onClick={disconnectWallet} className="w-full rounded-lg bg-white/5 px-3 py-2 text-xs text-cream/70 hover:bg-white/10">
-                          {t.buy.disconnect}
-                        </button>
-                      </div>
-                    </>
-                  )}
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={() => setWalletModal((v) => !v)}
-                    className="flex items-center gap-1.5 rounded-full border border-gold/40 bg-gold/10 px-3 py-1.5 text-xs font-semibold text-gold transition hover:border-gold/60"
-                  >
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-80"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
-                    {t.buy.connect}
-                  </button>
-                  {walletModal && (
-                    <>
-                      <div className="fixed inset-0 z-40" onClick={() => setWalletModal(false)} />
-                      <div className="absolute right-0 top-10 z-50 w-52 rounded-xl border border-white/10 bg-ink/95 p-3 shadow-xl backdrop-blur-md">
-                        <p className="mb-2 text-[10px] uppercase tracking-wider text-cream/40">Выбери кошелёк</p>
-                        <div className="flex flex-col gap-1">
-                          {WALLET_OPTS.map((w) => (
-                            <button
-                              key={w.id}
-                              onClick={() => connectWallet(w.id)}
-                              className="flex items-center justify-between rounded-lg bg-white/5 px-3 py-2 text-left text-sm text-cream transition hover:bg-white/10"
-                            >
-                              <span>{w.name}</span>
-                              {w.note && <span className="text-[10px] text-teal">{w.note}</span>}
-                            </button>
-                          ))}
-                        </div>
-                        <p className="mt-2 text-[10px] text-cream/30">Аппаратный кошелёк (Ledger) работает через Phantom или Solflare</p>
-                      </div>
-                    </>
-                  )}
-                </>
-              )}
-            </div>
+            {/* Кнопка в игру. Раньше здесь подключался кошелёк — но покупать
+                на сайте нечего, а играть есть где. */}
+            <a
+              href={ECOSYSTEM.game.telegramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden items-center gap-1.5 rounded-full border border-gold/40 bg-gold/10 px-3 py-1.5 text-xs font-semibold text-gold transition hover:border-gold/60 sm:flex"
+            >
+              ⚔️ {ECOSYSTEM.primaryGameName}
+            </a>
             <label className="relative flex items-center">
               <span className="sr-only">Language</span>
               <svg className="pointer-events-none absolute left-2.5 h-3.5 w-3.5 text-cream/50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -365,6 +289,13 @@ export default function Home() {
         {menuOpen && (
           <nav className="border-t border-white/10 bg-ink/95 backdrop-blur-md lg:hidden">
             <div className="mx-auto grid max-w-6xl grid-cols-2 gap-x-4 gap-y-1 px-5 py-4">
+              <Link
+                href="/game"
+                onClick={() => setMenuOpen(false)}
+                className="col-span-2 block rounded-lg bg-gold/10 px-3 py-2.5 text-left text-sm font-semibold text-gold hover:bg-gold/20"
+              >
+                ⚔️ {t.tabs.game}
+              </Link>
               {tabs.map((t) =>
                 t.id === "merch" ? (
                   <Link
@@ -400,13 +331,6 @@ export default function Home() {
                 {TRANSPARENCY_LABEL[lang] ?? "Transparency"}
               </Link>
               <Link
-                href="/download"
-                onClick={() => setMenuOpen(false)}
-                className="block rounded-lg px-3 py-2 text-left text-sm font-semibold text-gold hover:bg-gold/10"
-              >
-                {t.tabs.download} ↓
-              </Link>
-              <Link
                 href="/profile"
                 onClick={() => setMenuOpen(false)}
                 className="block rounded-lg px-3 py-2 text-left text-sm text-cream/75 hover:bg-white/5 hover:text-gold"
@@ -427,7 +351,7 @@ export default function Home() {
           muted
           loop
           playsInline
-          poster="/brand/cafe-night-2.jpeg"
+          poster="/brand/game/fight-roastery.jpg"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1.4, ease: "easeOut" }}
@@ -447,16 +371,6 @@ export default function Home() {
         <MouseParallax strength={-10} className="pointer-events-none absolute -right-32 bottom-0 h-80 w-80">
           <div className="glow-pulse h-80 w-80 rounded-full bg-teal/15 blur-[110px]" style={{ animationDelay: "2s" }} />
         </MouseParallax>
-        {/* Бутылка сильно крупнее: канвас квадратный, сама бутылка занимает
-            центральную треть его ширины — поэтому отрицательный right уводит за
-            край только пустое поле канваса, а не саму бутылку. Текст hero идёт
-            дальше по DOM и остаётся поверх. */}
-        <Hero3D className="absolute right-0 top-2 h-[64vw] w-[64vw] sm:-right-6 sm:top-20 sm:h-[28rem] sm:w-[28rem] lg:-right-8 lg:top-16 lg:h-[40rem] lg:w-[40rem]" />
-        {/* эффект пара */}
-        <div className="steam" />
-        <div className="steam s2" />
-        <div className="steam s3" />
-        <div className="steam s4" />
 
         <MouseParallax strength={10} className="relative mx-auto w-full max-w-6xl px-5 pb-20 pt-28">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
@@ -464,31 +378,28 @@ export default function Home() {
               <span aria-hidden className="h-px w-9 bg-gradient-to-r from-transparent to-amber" />
               {t.hero.kicker}
             </p>
-            <h1 className="display max-w-4xl text-6xl font-extrabold leading-[0.96] tracking-tight text-cream-soft sm:text-8xl">
+            <h1 className="display max-w-4xl break-words text-[2.5rem] font-extrabold leading-[1] tracking-tight text-cream-soft min-[420px]:text-5xl sm:text-7xl lg:text-8xl">
               {t.hero.title1}
               <br />
               <span className="bg-gradient-to-r from-gold via-amber to-copper bg-clip-text text-transparent text-glow">{t.hero.title2}</span>
             </h1>
             <p className="mt-8 max-w-xl text-lg leading-relaxed text-cream/80">{t.hero.sub}</p>
             <div className="mt-6 flex flex-wrap items-center gap-3 text-sm text-cream/75">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1.5">
-                📍 {t.ui.location}
-              </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1.5">
-                🕖 07:00–22:00
-              </span>
-              {/* Появляется, только когда заданы координаты кофейни и Open-Meteo ответил. */}
-              <WeatherChip />
+              {t.hero.chips.map((c) => (
+                <span key={c} className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1.5">
+                  {c}
+                </span>
+              ))}
             </div>
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Magnetic>
-                <button onClick={() => setActiveTab("token")} className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold to-copper px-7 py-3 font-bold text-ink shadow-lg shadow-gold/10 transition hover:brightness-110">
-                  {t.hero.ctaBuy}
-                </button>
+                <a href={GAME_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold to-copper px-7 py-3 font-bold text-ink shadow-lg shadow-gold/10 transition hover:brightness-110">
+                  ⚔️ {t.hero.ctaPlay}
+                </a>
               </Magnetic>
               <Magnetic>
-                <Link href="/merch" className="rounded-full border border-cream/30 px-7 py-3 font-semibold text-cream transition hover:border-gold hover:text-gold">
-                  {t.hero.ctaMenu}
+                <Link href="/game" className="rounded-full border border-cream/30 px-7 py-3 font-semibold text-cream transition hover:border-gold hover:text-gold">
+                  {t.hero.ctaGame}
                 </Link>
               </Magnetic>
             </div>
@@ -512,12 +423,12 @@ export default function Home() {
         <div className="marquee-track">
           {[0, 1].map((i) => (
             <span key={i} className="display inline-flex shrink-0 items-center gap-10 px-10 text-sm uppercase tracking-[0.3em] text-cream/40">
-              <span>Tap · Run · Claim</span><span className="text-teal">·</span>
+              <span>DOFFA DRAKA</span><span className="text-teal">·</span>
+              <span>Tap · Fight · Claim</span><span className="text-teal">·</span>
+              <span>11 fighters</span><span className="text-teal">·</span>
+              <span>15 arenas</span><span className="text-teal">·</span>
+              <span>DOFF · TON Jetton</span><span className="text-teal">·</span>
               <span>Since 2021</span><span className="text-teal">·</span>
-              <span>Solana SPL</span><span className="text-teal">·</span>
-              <span>DOFFA Heroes</span><span className="text-teal">·</span>
-              <span>Halal spirit</span><span className="text-teal">·</span>
-              <span>DOFFA Games</span><span className="text-teal">·</span>
             </span>
           ))}
         </div>
@@ -529,32 +440,41 @@ export default function Home() {
           {/* TAB: STORY */}
           {activeTab === "story" && (
             <motion.div key="story" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}>
-              {/* VIDEOS */}
-              <Section id="videos">
+              {/* ИГРА: бойцы и кнопка на страницу «Игра» */}
+              <Section id="game">
                 <Reveal>
                   <div className="text-center">
-                    <Tag>{t.videos.tag}</Tag>
-                    <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.videos.title}</h2>
-                    <p className="mx-auto mt-4 max-w-2xl text-cream/70">{t.videos.sub}</p>
+                    <Tag>{t.spot.tag}</Tag>
+                    <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.spot.title}</h2>
+                    <p className="mx-auto mt-4 max-w-2xl text-cream/70">{t.spot.sub}</p>
                   </div>
                 </Reveal>
-                <div className="mx-auto mt-10 grid max-w-3xl grid-cols-2 gap-4 sm:gap-6">
-                  {VIDEOS.map((v, i) => (
-                    <Reveal key={v.src} delay={i * 0.1}>
-                      <div className="group relative aspect-[9/16] overflow-hidden rounded-3xl ring-1 ring-gold/20">
-                        <video
-                          src={v.src}
-                          autoPlay
-                          muted
-                          loop
-                          playsInline
-                          aria-label={v.alt}
-                          className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-ink/50 to-transparent" />
-                      </div>
+                <div className="mt-10 grid grid-cols-3 gap-3 sm:grid-cols-6 sm:gap-4">
+                  {SPOT_FIGHTERS.map((f, i) => (
+                    <Reveal key={f.key} delay={i * 0.06}>
+                      <Link href="/game" className="group block overflow-hidden rounded-2xl ring-1 ring-gold/20 transition hover:ring-gold/60">
+                        <Image src={`/brand/game/fighter-${f.key}.jpg`} alt={f.name} width={560} height={747} className="aspect-[3/4] w-full object-cover transition duration-500 group-hover:scale-105" />
+                        <span className="display block bg-ink/70 px-2 py-2 text-center text-[11px] font-bold tracking-wide text-cream-soft sm:text-xs">{f.name}</span>
+                      </Link>
                     </Reveal>
                   ))}
+                </div>
+                <Reveal>
+                  <div className="mt-8 overflow-hidden rounded-3xl ring-1 ring-gold/20">
+                    <Image src="/brand/game/fight-blade.jpg" alt="DOFFA DRAKA: HONEY BADGER и BOY на арене «Медная обжарочная»" width={1200} height={675} className="w-full" />
+                  </div>
+                </Reveal>
+                <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+                  <Magnetic>
+                    <a href={GAME_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold to-copper px-7 py-3 font-bold text-ink shadow-lg shadow-gold/10 transition hover:brightness-110">
+                      ⚔️ {t.hero.ctaPlay}
+                    </a>
+                  </Magnetic>
+                  <Magnetic>
+                    <Link href="/game" className="rounded-full border border-cream/30 px-7 py-3 font-semibold text-cream transition hover:border-gold hover:text-gold">
+                      {t.spot.cta}
+                    </Link>
+                  </Magnetic>
                 </div>
               </Section>
 
@@ -579,7 +499,7 @@ export default function Home() {
                 </div>
               </Section>
 
-              {/* FLOW: Tap → Зёрна → Game → $DOFFA */}
+              {/* FLOW: тап → зёрна → драка → DOFF */}
               <Section id="flow">
                 <Reveal>
                   <div className="text-center">
@@ -672,7 +592,7 @@ export default function Home() {
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <span className="text-sm font-bold text-cream-soft">{t.flow.vaultTag} · mainnet</span>
                       <span className="inline-flex items-center gap-1.5 rounded-full border border-gold/40 bg-gradient-to-r from-gold/20 to-copper/20 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-gold">
-                        $DOFFA · SOLANA
+                        {ECOSYSTEM.token.symbol} · {ECOSYSTEM.token.network.toUpperCase()}
                       </span>
                     </div>
                     <div className="mt-6 grid gap-5 sm:grid-cols-3">
@@ -685,13 +605,13 @@ export default function Home() {
                         unit={REWARD_VAULT > 0 ? TOKEN.symbol : undefined}
                         accent
                       />
-                      <Stat label={t.flow.vaultSupplyLabel} value={REAL.initialSupply.toLocaleString(loc)} unit={TOKEN.symbol} />
+                      <Stat label={t.flow.vaultSupplyLabel} value={ECOSYSTEM.token.totalSupply.toLocaleString(loc)} unit={TOKEN.symbol} />
                       <Stat label={t.flow.vaultShareLabel} value={vaultSharePct(loc)} />
                     </div>
                     <p className="mt-6 text-center text-xs leading-relaxed text-cream/50">{t.flow.vaultNote}</p>
                     <div className="mt-3 text-center">
                       <a
-                        href={solscanTokenOf(REAL)}
+                        href={ECOSYSTEM.token.explorerUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1.5 text-xs font-semibold text-gold transition hover:text-amber"
@@ -753,8 +673,8 @@ export default function Home() {
                   <Reveal>
                     <VerifyCard
                       label={t.verify.mintLabel}
-                      value={REAL.mint ?? ""}
-                      href={solscanToken()}
+                      value={ECOSYSTEM.token.master}
+                      href={ECOSYSTEM.token.explorerUrl}
                       cta={t.verify.viewToken}
                       copiedLabel={t.ui.copied}
                       copyLabel={t.ui.copy}
@@ -764,7 +684,7 @@ export default function Home() {
                     <VerifyCard
                       label={t.verify.reserveLabel}
                       value={t.verify.reserveNote}
-                      href={solscanHolders()}
+                      href={ECOSYSTEM.rewardVault.explorerUrl}
                       cta={t.verify.viewHolders}
                       mono={false}
                       copiedLabel={t.ui.copied}
@@ -786,6 +706,35 @@ export default function Home() {
           {/* TAB: CAFE */}
           {activeTab === "cafe" && (
             <motion.div key="cafe" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}>
+              {/* VIDEOS */}
+              <Section id="videos">
+                <Reveal>
+                  <div className="text-center">
+                    <Tag>{t.videos.tag}</Tag>
+                    <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.videos.title}</h2>
+                    <p className="mx-auto mt-4 max-w-2xl text-cream/70">{t.videos.sub}</p>
+                  </div>
+                </Reveal>
+                <div className="mx-auto mt-10 grid max-w-3xl grid-cols-2 gap-4 sm:gap-6">
+                  {VIDEOS.map((v, i) => (
+                    <Reveal key={v.src} delay={i * 0.1}>
+                      <div className="group relative aspect-[9/16] overflow-hidden rounded-3xl ring-1 ring-gold/20">
+                        <video
+                          src={v.src}
+                          autoPlay
+                          muted
+                          loop
+                          playsInline
+                          aria-label={v.alt}
+                          className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-ink/50 to-transparent" />
+                      </div>
+                    </Reveal>
+                  ))}
+                </div>
+              </Section>
+
               {/* MENU */}
               <Section id="menu">
                 <Reveal>
@@ -960,34 +909,18 @@ export default function Home() {
                     <Tag>{t.buy.tag}</Tag>
                     <h2 className="display mt-5 text-4xl font-bold text-cream-soft sm:text-5xl">{t.buy.title}</h2>
                     <p className="mt-4 text-cream/70">{t.buy.sub}</p>
+                    {/* Единственный способ получить DOFF — играть, поэтому
+                        здесь одна кнопка, ведущая в игру, а не подключение
+                        кошелька: покупать на сайте нечего. */}
                     <div className="mt-7">
-                      {wallet ? (
-                        <div className="space-y-3">
-                          <div className="flex flex-wrap items-center gap-3">
-                            <span className="inline-flex items-center gap-2 rounded-full border border-teal/40 bg-teal/10 px-4 py-2 text-sm font-semibold text-teal">
-                              <span className="h-2 w-2 rounded-full bg-teal" />
-                              {t.buy.connected}: {wallet.slice(0, 4)}…{wallet.slice(-4)}
-                            </span>
-                            <button onClick={disconnectWallet} className="text-xs text-cream/50 underline transition hover:text-cream">
-                              {t.buy.disconnect}
-                            </button>
-                          </div>
-                          <div className="rounded-xl border border-white/10 bg-white/[0.02] px-5 py-4">
-                            <div className="text-xs uppercase tracking-wider text-cream/50">{t.buy.balanceLabel}</div>
-                            <div className="display mt-1 text-2xl font-extrabold text-cream-soft">
-                              {walletBal === null ? "…" : walletBal.toLocaleString(loc)}{" "}
-                              <span className="text-gold">{TOKEN.symbol}</span>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => setWalletModal(true)}
-                          className="inline-flex items-center gap-2 rounded-full bg-gold px-7 py-3 font-bold text-ink transition hover:brightness-110"
-                        >
-                          {t.buy.connect}
-                        </button>
-                      )}
+                      <a
+                        href={ECOSYSTEM.game.telegramUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold to-copper px-7 py-3 font-bold text-ink shadow-lg shadow-gold/10 transition hover:brightness-110"
+                      >
+                        ⚔️ {t.flow.playCta} ↗
+                      </a>
                       <p className="mt-3 max-w-md text-xs text-cream/50">{t.buy.walletNote}</p>
                     </div>
                   </Reveal>
@@ -1041,6 +974,10 @@ export default function Home() {
                         <InfoRow k={t.contact.phone} v={t.contact.phoneVal} href={`tel:${CONTACT.phoneTel}`} />
                         <InfoRow k={t.contact.hours} v={t.contact.hoursVal} />
                         <InfoRow k={t.contact.ig} v={TOKEN.instagramHandle} href={TOKEN.instagram} />
+                        {/* Погода в ауле: сама решает, показываться ли (нет данных — не рисуется). */}
+                        <div className="text-sm text-cream/75">
+                          <WeatherChip />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1056,7 +993,13 @@ export default function Home() {
         <div className="mx-auto max-w-6xl">
           <div className="flex flex-col items-center gap-3 text-center">
             <span className="display text-2xl font-extrabold text-cream-soft">DOFFA<span className="text-teal">.</span></span>
-            <p className="text-xs uppercase tracking-[0.3em] text-cream/40">Espresso Bar · Since {TOKEN.since}</p>
+            <p className="text-xs uppercase tracking-[0.3em] text-cream/40">{ECOSYSTEM.primaryGameName} · Since {TOKEN.since}</p>
+            <div className="mt-2 flex flex-wrap items-center justify-center gap-5 text-xs font-semibold">
+              <Link href="/game" className="text-gold transition hover:text-amber">⚔️ {t.tabs.game}</Link>
+              <a href={GAME_URL} target="_blank" rel="noopener noreferrer" className="text-gold transition hover:text-amber">
+                @{ECOSYSTEM.game.botUsername} ↗
+              </a>
+            </div>
           </div>
           <div className="gold-line mx-auto my-8 h-px max-w-md" />
           <p className="mx-auto max-w-3xl text-center text-[11px] leading-relaxed text-cream/40">{t.legal}</p>

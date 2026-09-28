@@ -12,6 +12,14 @@ export type FetchJsonOptions = {
   revalidate: number;
   timeoutMs?: number;
   headers?: Record<string, string>;
+  /**
+   * Не кэшировать вовсе. Нужно там, где ответ решает, пускать человека или нет:
+   * закэшированный ответ проверки — это проверка, которая однажды перестаёт
+   * проверять.
+   */
+  noStore?: boolean;
+  /** Подмена fetch для проверок: сеть в тестах не нужна и вредна. */
+  fetchImpl?: typeof fetch;
 };
 
 /**
@@ -22,10 +30,11 @@ export async function fetchJson(url: string, opts: FetchJsonOptions): Promise<un
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), opts.timeoutMs ?? DEFAULT_TIMEOUT_MS);
   try {
-    const res = await fetch(url, {
+    const выполнить = opts.fetchImpl ?? fetch;
+    const res = await выполнить(url, {
       signal: controller.signal,
       headers: { accept: "application/json", ...(opts.headers ?? {}) },
-      next: { revalidate: opts.revalidate },
+      ...(opts.noStore ? { cache: "no-store" as const } : { next: { revalidate: opts.revalidate } }),
     });
     if (!res.ok) return null;
     return (await res.json()) as unknown;

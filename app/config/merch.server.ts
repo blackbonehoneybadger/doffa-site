@@ -32,14 +32,12 @@ export const MERCH_SERVER = {
   /** Секрет платёжного провайдера (fiat). null → провайдер не подключён. */
   paymentProviderSecret: envStr(process.env.MERCH_PAYMENT_PROVIDER_SECRET),
 
-  /** Адрес-получатель платежей в DOFFA. Приватный ключ здесь НЕ хранится. */
+  /** Адрес-получатель платежей в DOFF (TON). Приватный ключ здесь НЕ хранится. */
   doffaReceiverAddress: envStr(process.env.DOFFA_PAYMENT_RECEIVER_ADDRESS),
 
-  /** Ключ провайдера цены DOFFA (котировки). */
+  /** Ключ провайдера цены DOFF (котировки). */
   doffaPriceProviderApiKey: envStr(process.env.DOFFA_PRICE_PROVIDER_API_KEY),
 
-  /** RPC для серверной проверки Solana-транзакций. */
-  solanaRpc: envStr(process.env.SOLANA_RPC) ?? "https://api.mainnet-beta.solana.com",
 } as const;
 
 /** Готовность интеграций (сервер сам решает, что реально работает). */

@@ -38,10 +38,4 @@ export const INTEGRATIONS = {
     enabled: (process.env.FX_RATES_ENABLED ?? "true").trim() !== "false",
     baseCurrency: envStr(process.env.FX_BASE_CURRENCY) ?? "RUB",
   },
-  price: {
-    // Котировки SOL и $DOFFA. Ключ необязателен (публичный источник работает
-    // без него) — переменная та же, что уже заведена под маркетплейс.
-    apiKey: envStr(process.env.DOFFA_PRICE_PROVIDER_API_KEY),
-    enabled: (process.env.TOKEN_PRICE_ENABLED ?? "true").trim() !== "false",
-  },
 } as const;

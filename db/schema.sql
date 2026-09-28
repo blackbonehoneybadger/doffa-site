@@ -1,4 +1,8 @@
--- Схема пользователей DOFFA: вход по Solana-кошельку, профиль, лояльность кофейни.
+-- Схема пользователей DOFFA: вход по кошельку TON, профиль, лояльность кофейни.
+--
+-- wallet_address хранит СЫРОЙ адрес TON вида «0:9a1b…». Человекочитаемых форм
+-- у одного адреса несколько (UQ… и EQ… — это один и тот же кошелёк), и ключ по
+-- ним однажды не узнал бы вернувшегося человека.
 -- Применяется один раз через scripts/migrate.mjs (см. README) или вручную в
 -- Vercel → Storage → выбранная база → Query.
 
@@ -288,7 +292,7 @@ create table if not exists merch_payments (
   provider_ref text,
   amount_cents bigint,
   doffa_amount_base numeric,        -- сумма в минимальных единицах DOFFA (с учётом decimals)
-  tx_signature text,                -- подпись Solana-транзакции
+  tx_signature text,                -- хэш транзакции в сети
   status text not null default 'pending'
     check (status in ('pending','confirmed','failed','refunded')),
   created_at timestamptz not null default now(),

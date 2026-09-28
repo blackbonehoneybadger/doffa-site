@@ -3,16 +3,32 @@
 // внешние данные (кошелёк, подпись, никнейм, URL видео) валидировались реально.
 import { z } from "zod";
 
+/**
+ * Сырой адрес TON: «0:9a1b…» или «-1:9a1b…». Человекочитаемую форму (UQ…, EQ…)
+ * здесь не принимаем: у одного адреса их несколько, и сравнивать по ним значит
+ * однажды не узнать вернувшегося человека.
+ */
 export const walletSchema = z
   .string()
   .trim()
-  .regex(/^[1-9A-HJ-NP-Za-km-z]{32,44}$/, "Некорректный адрес кошелька");
+  .regex(/^-?\d+:[0-9a-fA-F]{64}$/, "Некорректный адрес кошелька");
 
-export const nonceRequestSchema = z.object({ wallet: walletSchema });
-
+/**
+ * Тело входа через TON Connect. Длины ограничены сверху не для красоты: без
+ * предела сюда прилетит мегабайт, который придётся разбирать и хэшировать.
+ */
 export const verifyRequestSchema = z.object({
-  token: z.string().min(1).max(1024),
-  signature: z.string().min(1).max(512),
+  address: walletSchema,
+  publicKey: z.string().trim().regex(/^[0-9a-fA-F]{64}$/, "Некорректный публичный ключ"),
+  proof: z.object({
+    timestamp: z.number().int().positive(),
+    domain: z.object({
+      lengthBytes: z.number().int().positive().max(255),
+      value: z.string().min(1).max(255),
+    }),
+    payload: z.string().min(1).max(256),
+    signature: z.string().min(1).max(256),
+  }),
 });
 
 export const profilePatchSchema = z.object({
