@@ -11,9 +11,16 @@ import { ThemeToggle } from "./theme-toggle";
 import { Assistant } from "./assistant";
 import { WeatherChip } from "./WeatherChip";
 
-// Фон первого экрана — живой ролик арены «Медная обжарочная» из самой игры.
-// Владелец может подменить его через /admin (api/hero-video), как и раньше.
-const DEFAULT_HERO_VIDEO = "/brand/game/arena-roastery.webm";
+// Фон первого экрана — анимационный трейлер DOFFA DRAKA, 1080p: все 11 бойцов.
+// Концевая карточка ролика (логотип, @doffadrakabot) обрезана решением
+// владельца: она наезжала на заголовок главной, а название и кнопка «Играть»
+// и так стоят поверх видео. Идёт по кругу без звука — со звуком браузеры сами
+// не запускают.
+// WebM (VP9) легче, MP4 (H.264) — для Safari на старых iPhone. Владелец может
+// подменить ролик через /admin (api/hero-video), как и раньше.
+const DEFAULT_HERO_VIDEO = "/brand/game/trailer-hero.webm";
+const DEFAULT_HERO_VIDEO_MP4 = "/brand/game/trailer-hero.mp4";
+const DEFAULT_HERO_POSTER = "/brand/game/trailer-poster.jpg";
 
 // Фонд наград — рабочий запас DOFF на игровые награды. Берётся из
 // централизованной конфигурации, а не из отдельной константы. 0 означает
@@ -346,22 +353,28 @@ export default function Home() {
       <section id="top" className="theme-pin-dark relative flex min-h-screen items-end overflow-hidden sm:items-center">
         <motion.video
           key={heroVideo}
-          src={heroVideo}
+          src={heroVideo === DEFAULT_HERO_VIDEO ? undefined : heroVideo}
           autoPlay
           muted
           loop
           playsInline
-          poster="/brand/game/fight-roastery.jpg"
+          poster={DEFAULT_HERO_POSTER}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1.4, ease: "easeOut" }}
-          // Видео 720p растянуто на весь экран через object-cover — при апскейле
-          // центр кадра (низкоконтрастные окна/стены) выглядит мягче, чем края
-          // с высококонтрастной вывеской. Лёгкая коррекция контраста/резкости
-          // компенсирует этот эффект без обрезки или замены самого файла.
+          // Видео растянуто на весь экран через object-cover и прикрыто
+          // затемнением для текста — лёгкая коррекция контраста и насыщенности
+          // возвращает рисунку яркость под этим затемнением.
           style={{ filter: "contrast(1.08) saturate(1.12) brightness(1.02)" }}
           className="absolute inset-0 h-full w-full object-cover object-center [image-rendering:-webkit-optimize-contrast]"
-        />
+        >
+          {heroVideo === DEFAULT_HERO_VIDEO && (
+            <>
+              <source src={DEFAULT_HERO_VIDEO} type="video/webm" />
+              <source src={DEFAULT_HERO_VIDEO_MP4} type="video/mp4" />
+            </>
+          )}
+        </motion.video>
         {/* затемнение для читаемости текста */}
         <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/55 to-ink/30" />
         <div className="absolute inset-0 bg-ink/20" />
